@@ -1,0 +1,11 @@
+---
+platform: linux
+
+image: docker:///ubuntu#14.04
+
+inputs:
+- name: bosh
+- name: cpi-release
+
+run:
+	path: bosh/bat/ci/tasks/run-bats.sh

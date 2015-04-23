@@ -1,0 +1,37 @@
+resources:
+  - name: bosh
+    type: git
+    source:
+      uri: https://github.com/cloudfoundry/bosh.git
+      branch: concourse-ci
+
+  - name: aws-cpi
+    type: git
+    source:
+      uri: https://github.com/cloudfoundry-incubator/bosh-aws-cpi-release.git
+      branch: master
+
+  - name: openstack-cpi
+    type: git
+    source:
+      uri: https://github.com/cloudfoundry-incubator/bosh-openstack-cpi-release.git
+      branch: master
+
+jobs:
+  - name: bats-aws-cpi
+    plan:
+      - aggregate:
+        - get: bosh
+        - get: cpi-release
+          resource: aws-cpi
+      - task: run-bats
+        file: bosh/bat/ci/tasks/run-bats.yml
+
+  - name: bats-openstack-cpi
+    plan:
+      - aggregate:
+        - get: bosh
+        - get: cpi-release
+          resource: openstack-cpi
+      - task: run-bats
+        file: bosh/bat/ci/tasks/run-bats.yml
