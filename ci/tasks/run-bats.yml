@@ -8,4 +8,4 @@ inputs:
 - name: cpi-release
 
 run:
-	path: bosh/bat/ci/tasks/run-bats.sh
+  path: bosh/bat/ci/tasks/run-bats.sh
