@@ -3,7 +3,7 @@
 set -e -x
 
 basedir=$PWD
-boshdir=$basedir/bosh
+boshdir=$basedir/bosh-src
 initdir=$basedir/bosh-init
 initver=$(cat $initdir/version)
 initexe="bosh-init-$(initver)-linux-amd64"
@@ -25,4 +25,4 @@ bundle exec bosh create release \
 
 echo "deploying microbosh..."
 cd $basedir
-$initexe deploy $manifest_path stemcell/stemcell.tgz cpi-release/dev_releases/**/*.tgz
+$initexe deploy $manifest_path

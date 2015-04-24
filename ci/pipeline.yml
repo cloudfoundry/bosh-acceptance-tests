@@ -1,25 +1,30 @@
 resources:
-  - name: bosh
+  - name: bosh-src
     type: git
     source:
-      uri:                https://github.com/cloudfoundry/bosh.git
-      branch:             concourse-ci
+      uri: https://github.com/cloudfoundry/bosh.git
+      branch: concourse-ci
+
+  - name: bosh-release
+    type: bosh-io-release
+    source:
+      repository: cloudfoundry/bosh
 
   - name: bosh-init
     type: s3
     source:
-      regexp:             bosh-init-(2\.0\.7)-linux-amd64
-      bucket:             {{aws_s3_release_bucket}}
-      region_name:        {{aws_s3_release_bucket_region}}
-      access_key_id:      {{aws_s3_release_bucket_access_key}}
-      secret_access_key:  {{aws_s3_release_bucket_secret_key}}
+      regexp: bosh-init-(2\.0\.7)-linux-amd64
+      bucket: {{aws_s3_release_bucket}}
+      region_name: {{aws_s3_release_bucket_region}}
+      access_key_id: {{aws_s3_release_bucket_access_key}}
+      secret_access_key: {{aws_s3_release_bucket_secret_key}}
 
   - name: bosh-deployments
     type: git
     source:
-      uri:                git@github.com:cloudfoundry/deployments-bosh.git
-      branch:             master
-      private_key:        {{github_private_key}}
+      uri: git@github.com:cloudfoundry/deployments-bosh.git
+      branch: master
+      private_key: {{github_private_key}}
 
   - name: aws-cpi
     type: git
@@ -42,12 +47,13 @@ jobs:
   - name: bats-aws-cpi
     plan:
       - aggregate:
-        - get: bosh
+        - get: bosh-src
         - get: bosh-init
         - get: bosh-deployments
+        - get: bosh-release
         - get: cpi-release
           resource: aws-cpi
-        - get: stemcell
+        - get: stemcell-release
           resource: aws-stemcell
       - task: deploy-microbosh
         file: bosh/bat/ci/tasks/deploy-microbosh.yml

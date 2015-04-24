@@ -1,14 +1,15 @@
 ---
 platform: linux
 
-image: docker:///ubuntu#14.04
+image: docker:///bosh/init
 
 inputs:
-- name: bosh
+- name: bosh-src
 - name: bosh-init
 - name: bosh-deployments
+- name: bosh-release
 - name: cpi-release
-- name: stemcell
+- name: stemcell-release
 
 run:
   path: bosh/bat/ci/tasks/deploy-microbosh.sh
