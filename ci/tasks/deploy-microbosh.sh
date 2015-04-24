@@ -2,13 +2,27 @@
 
 set -e -x
 
-dir=$PWD
+basedir=$PWD
+boshdir=$basedir/bosh
+initdir=$basedir/bosh-init
+initver=$(cat $initdir/version)
+initexe="bosh-init-$(initver)-linux-amd64"
 
-echo "working dir: `pwd`"
-ls -la *
+export PATH=$initdir:$PATH
+export BUNDLE_GEMFILE=$boshdir/Gemfile
 
-echo "manifest: $manifest_path"
-cat $manifest_path
+chmod +x $initdir/$initexe
 
+echo "building CPI release..."
+cd cpi-release
+bundle exec bosh create release \
+  --name cpi-release            \
+  --version 0.0.0               \
+  --with-tarball                \
+  --force                       \
+  --final                       \
+  --non-interactive
 
-export PATH=$dir/bosh-init:$PATH
+echo "deploying microbosh..."
+cd $basedir
+$initexe deploy $manifest_path stemcell/stemcell.tgz cpi-release/dev_releases/**/*.tgz

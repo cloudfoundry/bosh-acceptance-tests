@@ -8,7 +8,7 @@ resources:
   - name: bosh-init
     type: s3
     source:
-      regexp:             bosh-init-2\.0\.7-linux-amd64
+      regexp:             bosh-init-(2\.0\.7)-linux-amd64
       bucket:             {{aws_s3_release_bucket}}
       region_name:        {{aws_s3_release_bucket_region}}
       access_key_id:      {{aws_s3_release_bucket_access_key}}
@@ -27,6 +27,11 @@ resources:
       uri: https://github.com/cloudfoundry-incubator/bosh-aws-cpi-release.git
       branch: master
 
+  - name: aws-stemcell
+    type: bosh-io-stemcell
+    source:
+      name: light-bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+
   - name: openstack-cpi
     type: git
     source:
@@ -42,6 +47,8 @@ jobs:
         - get: bosh-deployments
         - get: cpi-release
           resource: aws-cpi
+        - get: stemcell
+          resource: aws-stemcell
       - task: deploy-microbosh
         file: bosh/bat/ci/tasks/deploy-microbosh.yml
         config:

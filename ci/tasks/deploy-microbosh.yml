@@ -8,6 +8,7 @@ inputs:
 - name: bosh-init
 - name: bosh-deployments
 - name: cpi-release
+- name: stemcell
 
 run:
   path: bosh/bat/ci/tasks/deploy-microbosh.sh
