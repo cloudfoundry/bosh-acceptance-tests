@@ -11,6 +11,3 @@ inputs:
 
 run:
   path: bosh/bat/ci/tasks/deploy-microbosh.sh
-
-params:
-  manifest_path: bosh-deployments/concourse/bats-pipeline/micro-aws.yml

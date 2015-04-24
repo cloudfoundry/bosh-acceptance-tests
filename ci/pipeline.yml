@@ -17,8 +17,9 @@ resources:
   - name: bosh-deployments
     type: git
     source:
-      uri:                https://github.com/cloudfoundry/deployments-bosh.git
-      branch:             concourse-ci
+      uri:                git@github.com:cloudfoundry/deployments-bosh.git
+      branch:             master
+      private_key:        {{github_private_key}}
 
   - name: aws-cpi
     type: git
