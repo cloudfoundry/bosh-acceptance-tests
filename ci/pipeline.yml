@@ -2,8 +2,23 @@ resources:
   - name: bosh
     type: git
     source:
-      uri: https://github.com/cloudfoundry/bosh.git
-      branch: concourse-ci
+      uri:                https://github.com/cloudfoundry/bosh.git
+      branch:             concourse-ci
+
+  - name: bosh-init
+    type: s3
+    source:
+      regexp:             bosh-init-2\.0\.7-linux-amd64
+      bucket:             {{aws_s3_release_bucket}}
+      region_name:        {{aws_s3_release_bucket_region}}
+      access_key_id:      {{aws_s3_release_bucket_access_key}}
+      secret_access_key:  {{aws_s3_release_bucket_secret_key}}
+
+  - name: bosh-deployments
+    type: git
+    source:
+      uri:                https://github.com/cloudfoundry/deployments-bosh.git
+      branch:             concourse-ci
 
   - name: aws-cpi
     type: git
@@ -22,16 +37,30 @@ jobs:
     plan:
       - aggregate:
         - get: bosh
+        - get: bosh-init
+        - get: bosh-deployments
         - get: cpi-release
           resource: aws-cpi
+      - task: deploy-microbosh
+        file: bosh/bat/ci/tasks/deploy-microbosh.yml
+        config:
+          params:
+            manifest_path: bosh-deployments/concourse/bats-pipeline/micro-aws.yml
       - task: run-bats
         file: bosh/bat/ci/tasks/run-bats.yml
 
-  - name: bats-openstack-cpi
-    plan:
-      - aggregate:
-        - get: bosh
-        - get: cpi-release
-          resource: openstack-cpi
-      - task: run-bats
-        file: bosh/bat/ci/tasks/run-bats.yml
+  # - name: bats-openstack-cpi
+  #   plan:
+  #     - aggregate:
+  #       - get: bosh
+  #       - get: bosh-init
+  #       - get: bosh-deployments
+  #       - get: cpi-release
+  #         resource: openstack-cpi
+  #     - task: deploy-microbosh
+  #       file: bosh/bat/ci/tasks/deploy-microbosh.yml
+  #       config:
+  #         params:
+  #           manifest_path: bosh-deployments/concourse/bats-pipeline/micro-openstack.yml
+  #     - task: run-bats
+  #       file: bosh/bat/ci/tasks/run-bats.yml

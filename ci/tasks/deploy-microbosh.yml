@@ -1,0 +1,16 @@
+---
+platform: linux
+
+image: docker:///ubuntu#14.04
+
+inputs:
+- name: bosh
+- name: bosh-init
+- name: bosh-deployments
+- name: cpi-release
+
+run:
+  path: bosh/bat/ci/tasks/deploy-microbosh.sh
+
+params:
+  manifest_path: bosh-deployments/concourse/bats-pipeline/micro-aws.yml
