@@ -48,13 +48,13 @@ jobs:
     plan:
       - aggregate:
         - get: bosh-src
-        - get: bosh-init
-        - get: bosh-deployments
-        - get: bosh-release
-        - get: cpi-release
-          resource: aws-cpi
-        - get: stemcell-release
-          resource: aws-stemcell
+        # - get: bosh-init
+        # - get: bosh-deployments
+        # - get: bosh-release
+        # - get: cpi-release
+        #   resource: aws-cpi
+        # - get: stemcell-release
+        #   resource: aws-stemcell
       - task: deploy-microbosh
         file: bosh/bat/ci/tasks/deploy-microbosh.yml
         config:

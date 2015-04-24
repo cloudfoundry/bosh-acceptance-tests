@@ -3,6 +3,9 @@
 set -e -x
 
 basedir=$PWD
+
+ls -la
+
 boshdir=$basedir/bosh-src
 initdir=$basedir/bosh-init
 initver=$(cat $initdir/version)
