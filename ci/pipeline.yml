@@ -56,12 +56,12 @@ jobs:
         # - get: stemcell-release
         #   resource: aws-stemcell
       - task: deploy-microbosh
-        file: bosh/bat/ci/tasks/deploy-microbosh.yml
+        file: bosh-src/bat/ci/tasks/deploy-microbosh.yml
         config:
           params:
             manifest_path: bosh-deployments/concourse/bats-pipeline/micro-aws.yml
       - task: run-bats
-        file: bosh/bat/ci/tasks/run-bats.yml
+        file: bosh-src/bat/ci/tasks/run-bats.yml
 
   # - name: bats-openstack-cpi
   #   plan:
