@@ -9,7 +9,7 @@ ls -la
 boshdir=$basedir/bosh-src
 initdir=$basedir/bosh-init
 initver=$(cat $initdir/version)
-initexe="bosh-init-$(initver)-linux-amd64"
+initexe="bosh-init-${initver}-linux-amd64"
 
 export PATH=$initdir:$PATH
 export BUNDLE_GEMFILE=$boshdir/Gemfile
