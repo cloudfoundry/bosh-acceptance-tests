@@ -15,6 +15,7 @@ export PATH=$initdir:$PATH
 export BUNDLE_GEMFILE=$boshdir/Gemfile
 
 chmod +x $initdir/$initexe
+gem install bundler
 
 echo "building CPI release..."
 cd cpi-release

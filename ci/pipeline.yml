@@ -53,8 +53,8 @@ jobs:
         # - get: bosh-release
         - get: cpi-release
           resource: aws-cpi
-        # - get: stemcell-release
-        #   resource: aws-stemcell
+        - get: stemcell-release
+          resource: aws-stemcell
       - task: deploy-microbosh
         file: bosh-src/bat/ci/tasks/deploy-microbosh.yml
         config:
