@@ -8,7 +8,7 @@ inputs:
 - name: bosh-init
 - name: bosh-deployments
 # - name: bosh-release
-# - name: cpi-release
+- name: cpi-release
 # - name: stemcell-release
 
 run:

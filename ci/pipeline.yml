@@ -51,8 +51,8 @@ jobs:
         - get: bosh-init
         - get: bosh-deployments
         # - get: bosh-release
-        # - get: cpi-release
-        #   resource: aws-cpi
+        - get: cpi-release
+          resource: aws-cpi
         # - get: stemcell-release
         #   resource: aws-stemcell
       - task: deploy-microbosh
