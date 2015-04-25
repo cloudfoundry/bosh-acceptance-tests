@@ -48,8 +48,8 @@ jobs:
     plan:
       - aggregate:
         - get: bosh-src
-        # - get: bosh-init
-        # - get: bosh-deployments
+        - get: bosh-init
+        - get: bosh-deployments
         # - get: bosh-release
         # - get: cpi-release
         #   resource: aws-cpi
