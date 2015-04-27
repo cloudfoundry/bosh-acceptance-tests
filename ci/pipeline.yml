@@ -48,6 +48,8 @@ jobs:
     plan:
       - aggregate:
         - get: bosh-src
+          params:
+            submodules: none
         - get: bosh-init
         - get: bosh-deployments
         - get: bosh-release
