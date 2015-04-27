@@ -13,7 +13,7 @@ resources:
   - name: bosh-init
     type: s3
     source:
-      regexp: bosh-init-(0\.0\.1)-linux-amd64
+      regexp: bosh-init-([0-9.]+)-linux-amd64
       bucket: {{aws_s3_release_bucket}}
       region_name: {{aws_s3_release_bucket_region}}
       access_key_id: {{aws_s3_release_bucket_access_key}}
