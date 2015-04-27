@@ -35,7 +35,7 @@ resources:
   - name: aws-stemcell
     type: bosh-io-stemcell
     source:
-      name: light-bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+      name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
 
   - name: openstack-cpi
     type: git
@@ -50,7 +50,7 @@ jobs:
         - get: bosh-src
         - get: bosh-init
         - get: bosh-deployments
-        # - get: bosh-release
+        - get: bosh-release
         - get: cpi-release
           resource: aws-cpi
         - get: stemcell-release
