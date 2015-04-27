@@ -12,6 +12,7 @@ initver=$(cat $initdir/version)
 initexe="bosh-init-${initver}-linux-amd64"
 
 export PATH=$initdir:$PATH
+export BUNDLER_GEMFILE=$boshdir/Gemfile
 
 chmod +x $initdir/$initexe
 # gem install bosh_cli --no-ri --no-rdoc
