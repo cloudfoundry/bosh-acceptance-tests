@@ -24,10 +24,7 @@ bundle install
 bundle exec bosh create release \
   --name cpi-release            \
   --version 0.0.0               \
-  --with-tarball                \
-  --force                       \
-  --final                       \
-  --non-interactive
+  --with-tarball
 
 echo "deploying microbosh..."
 cd $basedir
