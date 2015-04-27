@@ -12,7 +12,7 @@ initver=$(cat $initdir/version)
 initexe="bosh-init-${initver}-linux-amd64"
 
 export PATH=$initdir:$PATH
-export BUNDLER_GEMFILE=$boshdir/Gemfile
+export BUNDLE_GEMFILE=$boshdir/Gemfile
 
 chmod +x $initdir/$initexe
 # gem install bosh_cli --no-ri --no-rdoc
@@ -20,6 +20,7 @@ gem install bundler --no-ri --no-rdoc
 
 echo "building CPI release..."
 cd cpi-release
+bundle install
 bundle exec bosh create release \
   --name cpi-release            \
   --version 0.0.0               \
