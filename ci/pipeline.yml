@@ -1,4 +1,7 @@
 resources:
+  # TODO: replace this with:
+  # 1. bosh_cli installed on the Docker image.
+  # 2. the bats (acceptance) pulled out to a separate repo.
   - name: bosh-src
     type: git
     source:
@@ -10,7 +13,7 @@ resources:
     source:
       repository: cloudfoundry/bosh
 
-  - name: bosh-init
+  - name: bosh-init-exe
     type: s3
     source:
       regexp: bosh-init-([0-9.]+)-linux-amd64
@@ -48,14 +51,21 @@ jobs:
     plan:
       - aggregate:
         - get: bosh-src
+          trigger: false
           params:
             submodules: none
         - get: bosh-init
+          trigger: false
+          resource: bosh-init-exe
         - get: bosh-deployments
+          trigger: false
         - get: bosh-release
+          trigger: false
         - get: cpi-release
+          trigger: false
           resource: aws-cpi
         - get: stemcell-release
+          trigger: false
           resource: aws-stemcell
       - task: deploy-microbosh
         privileged: true
