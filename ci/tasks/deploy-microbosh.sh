@@ -29,3 +29,7 @@ bundle exec bosh create release \
 echo "deploying BOSH..."
 cd $basedir
 $initexe deploy $manifest_path
+
+echo "WAAAAT"
+cd /tmp/build/src/bosh-deployments/concourse/bats-pipeline/
+git status
