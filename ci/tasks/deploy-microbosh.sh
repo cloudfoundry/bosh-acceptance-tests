@@ -26,12 +26,16 @@ bundle exec bosh create release \
   --version 0.0.0               \
   --with-tarball
 
-echo "deploying BOSH..."
+echo "destroying existing BATS something something"
+bosh
 cd $basedir
+echo "destroying existing BOSH..."
+$initexe delete $manifest_path
+echo "deploying BOSH..."
 $initexe deploy $manifest_path
 
 echo "checking in BOSH deployment state"
 cd $basedir/bosh-deployments
 git checkout master
 git add concourse/bats-pipeline/*.json
-git commit -m ":airplane: Concourse auto-updating deployment state for bats pipeline"
+git commit -m ":airplane: Concourse auto-updating deployment state for bats pipeline" --author="bosh-ci <cf-bosh-eng+bosh-ci@pivotal.io>"
