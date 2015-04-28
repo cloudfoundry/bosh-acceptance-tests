@@ -19,7 +19,7 @@ chmod +x $initdir/$initexe
 gem install bundler --no-ri --no-rdoc
 
 echo "building CPI release..."
-cd cpi-release
+cd $basedir/cpi-release
 bundle install
 bundle exec bosh create release \
   --name cpi-release            \
@@ -30,6 +30,8 @@ echo "deploying BOSH..."
 cd $basedir
 $initexe deploy $manifest_path
 
-echo "WAAAAT"
-cd /tmp/build/src/bosh-deployments/concourse/bats-pipeline/
-git status
+echo "checking in BOSH deployment state"
+cd $basedir/bosh-deployments
+git checkout master
+git add concourse/bats-pipeline/*.json
+git commit -m ":airplane: Concourse auto-updating deployment state for bats pipeline"
