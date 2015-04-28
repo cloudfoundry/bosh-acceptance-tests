@@ -73,6 +73,10 @@ jobs:
         config:
           params:
             manifest_path: bosh-deployments/concourse/bats-pipeline/micro-aws.yml
+      - put: bosh-deployments
+        params:
+          repository: bosh-deployments
+          rebase: true
       - task: run-bats
         file: bosh-src/bat/ci/tasks/run-bats.yml
 

@@ -26,6 +26,6 @@ bundle exec bosh create release \
   --version 0.0.0               \
   --with-tarball
 
-echo "deploying microbosh..."
+echo "deploying BOSH..."
 cd $basedir
 $initexe deploy $manifest_path
