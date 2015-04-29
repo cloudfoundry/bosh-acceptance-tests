@@ -50,23 +50,19 @@ jobs:
   - name: bats-aws-cpi
     plan:
       - aggregate:
-        - get: bosh-src
-          trigger: false
-          params:
-            submodules: none
-        - get: bosh-init
-          trigger: false
-          resource: bosh-init-exe
-        - get: bosh-deployments
-          trigger: false
-        - get: bosh-release
-          trigger: false
-        - get: cpi-release
-          resource: aws-cpi
-        - get: stemcell-release
-          trigger: false
-          resource: aws-stemcell
+        - {get: bosh-src, trigger: false, params: {submodules: none}}
+        - {get: bosh-init, trigger: false, resource: bosh-init-exe}
+        - {get: bosh-deployments, trigger: false}
+        - {get: bosh-release, trigger: false}
+        - {get: cpi-release, resource: aws-cpi}
+        - {get: stemcell, trigger: false, resource: aws-stemcell}
       # - task: clean
+      - task: build-cpi
+        privileged: true
+        file: bosh-src/bat/ci/tasks/build-cpi.yml
+        config:
+          params:
+            CPI_RELEASE_NAME: bosh-aws-cpi
       - task: deploy-bosh
         privileged: true
         file: bosh-src/bat/ci/tasks/deploy-bosh.yml
@@ -79,6 +75,11 @@ jobs:
           rebase: true
       - task: run-bats
         file: bosh-src/bat/ci/tasks/run-bats.yml
+        config:
+          params:
+            BAT_INFRASTRUCTURE: aws
+            BAT_NETWORKING: manual
+            BAT_VCAP_PRIVATE_KEY_PATH: bosh-deployments/bosh-ci/config/id_rsa_no_password
 
   # - name: bats-openstack-cpi
   #   plan:

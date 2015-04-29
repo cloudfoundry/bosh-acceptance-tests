@@ -7,7 +7,16 @@ cd cpi-release
 echo "working dir: `pwd`"
 echo "...contains: `ls -la`"
 
-# bundle exec rake spec:system:existing_micro[aws,xen,ubuntu,trusty,manual,go,true,raw]
+env
+
+export BAT_DEPLOYMENT_SPEC=
+export BAT_DIRECTOR= 
+export BAT_DNS_HOST= 
+export BAT_STEMCELL= 
+export BAT_VCAP_PRIVATE_KEY=
+export BAT_VCAP_PASSWORD='c1oudc0w'
+
+# bundle exec rake spec:system:existing_micro[aws,xen,ubuntu,trusty,manual,go,true,raw
 # NOTE: would require that we place artifacts at something like...
 # /tmp/ci-artifacts/aws/manual/ubuntu/trusty/go/deployments
 # WORKING/ci-artifacts/aws/manual/ubuntu/trusty/go/deployments
@@ -18,7 +27,7 @@ echo "...contains: `ls -la`"
 # task :existing_micro, [
 # 	:infrastructure_name, :hypervisor_name,
 # 	:operating_system_name, :operating_system_version,
-#   :net_type, :agent_name, :light, :disk_format] do |_, args|
+#   :net_type, :agent_name, :light, :disk_format do |_, args|
 # Bosh::Dev::BatHelper.for_rake_args(args).run_bats
 
 # Bosh::Dev::Aws::RunnerBuilder.build(artifacts, net_type)
@@ -31,6 +40,6 @@ echo "...contains: `ls -la`"
 #
 # runner.run_bats
 # ... -->
-#   Rake::Task['bat'].invoke
+#   Rake::Task['bat'.invoke
 #   ... -->
 #     Dir.chdir('bat') { exec('rspec', 'spec') }
