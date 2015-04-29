@@ -36,4 +36,7 @@ echo "checking in BOSH deployment state"
 cd $basedir/bosh-deployments
 git checkout master
 git add concourse/bats-pipeline/*.json
-git commit -m ":airplane: Concourse auto-updating deployment state for bats pipeline" --author="bosh-ci <cf-bosh-eng+bosh-ci@pivotal.io>"
+
+git config --global user.email "cf-bosh-eng+bosh-ci@pivotal.io"
+git config --global user.name "bosh-ci"
+git commit -m ":airplane: Concourse auto-updating deployment state for bats pipeline"
