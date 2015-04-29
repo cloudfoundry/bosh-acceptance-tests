@@ -62,20 +62,20 @@ jobs:
         - get: bosh-release
           trigger: false
         - get: cpi-release
-          trigger: false
           resource: aws-cpi
         - get: stemcell-release
           trigger: false
           resource: aws-stemcell
-      - task: deploy-microbosh
+      # - task: clean
+      - task: deploy-bosh
         privileged: true
-        file: bosh-src/bat/ci/tasks/deploy-microbosh.yml
+        file: bosh-src/bat/ci/tasks/deploy-bosh.yml
         config:
           params:
-            manifest_path: bosh-deployments/concourse/bats-pipeline/micro-aws.yml
+            manifest_path: bosh-deployments/concourse/bats-pipeline/bosh-aws-manifest.yml
       - put: bosh-deployments
         params:
-          repository: deploy-microbosh/bosh-deployments
+          repository: deploy-bosh/bosh-deployments
           rebase: true
       - task: run-bats
         file: bosh-src/bat/ci/tasks/run-bats.yml

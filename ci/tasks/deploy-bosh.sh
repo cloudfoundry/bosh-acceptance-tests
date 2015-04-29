@@ -26,17 +26,18 @@ bundle exec bosh create release \
   --version 0.0.0               \
   --with-tarball
 
-cd $basedir
 echo "destroying existing BOSH..."
+cd $basedir
 $initexe delete $manifest_path
+
 echo "deploying BOSH..."
+cd $basedir
 $initexe deploy $manifest_path
 
 echo "checking in BOSH deployment state"
 cd $basedir/bosh-deployments
 git checkout master
 git add concourse/bats-pipeline/*.json
-
 git config --global user.email "cf-bosh-eng+bosh-ci@pivotal.io"
 git config --global user.name "bosh-ci"
 git commit -m ":airplane: Concourse auto-updating deployment state for bats pipeline"

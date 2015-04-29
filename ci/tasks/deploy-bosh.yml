@@ -12,4 +12,4 @@ inputs:
 - name: stemcell-release
 
 run:
-  path: bosh-src/bat/ci/tasks/deploy-microbosh.sh
+  path: bosh-src/bat/ci/tasks/deploy-bosh.sh

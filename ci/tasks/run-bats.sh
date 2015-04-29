@@ -10,6 +10,7 @@ echo "...contains: `ls -la`"
 # bundle exec rake spec:system:existing_micro[aws,xen,ubuntu,trusty,manual,go,true,raw]
 # NOTE: would require that we place artifacts at something like...
 # /tmp/ci-artifacts/aws/manual/ubuntu/trusty/go/deployments
+# WORKING/ci-artifacts/aws/manual/ubuntu/trusty/go/deployments
 
 
 # Interesting parts of what actually happens...
