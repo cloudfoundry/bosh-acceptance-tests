@@ -26,8 +26,6 @@ bundle exec bosh create release \
   --version 0.0.0               \
   --with-tarball
 
-echo "destroying existing BATS something something"
-bosh
 cd $basedir
 echo "destroying existing BOSH..."
 $initexe delete $manifest_path
