@@ -63,7 +63,6 @@ jobs:
           params:
             cpi_release_name: bosh-aws-cpi
       - task: deploy-bosh
-        privileged: true
         file: bosh-src/bat/ci/tasks/deploy-bosh.yml
         config:
           params:
