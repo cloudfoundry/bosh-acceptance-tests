@@ -13,4 +13,7 @@ inputs:
 - name: stemcell
 
 run:
-  path: bash -l bosh-src/bat/ci/tasks/deploy-bosh.sh
+  path: bash 
+  args:
+    - -l
+    - bosh-src/bat/ci/tasks/deploy-bosh.sh
