@@ -2,6 +2,9 @@
 
 set -e -x
 
+ls -la
+ls -la bosh-deployments
+
 initver=$(cat bosh-init/version)
 initexe="$PWD/bosh-init/bosh-init-${initver}-linux-amd64"
 chmod +x $initexe
