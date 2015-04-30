@@ -6,6 +6,7 @@ image: docker:///bosh/init
 inputs:
 - name: bosh-src
 - name: bosh-init
+- name: build-cpi
 - name: bosh-deployments
 - name: bosh-release
 - name: cpi-release
