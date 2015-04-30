@@ -1,11 +1,11 @@
 ---
 platform: linux
 
-image: docker:///bosh/init
+image: docker:///bosh/bats
 
 inputs:
 - name: bosh-src
 - name: cpi-release
 
 run:
-  path: bosh-src/bat/ci/tasks/build-cpi.sh
+  path: bash -l bosh-src/bat/ci/tasks/build-cpi.sh

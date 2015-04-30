@@ -58,11 +58,10 @@ jobs:
         - {get: stemcell, trigger: false, resource: aws-stemcell}
       # - task: clean
       - task: build-cpi
-        privileged: true
         file: bosh-src/bat/ci/tasks/build-cpi.yml
         config:
           params:
-            CPI_RELEASE_NAME: bosh-aws-cpi
+            cpi_release_name: bosh-aws-cpi
       - task: deploy-bosh
         privileged: true
         file: bosh-src/bat/ci/tasks/deploy-bosh.yml
@@ -77,10 +76,14 @@ jobs:
         file: bosh-src/bat/ci/tasks/run-bats.yml
         config:
           params:
+            BAT_DEPLOYMENT_SPEC: 
+            BAT_DIRECTOR: 54.85.57.13
+            BAT_DNS_HOST: 54.85.57.13
+            BAT_STEMCELL: stemcell/stemcell.tgz
             BAT_INFRASTRUCTURE: aws
             BAT_NETWORKING: manual
             BAT_VCAP_PRIVATE_KEY_PATH: bosh-deployments/bosh-ci/config/id_rsa_no_password
-
+            BAT_VCAP_PASSWORD: 'c1oudc0w'
   # - name: bats-openstack-cpi
   #   plan:
   #     - aggregate:

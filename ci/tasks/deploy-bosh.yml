@@ -1,7 +1,7 @@
 ---
 platform: linux
 
-image: docker:///bosh/init
+image: docker:///bosh/bats
 
 inputs:
 - name: bosh-src
@@ -13,4 +13,4 @@ inputs:
 - name: stemcell
 
 run:
-  path: bosh-src/bat/ci/tasks/deploy-bosh.sh
+  path: bash -l bosh-src/bat/ci/tasks/deploy-bosh.sh
