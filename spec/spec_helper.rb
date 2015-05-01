@@ -1,4 +1,4 @@
-require 'fakefs/spec_helpers'
+#require 'fakefs/spec_helpers'
 
 SPEC_ROOT = File.expand_path(File.dirname(__FILE__))
 
