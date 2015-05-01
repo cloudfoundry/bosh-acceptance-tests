@@ -2,14 +2,11 @@
 
 set -e -x
 
-cd cpi-release
-
-echo "working dir: `pwd`"
-echo "...contains: `ls -la`"
-
+cd bats
+bundle install
 env
 
-# bundle exec rake spec:system:existing_micro[aws,xen,ubuntu,trusty,manual,go,true,raw
+bundle exec rake spec:system:existing_micro[aws,xen,ubuntu,trusty,manual,go,true,raw
 # NOTE: would require that we place artifacts at something like...
 # /tmp/ci-artifacts/aws/manual/ubuntu/trusty/go/deployments
 # WORKING/ci-artifacts/aws/manual/ubuntu/trusty/go/deployments

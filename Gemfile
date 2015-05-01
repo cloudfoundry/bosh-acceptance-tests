@@ -42,9 +42,9 @@ gem 'net-ssh'
 #  gem 'bosh-stemcell', path: 'bosh-stemcell'
 #  gem 'serverspec'
 #
-#  gem 'rspec', '~> 3.0.0'
-#  gem 'rspec-its'
-#  gem 'rspec-instafail'
+gem 'rspec', '~> 3.0.0'
+gem 'rspec-its'
+gem 'rspec-instafail'
 #
 #  gem 'rubocop', require: false
 #  gem 'parallel_tests'

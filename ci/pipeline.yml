@@ -66,7 +66,7 @@ jobs:
         file: bats/ci/tasks/deploy-bosh.yml
         config:
           params:
-            manifest_path: bosh-deployments/concourse/bats-pipeline/bosh-aws-manifest.yml
+          manifest_path: {{aws_bosh_manifest_path}}
       - put: bosh-deployments
         params:
           repository: deploy-bosh/bosh-deployments
@@ -76,12 +76,12 @@ jobs:
         config:
           params:
             BAT_DEPLOYMENT_SPEC: 
-            BAT_DIRECTOR: 54.85.57.13
-            BAT_DNS_HOST: 54.85.57.13
+            BAT_DIRECTOR: {{aws_bats_director_address}}
+            BAT_DNS_HOST: {{aws_bats_dns_host}}
             BAT_STEMCELL: stemcell/stemcell.tgz
             BAT_INFRASTRUCTURE: aws
             BAT_NETWORKING: manual
-            BAT_VCAP_PRIVATE_KEY_PATH: bosh-deployments/bosh-ci/config/id_rsa_no_password
+            BAT_VCAP_PRIVATE_KEY_PATH: {{bats_vcap_private_key_path}}
             BAT_VCAP_PASSWORD: 'c1oudc0w'
   # - name: bats-openstack-cpi
   #   plan:
