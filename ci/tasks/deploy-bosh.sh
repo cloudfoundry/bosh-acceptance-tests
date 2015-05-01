@@ -7,7 +7,7 @@ initexe="$PWD/bosh-init/bosh-init-${initver}-linux-amd64"
 chmod +x $initexe
 
 echo "deploying BOSH..."
-$initexe deploy --update-if-exists $manifest_path
+$initexe deploy $manifest_path
 
 echo "checking in BOSH deployment state"
 pushd bosh-deployments
