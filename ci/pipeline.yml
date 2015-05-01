@@ -75,7 +75,7 @@ jobs:
         file: bats/ci/tasks/run-bats.yml
         config:
           params:
-            BAT_DEPLOYMENT_SPEC: bosh-deployments
+            BAT_DEPLOYMENT_SPEC: {{aws_bats_manifest_path}}
             BAT_DIRECTOR: {{aws_bats_director_address}}
             BAT_DNS_HOST: {{aws_bats_dns_host}}
             BAT_STEMCELL: stemcell/stemcell.tgz
