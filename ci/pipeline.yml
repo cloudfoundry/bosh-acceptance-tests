@@ -2,11 +2,11 @@ resources:
   # TODO: replace this with:
   # 1. bosh_cli installed on the Docker image.
   # 2. the bats (acceptance) pulled out to a separate repo.
-  - name: bosh-src
+  - name: bats
     type: git
     source:
-      uri: https://github.com/cloudfoundry/bosh.git
-      branch: concourse-ci
+      uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
+      branch: concourse
 
   - name: bosh-release
     type: bosh-io-release
@@ -50,7 +50,7 @@ jobs:
   - name: bats-aws-cpi
     plan:
       - aggregate:
-        - {get: bosh-src, trigger: false, params: {submodules: none}}
+        - {get: bats, trigger: false}
         - {get: bosh-init, trigger: false, resource: bosh-init-exe}
         - {get: bosh-deployments, trigger: false}
         - {get: bosh-release, trigger: false}
@@ -58,12 +58,12 @@ jobs:
         - {get: stemcell, trigger: false, resource: aws-stemcell}
       # - task: clean
       - task: build-cpi
-        file: bosh-src/bat/ci/tasks/build-cpi.yml
+        file: bats/ci/tasks/build-cpi.yml
         config:
           params:
             cpi_release_name: bosh-aws-cpi
       - task: deploy-bosh
-        file: bosh-src/bat/ci/tasks/deploy-bosh.yml
+        file: bats/ci/tasks/deploy-bosh.yml
         config:
           params:
             manifest_path: bosh-deployments/concourse/bats-pipeline/bosh-aws-manifest.yml
@@ -72,7 +72,7 @@ jobs:
           repository: deploy-bosh/bosh-deployments
           rebase: true
       - task: run-bats
-        file: bosh-src/bat/ci/tasks/run-bats.yml
+        file: bats/ci/tasks/run-bats.yml
         config:
           params:
             BAT_DEPLOYMENT_SPEC: 

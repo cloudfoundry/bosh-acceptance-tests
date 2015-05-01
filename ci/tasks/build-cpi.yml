@@ -4,11 +4,11 @@ platform: linux
 image: docker:///bosh/bats
 
 inputs:
-- name: bosh-src
+- name: bats
 - name: cpi-release
 
 run:
   path: bash 
   args:
     - -l
-    - bosh-src/bat/ci/tasks/build-cpi.sh
+    - bats/ci/tasks/build-cpi.sh

@@ -9,13 +9,6 @@ echo "...contains: `ls -la`"
 
 env
 
-export BAT_DEPLOYMENT_SPEC=
-export BAT_DIRECTOR= 
-export BAT_DNS_HOST= 
-export BAT_STEMCELL= 
-export BAT_VCAP_PRIVATE_KEY=
-export BAT_VCAP_PASSWORD='c1oudc0w'
-
 # bundle exec rake spec:system:existing_micro[aws,xen,ubuntu,trusty,manual,go,true,raw
 # NOTE: would require that we place artifacts at something like...
 # /tmp/ci-artifacts/aws/manual/ubuntu/trusty/go/deployments

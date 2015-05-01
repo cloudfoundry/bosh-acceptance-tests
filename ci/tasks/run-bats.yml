@@ -4,7 +4,7 @@ platform: linux
 image: docker:///bosh/bats
 
 inputs:
-- name: bosh-src
+- name: bats
 - name: cpi-release
 - name: stemcell
 
@@ -12,4 +12,4 @@ run:
   path: bash 
   args:
     - -l
-    - bosh-src/bat/ci/tasks/run-bats.sh
+    - bats/ci/tasks/run-bats.sh

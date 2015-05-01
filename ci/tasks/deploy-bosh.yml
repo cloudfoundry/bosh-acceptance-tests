@@ -4,7 +4,7 @@ platform: linux
 image: docker:///bosh/bats
 
 inputs:
-- name: bosh-src
+- name: bats
 - name: bosh-init
 - name: build-cpi
 - name: bosh-deployments
@@ -16,4 +16,4 @@ run:
   path: bash 
   args:
     - -l
-    - bosh-src/bat/ci/tasks/deploy-bosh.sh
+    - bats/ci/tasks/deploy-bosh.sh
