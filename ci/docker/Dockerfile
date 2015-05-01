@@ -28,5 +28,8 @@ RUN rm -rf /tmp/ruby-install
 RUN ruby-install ruby 2.1.2
 RUN echo "chruby 2.1.2" >> /etc/profile.d/chruby.sh
 
+#Bundler
+RUN ["/bin/bash", "-l", "-c", "gem install bundler --no-ri --no-rdoc"]
+
 #BOSH CLI
 RUN ["/bin/bash", "-l", "-c", "gem install bosh_cli --no-ri --no-rdoc"]
