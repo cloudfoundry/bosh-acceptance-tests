@@ -8,8 +8,6 @@ describe Bat::Release do
   let(:release_versions) { %w(FAKE_VERSION_1 FAKE_VERSION_2) }
 
   describe '.from_path' do
-    include FakeFS::SpecHelpers
-
     let(:bat_path) { '/fake/bat/path' }
 
     context 'when there files in the path' do
