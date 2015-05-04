@@ -3,11 +3,10 @@ require 'bat/stemcell'
 require 'fileutils'
 
 describe Bat::Stemcell do
+  pending("make unit tests for Bat helpers use real things")
   subject(:stemcell) { Bat::Stemcell.new('STEMCELL_NAME', 'STEMCELL_NAME') }
 
   describe '.from_path' do
-    include FakeFS::SpecHelpers
-
     let(:fake_tmpdir) { '/fake/tmpdir' }
     let(:stemcell_file_path) { '/fake/path/stemcell.tgz' }
 
