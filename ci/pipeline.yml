@@ -62,11 +62,11 @@ jobs:
         config:
           params:
             cpi_release_name: bosh-aws-cpi
-      - task: deploy-bosh
-        file: bats/ci/tasks/deploy-bosh.yml
-        config:
-          params:
-            manifest_path: {{aws_bosh_manifest_path}}
+#      - task: deploy-bosh
+#        file: bats/ci/tasks/deploy-bosh.yml
+#        config:
+#          params:
+#            manifest_path: {{aws_bosh_manifest_path}}
       - put: bosh-deployments
         params:
           repository: deploy-bosh/bosh-deployments
