@@ -1,4 +1,5 @@
 #require 'fakefs/spec_helpers'
+require 'rspec/its'
 
 SPEC_ROOT = File.expand_path(File.dirname(__FILE__))
 
