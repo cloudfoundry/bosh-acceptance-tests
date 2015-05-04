@@ -67,10 +67,10 @@ jobs:
 #        config:
 #          params:
 #            manifest_path: {{aws_bosh_manifest_path}}
-      - put: bosh-deployments
-        params:
-          repository: deploy-bosh/bosh-deployments
-          rebase: true
+#      - put: bosh-deployments
+#        params:
+#          repository: deploy-bosh/bosh-deployments
+#          rebase: true
       - task: run-bats
         file: bats/ci/tasks/run-bats.yml
         config:
