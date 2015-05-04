@@ -38,7 +38,7 @@ resources:
   - name: aws-stemcell
     type: bosh-io-stemcell
     source:
-      name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+      name: bosh-aws-xen-ubuntu-trusty-go_agent
 
   - name: openstack-cpi
     type: git
@@ -62,15 +62,15 @@ jobs:
         config:
           params:
             cpi_release_name: bosh-aws-cpi
-#      - task: deploy-bosh
-#        file: bats/ci/tasks/deploy-bosh.yml
-#        config:
-#          params:
-#            manifest_path: {{aws_bosh_manifest_path}}
-#      - put: bosh-deployments
-#        params:
-#          repository: deploy-bosh/bosh-deployments
-#          rebase: true
+      - task: deploy-bosh
+        file: bats/ci/tasks/deploy-bosh.yml
+        config:
+          params:
+            manifest_path: {{aws_bosh_manifest_path}}
+     - put: bosh-deployments
+       params:
+         repository: deploy-bosh/bosh-deployments
+         rebase: true
       - task: run-bats
         file: bats/ci/tasks/run-bats.yml
         config:
@@ -78,23 +78,8 @@ jobs:
             BAT_DEPLOYMENT_SPEC: {{aws_bats_manifest_path}}
             BAT_DIRECTOR: {{aws_bats_director_address}}
             BAT_DNS_HOST: {{aws_bats_dns_host}}
-            BAT_STEMCELL: stemcell/stemcell.tgz
+            BAT_STEMCELL: /tmp/build/src/stemcell/stemcell.tgz
             BAT_INFRASTRUCTURE: aws
             BAT_NETWORKING: manual
             BAT_VCAP_PRIVATE_KEY_PATH: {{bats_vcap_private_key_path}}
             BAT_VCAP_PASSWORD: 'c1oudc0w'
-  # - name: bats-openstack-cpi
-  #   plan:
-  #     - aggregate:
-  #       - get: bosh
-  #       - get: bosh-init
-  #       - get: bosh-deployments
-  #       - get: cpi-release
-  #         resource: openstack-cpi
-  #     - task: deploy-microbosh
-  #       file: bosh/bat/ci/tasks/deploy-microbosh.yml
-  #       config:
-  #         params:
-  #           manifest_path: bosh-deployments/concourse/bats-pipeline/micro-openstack.yml
-  #     - task: run-bats
-  #       file: bosh/bat/ci/tasks/run-bats.yml
