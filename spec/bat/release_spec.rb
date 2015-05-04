@@ -9,7 +9,7 @@ describe Bat::Release do
   let(:release_versions) { %w(FAKE_VERSION_1 FAKE_VERSION_2) }
 
   describe '.from_path' do
-    let(:bat_path) { '/fake/bat/path' }
+    let(:bat_path) { '/tmp/fake/bat/path' }
 
     context 'when there files in the path' do
       before do
@@ -68,7 +68,7 @@ describe Bat::Release do
 
     context 'when a third argument is passed' do
       it 'sets path' do
-        expect(Bat::Release.new(nil, nil, '/fake/path').path).to eq('/fake/path')
+        expect(Bat::Release.new(nil, nil, '/tmp/fake/path').path).to eq('/tmp/fake/path')
       end
     end
   end
@@ -85,10 +85,10 @@ describe Bat::Release do
     end
 
     context 'when path is specified' do
-      subject(:release) { Bat::Release.new('FAKE_NAME', release_versions, '/fake/path') }
+      subject(:release) { Bat::Release.new('FAKE_NAME', release_versions, '/tmp/fake/path') }
 
       it 'returns its #path, and #to_s values joined as a YAML file path' do
-        expect(release.to_path).to eq('/fake/path/releases/FAKE_NAME-FAKE_VERSION_2.yml')
+        expect(release.to_path).to eq('/tmp/fake/path/releases/tmp/fake_NAME-FAKE_VERSION_2.yml')
       end
     end
   end
@@ -110,13 +110,13 @@ describe Bat::Release do
   end
 
   describe '#previous' do
-    subject(:release) { Bat::Release.new('FAKE_NAME', release_versions, '/fake/path') }
+    subject(:release) { Bat::Release.new('FAKE_NAME', release_versions, '/tmp/fake/path') }
 
     it 'returns a new Bat::Release whose #versions are missing the last element' do
       previous_release = release.previous
       expect(previous_release.name).to eq('FAKE_NAME')
       expect(previous_release.sorted_versions).to eq(%w(FAKE_VERSION_1))
-      expect(previous_release.path).to eq('/fake/path')
+      expect(previous_release.path).to eq('/tmp/fake/path')
     end
 
     it 'does not change #versions' do
