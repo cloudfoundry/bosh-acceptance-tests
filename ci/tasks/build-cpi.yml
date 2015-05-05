@@ -6,6 +6,7 @@ image: docker:///bosh/bats
 inputs:
 - name: bats
 - name: cpi-release
+- name: bosh-deployments
 
 run:
   path: bash 

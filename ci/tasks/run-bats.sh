@@ -3,7 +3,7 @@
 set -e -x
 
 eval $(ssh-agent)
-ssh-add /tmp/build/src/bosh-deployments/keys/bosh-dev.pub
+ssh-add bosh-deployments/keys/bosh-dev.pub
 
 cd bats
 bundle install
