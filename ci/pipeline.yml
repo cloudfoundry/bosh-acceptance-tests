@@ -81,5 +81,5 @@ jobs:
             BAT_STEMCELL: /tmp/build/src/stemcell/stemcell.tgz
             BAT_INFRASTRUCTURE: aws
             BAT_NETWORKING: manual
-            BAT_VCAP_PRIVATE_KEY_PATH: {{bats_vcap_private_key_path}}
+            BAT_VCAP_PRIVATE_KEY: {{bats_vcap_private_key_path}}
             BAT_VCAP_PASSWORD: 'c1oudc0w'
