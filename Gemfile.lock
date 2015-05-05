@@ -44,6 +44,7 @@ GEM
     builder (3.2.2)
     cf-uaa-lib (3.2.1)
       multi_json
+    diff-lcs (1.2.5)
     excon (0.45.3)
     fission (0.5.0)
       CFPropertyList (~> 2.2)
@@ -151,6 +152,23 @@ GEM
       mini_portile (~> 0.6.0)
     progressbar (0.9.2)
     rake (10.4.2)
+    rspec (3.0.0)
+      rspec-core (~> 3.0.0)
+      rspec-expectations (~> 3.0.0)
+      rspec-mocks (~> 3.0.0)
+    rspec-core (3.0.4)
+      rspec-support (~> 3.0.0)
+    rspec-expectations (3.0.4)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.0.0)
+    rspec-instafail (0.2.6)
+      rspec
+    rspec-its (1.2.0)
+      rspec-core (>= 3.0.0)
+      rspec-expectations (>= 3.0.0)
+    rspec-mocks (3.0.4)
+      rspec-support (~> 3.0.0)
+    rspec-support (3.0.4)
     ruby-atmos-pure (1.0.5)
       log4r (>= 1.1.9)
       ruby-hmac (>= 0.4.0)
@@ -172,3 +190,6 @@ DEPENDENCIES
   minitar
   net-ssh
   rake (~> 10.0)
+  rspec (~> 3.0.0)
+  rspec-instafail
+  rspec-its
