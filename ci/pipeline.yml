@@ -1,7 +1,4 @@
 resources:
-  # TODO: replace this with:
-  # 1. bosh_cli installed on the Docker image.
-  # 2. the bats (acceptance) pulled out to a separate repo.
   - name: bats
     type: git
     source:
@@ -40,21 +37,15 @@ resources:
     source:
       name: bosh-aws-xen-ubuntu-trusty-go_agent
 
-  - name: openstack-cpi
-    type: git
-    source:
-      uri: https://github.com/cloudfoundry-incubator/bosh-openstack-cpi-release.git
-      branch: master
-
 jobs:
   - name: bats-aws-cpi
     plan:
       - aggregate:
+        - {get: cpi-release, resource: aws-cpi}
         - {get: bats, trigger: false}
         - {get: bosh-init, trigger: false, resource: bosh-init-exe}
         - {get: bosh-deployments, trigger: false}
         - {get: bosh-release, trigger: false}
-        - {get: cpi-release, resource: aws-cpi}
         - {get: stemcell, trigger: false, resource: aws-stemcell}
       # - task: clean
       - task: build-cpi
