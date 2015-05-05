@@ -43,7 +43,7 @@ describe Bat::Release do
     end
 
     context 'when there are no files in the path' do
-      before { FileUtils.rm_f(bat_path, force: true) }
+      before { FileUtils.rm_r(bat_path, force: true) }
 
       it 'raises an error' do
         expect {
@@ -88,7 +88,7 @@ describe Bat::Release do
       subject(:release) { Bat::Release.new('FAKE_NAME', release_versions, '/tmp/fake/path') }
 
       it 'returns its #path, and #to_s values joined as a YAML file path' do
-        expect(release.to_path).to eq('/tmp/fake/path/releases/tmp/fake_NAME-FAKE_VERSION_2.yml')
+        expect(release.to_path).to eq('/tmp/fake/path/releases/FAKE_NAME-FAKE_VERSION_2.yml')
       end
     end
   end
