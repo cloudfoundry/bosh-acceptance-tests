@@ -6,8 +6,9 @@ eval $(ssh-agent)
 chmod go-r bosh-deployments/keys/bosh-dev.key
 ssh-add bosh-deployments/keys/bosh-dev.key
 
-bosh login admin admin
 bosh target $BAT_DIRECTOR
+bosh login admin admin
+
 export BAT_DEPLOYMENT_SPEC=$PWD/bats_config.yml
 cat << EOF > $BAT_DEPLOYMENT_SPEC
 ---
