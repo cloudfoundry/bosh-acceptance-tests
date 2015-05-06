@@ -7,7 +7,9 @@ chmod go-r bosh-deployments/keys/bosh-dev.key
 ssh-add bosh-deployments/keys/bosh-dev.key
 
 bosh target $BAT_DIRECTOR
-bosh login admin admin
+export BOSH_USER="admin"
+export BOSH_PASSWORD="admin"
+bosh login
 
 export BAT_DEPLOYMENT_SPEC=$PWD/bats_config.yml
 cat << EOF > $BAT_DEPLOYMENT_SPEC
