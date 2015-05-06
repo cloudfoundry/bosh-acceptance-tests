@@ -47,7 +47,6 @@ jobs:
         - {get: bosh-deployments, trigger: false}
         - {get: bosh-release, trigger: false}
         - {get: stemcell, trigger: false, resource: aws-stemcell}
-      # - task: clean
       - task: build-cpi
         file: bats/ci/tasks/build-cpi.yml
         config:
@@ -58,10 +57,10 @@ jobs:
         config:
           params:
             manifest_path: {{aws_bosh_manifest_path}}
-     - put: bosh-deployments
-       params:
-         repository: deploy-bosh/bosh-deployments
-         rebase: true
+      - put: bosh-deployments
+        params:
+          repository: deploy-bosh/bosh-deployments
+          rebase: true
       - task: run-bats
         file: bats/ci/tasks/run-bats.yml
         config:
