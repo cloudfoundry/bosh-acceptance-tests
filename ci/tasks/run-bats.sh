@@ -2,9 +2,12 @@
 
 set -e -x
 
+export BAT_VCAP_PRIVATE_KEY=$PWD/bosh-dev.key
+
 eval $(ssh-agent)
-chmod go-r bosh-deployments/keys/bosh-dev.key
-ssh-add bosh-deployments/keys/bosh-dev.key
+echo $aws_bats_ssh_private_key > $BAT_VCAP_PRIVATE_KEY
+chmod go-r $BAT_VCAP_PRIVATE_KEY
+ssh-add $BAT_VCAP_PRIVATE_KEY
 
 bosh -n target $BAT_DIRECTOR
 
