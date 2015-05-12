@@ -17,12 +17,3 @@ $initexe delete $manifest_path
 
 echo "deploying BOSH..."
 $initexe deploy $manifest_path
-
-echo "checking in BOSH deployment state"
-pushd bosh-deployments
-git checkout master
-git add concourse/bats-pipeline/*.json
-git config --global user.email "cf-bosh-eng+bosh-ci@pivotal.io"
-git config --global user.name "bosh-ci"
-git commit -m ":airplane: Concourse auto-updating deployment state for bats pipeline"
-popd
