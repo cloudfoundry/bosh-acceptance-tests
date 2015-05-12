@@ -5,7 +5,7 @@ set -e -x
 export BAT_VCAP_PRIVATE_KEY=$PWD/bosh-dev.key
 
 eval $(ssh-agent)
-echo $aws_bats_ssh_private_key > $BAT_VCAP_PRIVATE_KEY
+echo "$aws_bats_ssh_private_key" > $BAT_VCAP_PRIVATE_KEY
 chmod go-r $BAT_VCAP_PRIVATE_KEY
 ssh-add $BAT_VCAP_PRIVATE_KEY
 
