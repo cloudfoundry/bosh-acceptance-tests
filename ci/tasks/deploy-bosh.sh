@@ -12,10 +12,11 @@ initver=$(cat bosh-init/version)
 initexe="$PWD/bosh-init/bosh-init-${initver}-linux-amd64"
 chmod +x $initexe
 
-manifest_path=bosh-deployments/concourse/$cpi_release_name/director-manifest.yml
+manifest_dir=bosh-deployments/concourse/$cpi_release_name
+manifest_filename=$manifest_dir/director-manifest.yml
 
 echo "deleting existing BOSH Director VM..."
-$initexe delete $manifest_path
+$initexe delete $manifest_filename
 
 echo "deploying BOSH..."
-$initexe deploy $manifest_path
+$initexe deploy $manifest_filename

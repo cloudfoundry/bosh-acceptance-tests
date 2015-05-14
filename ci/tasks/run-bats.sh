@@ -14,9 +14,15 @@ set -x
 chmod go-r $BAT_VCAP_PRIVATE_KEY
 ssh-add $BAT_VCAP_PRIVATE_KEY
 
-bosh -n target $BAT_DIRECTOR
-
+export BAT_DIRECTOR=54.85.57.13
+export BAT_DNS_HOST=54.85.57.13
+export BAT_STEMCELL=/tmp/build/src/stemcell/stemcell.tgz
+export BAT_INFRASTRUCTURE=aws
+export BAT_NETWORKING=manual
+export BAT_VCAP_PASSWORD='c1oudc0w'
 export BAT_DEPLOYMENT_SPEC=$PWD/bats_config.yml
+
+bosh -n target $BAT_DIRECTOR
 cat << EOF > $BAT_DEPLOYMENT_SPEC
 ---
 cpi: aws
