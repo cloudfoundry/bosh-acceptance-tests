@@ -14,8 +14,8 @@ set -x
 chmod go-r $BAT_VCAP_PRIVATE_KEY
 ssh-add $BAT_VCAP_PRIVATE_KEY
 
-export BAT_DIRECTOR=54.172.219.114
-export BAT_DNS_HOST=54.172.219.114
+export BAT_DIRECTOR=52.4.218.25
+export BAT_DNS_HOST=52.4.218.25
 export BAT_STEMCELL=/tmp/build/src/stemcell/stemcell.tgz
 export BAT_INFRASTRUCTURE=aws
 export BAT_NETWORKING=manual
@@ -27,7 +27,7 @@ cat << EOF > $BAT_DEPLOYMENT_SPEC
 ---
 cpi: aws
 properties:
-  vip: 54.172.90.227
+  vip: 52.6.255.151
   second_static_ip: 10.10.0.30
   uuid: $(bosh status --uuid)
   pool_size: 1
@@ -44,7 +44,7 @@ properties:
       reserved: [10.10.0.2-10.10.0.9]
       static: [10.10.0.10-10.10.0.30]
       gateway: 10.10.0.1
-      subnet: subnet-b1ea9a99
+      subnet: subnet-beba20e7
       security_groups: [bat]
 EOF
 
