@@ -45,7 +45,7 @@ properties:
       static: [10.0.0.10-10.0.0.30]
       gateway: 10.0.0.1
       subnet: subnet-beba20e7
-      security_groups: [bat]
+      security_groups: [bats]
 EOF
 
 cd bats
