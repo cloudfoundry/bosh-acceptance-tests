@@ -28,7 +28,7 @@ cat << EOF > $BAT_DEPLOYMENT_SPEC
 cpi: aws
 properties:
   vip: 52.6.255.151
-  second_static_ip: 10.10.0.30
+  second_static_ip: 10.0.0.30
   uuid: $(bosh status --uuid)
   pool_size: 1
   stemcell:
@@ -38,12 +38,12 @@ properties:
   key_name:  bosh-dev
   networks:
     - name: default
-      static_ip: 10.10.0.29
+      static_ip: 10.0.0.29
       type: manual
-      cidr: 10.10.0.0/24
-      reserved: [10.10.0.2-10.10.0.9]
-      static: [10.10.0.10-10.10.0.30]
-      gateway: 10.10.0.1
+      cidr: 10.0.0.0/24
+      reserved: [10.0.0.2-10.0.0.9]
+      static: [10.0.0.10-10.0.0.30]
+      gateway: 10.0.0.1
       subnet: subnet-beba20e7
       security_groups: [bat]
 EOF
