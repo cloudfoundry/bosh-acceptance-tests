@@ -2,7 +2,7 @@
 
 set -e -x
 
-export BAT_VCAP_PRIVATE_KEY=$PWD/bosh-dev.key
+export BAT_VCAP_PRIVATE_KEY=$PWD/private.key
 
 eval $(ssh-agent)
 
@@ -35,7 +35,7 @@ properties:
     name: bosh-aws-xen-ubuntu-trusty-go_agent
     version: latest
   instances: 1
-  key_name:  bosh-dev
+  key_name:  bats
   networks:
     - name: default
       static_ip: 10.0.0.29
