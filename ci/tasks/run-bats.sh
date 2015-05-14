@@ -32,7 +32,7 @@ properties:
   uuid: $(bosh status --uuid)
   pool_size: 1
   stemcell:
-    name: bosh-aws-xen-ubuntu-trusty-go_agent
+    name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
     version: latest
   instances: 1
   key_name:  bats
