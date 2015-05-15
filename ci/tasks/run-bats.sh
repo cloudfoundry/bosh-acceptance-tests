@@ -8,7 +8,7 @@ eval $(ssh-agent)
 chmod go-r $BAT_VCAP_PRIVATE_KEY
 ssh-add $BAT_VCAP_PRIVATE_KEY
 
-bosh target $BAT_DIRECTOR
+bosh -n target $BAT_DIRECTOR
 
 sed -i.bak s/"uuid: replace-me"/"uuid: $(bosh status --uuid)"/ $BAT_DEPLOYMENT_SPEC
 
