@@ -13,7 +13,7 @@ initexe="$PWD/bosh-init/bosh-init-${initver}-linux-amd64"
 chmod +x $initexe
 
 manifest_dir=bosh-deployments/concourse/$cpi_release_name
-manifest_filename=$manifest_dir/director-manifest.yml
+manifest_filename=$manifest_dir/$base_os-director-manifest.yml
 
 echo "deleting existing BOSH Director VM..."
 $initexe delete $manifest_filename
