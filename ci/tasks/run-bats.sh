@@ -2,7 +2,7 @@
 
 set -e -x
 
-source bosh-deployments/concourse/$cpi_release_name/$base_os-exports.sh
+source deployments-bosh/concourse/$cpi_release_name/$base_os-exports.sh
 
 eval $(ssh-agent)
 chmod go-r $BAT_VCAP_PRIVATE_KEY
