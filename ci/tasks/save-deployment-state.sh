@@ -2,7 +2,7 @@
 
 set -e -x
 
-manifest_dir=deployments-bosh/concourse/$cpi_release_name
+manifest_dir=bosh-concourse-ci/pipelines/$cpi_release_name
 
 echo "checking in BOSH deployment state"
 cd deploy-bosh/$manifest_dir
