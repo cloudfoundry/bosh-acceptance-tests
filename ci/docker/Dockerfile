@@ -13,7 +13,7 @@ RUN apt-get install -y git curl wget tar make
 RUN apt-get clean
 
 # chruby
-RUN mkdir /tmp/chruby 
+RUN mkdir /tmp/chruby
 RUN cd /tmp && curl https://codeload.github.com/postmodern/chruby/tar.gz/v0.3.9 | tar -xz
 RUN cd /tmp/chruby-0.3.9 && sudo ./scripts/setup.sh
 RUN rm -rf /tmp/chruby
