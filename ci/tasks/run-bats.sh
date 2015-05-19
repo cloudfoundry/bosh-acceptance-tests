@@ -2,6 +2,9 @@
 
 set -e -x
 
+source /etc/profile.d/chruby.sh
+chruby 2.1.2
+
 source bosh-concourse-ci/pipelines/$cpi_release_name/$base_os-exports.sh
 
 eval $(ssh-agent)
