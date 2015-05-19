@@ -2,6 +2,9 @@
 
 set -e -x
 
+source /etc/profile.d/chruby.sh
+chruby 2.1.2
+
 semver=`cat version-semver/number`
 
 echo "normalizing cpi release filename to value referenced in $manifest_path"
