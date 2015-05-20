@@ -52,7 +52,7 @@ resource "aws_route_table_association" "rta" {
 }
 
 resource "aws_security_group" "bats_sg" {
-  name = "bats_sg"
+  name = "bats_sg-${var.build_id}"
   description = "allows local and concourse traffic"
   vpc_id = "${aws_vpc.vpc.id}"
 
@@ -109,4 +109,20 @@ resource "aws_eip" "director_vip" {
 
 resource "aws_eip" "bats_vip" {
     vpc = true
+}
+
+output "director_vip" {
+    value = "${aws_eip.director_vip.public_ip}"
+}
+
+output "bats_vip" {
+    value = "${aws_eip.bats_vip.public_ip}"
+}
+
+output "subnet_id" {
+    value = "${aws_subnet.sn.id}"
+}
+
+output "security_group_name" {
+    value = "${aws_security_group.bats_sg.name}"
 }
