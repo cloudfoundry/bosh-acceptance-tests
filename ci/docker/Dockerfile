@@ -33,3 +33,10 @@ RUN ["/bin/bash", "-l", "-c", "gem install bundler --no-ri --no-rdoc"]
 
 #BOSH CLI
 RUN ["/bin/bash", "-l", "-c", "gem install bosh_cli --no-ri --no-rdoc"]
+
+#Terraform
+RUN ["/bin/bash", "-l", "-c", "mkdir /terraform"]
+RUN ["/bin/bash", "-l", "-c", "sudo apt-get install unzip"]
+RUN ["/bin/bash", "-l", "-c", "wget https://dl.bintray.com/mitchellh/terraform/terraform_0.5.1_linux_amd64.zip"]
+RUN ["/bin/bash", "-l", "-c", "unzip terraform*.zip -d /terraform"]
+RUN ["/bin/bash", "-l", "-c", "rm terraform*.zip"]
