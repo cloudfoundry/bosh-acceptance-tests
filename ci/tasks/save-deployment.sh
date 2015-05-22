@@ -9,4 +9,4 @@ cd deploy/$manifest_dir
 git add $base_os-director-manifest-state.json
 git config --global user.email "cf-bosh-eng+bosh-ci@pivotal.io"
 git config --global user.name "bosh-ci"
-git commit -m ":airplane: Concourse auto-updating deployment state for bats pipeline"
+git commit -m ":airplane: Concourse auto-updating deployment state for bats pipeline, on $base_os"
