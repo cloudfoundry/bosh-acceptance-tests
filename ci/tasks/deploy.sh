@@ -2,6 +2,20 @@
 
 set -e -x
 
+ls -la ./stemcell
+
+ensure_not_replace_value() {
+  local name=$1
+  local value=$(eval echo '$'$name)
+  if [ "$value" == 'replace-me' ]; then
+    echo "environment variable $name must be set"
+    exit 1
+  fi
+}
+
+ensure_not_replace_value base_os
+ensure_not_replace_value cpi_release_name
+
 source /etc/profile.d/chruby.sh
 chruby 2.1.2
 
