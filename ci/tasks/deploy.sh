@@ -2,8 +2,6 @@
 
 set -e -x
 
-ls -la ./stemcell
-
 ensure_not_replace_value() {
   local name=$1
   local value=$(eval echo '$'$name)
