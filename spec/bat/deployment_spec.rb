@@ -3,6 +3,7 @@ require 'bat/deployment'
 require 'fileutils'
 
 describe Bat::Deployment do
+  pending("refactor Bat helper tests to be moar better")
   subject(:deployment) { Bat::Deployment.new('FAKE_DEPLOYMENT_SPEC') }
 
   # Make sure mktmpdir is always same but unique

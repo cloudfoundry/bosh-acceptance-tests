@@ -3,13 +3,12 @@ require 'bat/stemcell'
 require 'fileutils'
 
 describe Bat::Stemcell do
+  pending("make unit tests for Bat helpers use real things")
   subject(:stemcell) { Bat::Stemcell.new('STEMCELL_NAME', 'STEMCELL_NAME') }
 
   describe '.from_path' do
-    include FakeFS::SpecHelpers
-
-    let(:fake_tmpdir) { '/fake/tmpdir' }
-    let(:stemcell_file_path) { '/fake/path/stemcell.tgz' }
+    let(:fake_tmpdir) { '/tmp/fake/tmpdir' }
+    let(:stemcell_file_path) { '/tmp/fake/path/stemcell.tgz' }
 
     before do
       FileUtils.mkdir_p(fake_tmpdir)
@@ -65,7 +64,7 @@ describe Bat::Stemcell do
 
     context 'with four arguments' do
       it 'sets path' do
-        expect(Bat::Stemcell.new(nil, nil, nil, '/fake/path/stemcell.tgz').path).to eq('/fake/path/stemcell.tgz')
+        expect(Bat::Stemcell.new(nil, nil, nil, '/tmp/fake/path/stemcell.tgz').path).to eq('/tmp/fake/path/stemcell.tgz')
       end
     end
   end
