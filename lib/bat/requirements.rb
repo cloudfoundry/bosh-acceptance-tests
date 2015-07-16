@@ -45,11 +45,11 @@ module Bat
       @logger.info("Starting cleanup #{what}")
       case what
         when Bat::Stemcell
-          if @bosh_api.stemcells.include?(what.name)
+          if @bosh_api.stemcells.include?(what)
             expect(@bosh_runner.bosh_safe("delete stemcell #{what.name} #{what.version}")).to succeed
           end
         when Bat::Release
-          if @bosh_api.releases.include?(what.name)
+          if @bosh_api.releases.include?(what)
             expect(@bosh_runner.bosh_safe("delete release #{what.name}")).to succeed
           end
         when Bat::Deployment
