@@ -12,6 +12,7 @@ module Bat
 
     OPTIONAL_VARS = {
       vcap_private_key:     'BAT_VCAP_PRIVATE_KEY',
+      debug_mode:           'BAT_DEBUG_MODE',
     }.freeze
 
     def self.from_env

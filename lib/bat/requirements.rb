@@ -2,10 +2,11 @@ module Bat
   class Requirements
     include RSpec::Matchers
 
-    def initialize(stemcell_path, bosh_runner, bosh_api, logger)
+    def initialize(stemcell_path, bosh_runner, bosh_api, spec_state, logger)
       @stemcell_path = stemcell_path
       @bosh_runner = bosh_runner
       @bosh_api = bosh_api
+      @spec_state = spec_state
       @logger = logger
     end
 
@@ -42,6 +43,11 @@ module Bat
     end
 
     def cleanup(what)
+      if @spec_state.skip_cleanup?
+        @logger.info("Skipping cleanup #{what}")
+        return
+      end
+
       @logger.info("Starting cleanup #{what}")
       case what
         when Bat::Stemcell
@@ -98,6 +104,9 @@ module Bat
         expect(@bosh_runner.bosh_safe("deployment #{what.to_path}")).to succeed
         expect(@bosh_runner.bosh_safe('deploy')).to succeed
       end
+    rescue
+      @spec_state.register_fail
+      raise
     end
   end
 end
