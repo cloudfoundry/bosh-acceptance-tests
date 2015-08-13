@@ -41,6 +41,10 @@ module Bat
       @env.bat_infrastructure == 'warden'
     end
 
+    def azure?
+      @env.bat_infrastructure == 'azure'
+    end
+
     def compiled_package_cache?
       info = @bosh_api.info
       info['features'] && info['features']['compiled_package_cache']
