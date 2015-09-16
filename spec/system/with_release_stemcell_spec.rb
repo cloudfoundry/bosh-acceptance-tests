@@ -162,11 +162,6 @@ describe 'with release and stemcell and two deployments' do
         end
         expect(ssh(public_ip, 'vcap', "cat #{SAVE_FILE}", @our_ssh_options)).to match /foobar/
       end
-
-      xit 'should rename a job' do
-        expect(bosh('rename job batlight batfoo')).to succeed_with /Rename successful/
-        expect(bosh('vms')).to succeed_with /batfoo/
-      end
     end
   end
 end
