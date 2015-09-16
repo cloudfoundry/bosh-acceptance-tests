@@ -8,7 +8,7 @@ releases:
 
 compilation:
   workers: 1
-  network: static
+  network: default
   reuse_compilation_vms: true
   cloud_properties:
     ram: 1024
@@ -42,7 +42,7 @@ networks:
 
 resource_pools:
   - name: common
-    network: static
+    network: default
     size: <%= properties.pool_size %>
     stemcell:
       name: <%= properties.stemcell.name %>
@@ -70,6 +70,9 @@ jobs:
     networks:
       <% properties.job_networks.each_with_index do |network, i| %>
       - name: <%= network.name %>
+        <% if i == 0 %>
+        default: [dns, gateway]
+        <% end %>
         <% if properties.use_static_ip %>
         static_ips:
         - <%= network.static_ip %>
