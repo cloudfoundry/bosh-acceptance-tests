@@ -22,7 +22,7 @@ class BatsVerboseFormatter < RSpec::Core::Formatters::BaseTextFormatter
   private
 
   def format(verb, example, appended_content = nil)
-    "Bats example #{verb} '#{example.full_description.strip}' #{example.location}#{appended_content ? " " + appended_content : ''}"
+    "BATs example #{verb} '#{example.full_description.strip}' #{example.location}#{appended_content ? " " + appended_content : ''}"
   end
 
   def started_output(example)
