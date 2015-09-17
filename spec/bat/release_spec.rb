@@ -3,7 +3,6 @@ require 'bat/release'
 require 'fileutils'
 
 describe Bat::Release do
-  pending("make Bat helpers use real things")
   subject(:release) { Bat::Release.new(release_name, release_versions) }
   let(:release_name) { 'FAKE_NAME' }
   let(:release_versions) { %w(FAKE_VERSION_1 FAKE_VERSION_2) }
