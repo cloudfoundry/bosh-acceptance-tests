@@ -59,6 +59,10 @@ module Bat
       (name =~ /openstack/ && name =~ /ubuntu/ && name =~ /go_agent/) || (name =~ /vsphere/ && name =~ /go_agent/)
     end
 
+    def supports_raw_ephemeral_storage?
+      name =~ /aws/
+    end
+
     def ==(other)
       to_s == other.to_s
     end

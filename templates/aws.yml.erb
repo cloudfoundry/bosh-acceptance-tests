@@ -71,6 +71,9 @@ resource_pools:
       <% if properties.key_name %>
       key_name: <%= properties.key_name %>
       <% end %>
+      <% if properties.raw_instance_storage %>
+      raw_instance_storage: <%= properties.raw_instance_storage %>
+      <% end %>
     <% if properties.password %>
     env:
       bosh:

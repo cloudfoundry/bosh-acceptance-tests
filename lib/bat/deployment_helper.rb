@@ -151,6 +151,10 @@ module Bat
       end
     end
 
+    def use_raw_instance_storage
+      @spec['properties']['raw_instance_storage'] = 'true'
+    end
+
     def use_persistent_disk(size)
       @spec['properties']['persistent_disk'] = size
     end
