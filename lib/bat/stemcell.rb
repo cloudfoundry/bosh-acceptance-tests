@@ -35,7 +35,7 @@ module Bat
     end
 
     def supports_network_reconfiguration?
-      name !~ /vcloud/ && name !~ /warden/
+      !(name =~ /vcloud/ && name =~ /centos/) && name !~ /warden/
     end
 
     def sudo_command
