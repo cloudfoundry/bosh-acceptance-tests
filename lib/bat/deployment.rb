@@ -28,7 +28,7 @@ module Bat
     def generate_deployment_manifest(spec)
       puts "Generating deployment manifest with input:\n#{spec.to_yaml}"
       @context = Bosh::Template::EvaluationContext.new(spec)
-      erb = ERB.new(load_template(@context.spec.cpi))
+      erb = ERB.new(load_template(spec['manifest_template_path'], @context.spec.cpi))
       result = erb.result(@context.get_binding)
       begin
         @yaml = YAML.load(result)
@@ -51,8 +51,13 @@ module Bat
       @path = manifest.path
     end
 
-    def load_template(cpi)
-      template = File.expand_path("../../../templates/#{cpi}.yml.erb", __FILE__)
+    def load_template(path, cpi)
+      if (path)
+        template = File.expand_path(path, File.expand_path("../../../", __FILE__))
+      else
+        template = File.expand_path("../../../templates/#{cpi}.yml.erb", __FILE__)
+      end
+
       File.read(template)
     end
 
