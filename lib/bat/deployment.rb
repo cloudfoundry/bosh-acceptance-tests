@@ -52,8 +52,8 @@ module Bat
     end
 
     def load_template(path, cpi)
-      if (path)
-        template = File.expand_path(path, File.expand_path("../../../", __FILE__))
+      if path
+        template = path
       else
         template = File.expand_path("../../../templates/#{cpi}.yml.erb", __FILE__)
       end
