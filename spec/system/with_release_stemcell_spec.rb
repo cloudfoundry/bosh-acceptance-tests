@@ -109,26 +109,6 @@ describe 'with release and stemcell and two deployments' do
       end
     end
 
-    it 'should do two deployments from one release' do
-      skip "This fails on AWS VPC because use_static_ip only sets the eip but doesn't prevent collision" if aws?
-      skip "This fails on OpenStack because use_static_ip only sets the floating IP but doesn't prevent collision" if openstack?
-      skip "This fails on Warden because use_static_ip only sets the floating IP but doesn't prevent collision" if warden?
-
-      # second deployment can't use static IP or elastic IP or there will be a collision with the first deployment
-      no_static_ip
-      no_vip
-      use_deployment_name('bat2')
-      with_deployment do
-        expect(@bosh_api.deployments).to include('bat2')
-      end
-      # Not sure why these are necessary since the before(:all) should call them
-      # before setting up future deployments. But without these, the state leaks
-      # into subsequent tests.
-      use_deployment_name('bat')
-      use_static_ip
-      use_vip
-    end
-
     it 'should use job colocation', ssh: true do
       @jobs.each do |job|
         grep_cmd = "ps -ef | grep #{job} | grep -v grep"
