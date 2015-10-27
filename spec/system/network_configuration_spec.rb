@@ -47,7 +47,7 @@ describe 'network configuration' do
     end
   end
 
-  describe 'changing instance DNS (exercises configure_networks CPI method)' do
+  describe 'changing instance DNS' do
     before do
       skip 'director not configured with dns' unless dns?
       unless @requirements.stemcell.supports_network_reconfiguration?
