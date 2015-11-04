@@ -105,6 +105,8 @@ module Bat
       @spec['properties']['use_vip'] = false
     end
 
+    # Not necessarily a *public* ip, as it may fall back to
+    # the static ip which is actually private.
     def public_ip
       # For AWS and OpenStack, the elastic IP is the public IP
       # For vSphere and vCloud, the static_ip is the public IP
@@ -121,6 +123,10 @@ module Bat
 
     def static_ip
       static_ips.first
+    end
+
+    def vip
+      @spec['properties']['vip']
     end
 
     def static_ips

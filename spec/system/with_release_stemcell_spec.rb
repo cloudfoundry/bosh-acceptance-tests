@@ -116,11 +116,11 @@ describe 'with release and stemcell and two deployments' do
       end
     end
 
-    it 'should deploy using a static network', ssh: true do
-      skip "doesn't work on AWS as the VIP IP isn't visible to the VM" if aws?
-      skip "doesn't work on OpenStack as the VIP IP isn't visible to the VM" if openstack?
-      skip "doesn't work on Warden as the VIP IP isn't visible to eth0" if warden?
-      expect(ssh(public_ip, 'vcap', '/sbin/ifconfig eth0', @our_ssh_options)).to match /#{static_ip}/
+    it 'should use VIP network', focus: true do
+      skip "VIP network isn't supported" unless @requirements.stemcell.supports_vip?
+
+      expect(vip).not_to be_nil
+      expect(ssh(vip, 'vcap', '/sbin/ifconfig eth0', @our_ssh_options)).to match /#{static_ip}/
     end
 
     context 'second deployment' do
