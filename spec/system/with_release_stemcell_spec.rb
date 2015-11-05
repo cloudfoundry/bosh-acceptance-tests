@@ -1,6 +1,6 @@
 require 'system/spec_helper'
 
-describe 'with release and stemcell and two deployments' do
+describe 'with release and stemcell and subsequent deployments' do
   before(:all) do
     @requirements.requirement(@requirements.release)
     @requirements.requirement(@requirements.stemcell)
@@ -72,7 +72,7 @@ describe 'with release and stemcell and two deployments' do
     end
   end
 
-  context 'first deployment' do
+  context 'with ephemeral and persistent disk' do
     before(:all) do
       reload_deployment_spec
       # using password 'foobar'
@@ -86,10 +86,9 @@ describe 'with release and stemcell and two deployments' do
       ]
       use_job('colocated')
       use_templates(%w[batarang batlight])
-
       use_persistent_disk(2048)
 
-      @first_deployment_result = @requirements.requirement(deployment, @spec)
+      @requirements.requirement(deployment, @spec)
     end
 
     after(:all) do
@@ -116,14 +115,19 @@ describe 'with release and stemcell and two deployments' do
       end
     end
 
-    it 'should use VIP network', focus: true do
-      skip "VIP network isn't supported" unless @requirements.stemcell.supports_vip?
+    it 'should have network access to the vm using the manual static ip' do
+      expect(static_ip).not_to be_nil
+      expect(ssh_sudo(director_ip, 'vcap', "ping -qc1 #{static_ip}; echo $?", ssh_options)).to end_with("0\n")
+    end
+
+    it 'should have network access to the vm using the vip' do
+      skip "vip network isn't supported" unless @requirements.stemcell.supports_vip?
 
       expect(vip).not_to be_nil
       expect(ssh(vip, 'vcap', '/sbin/ifconfig eth0', @our_ssh_options)).to match /#{static_ip}/
     end
 
-    context 'second deployment' do
+    context 'changing the persistent disk size' do
       SAVE_FILE = '/var/vcap/store/batarang/save'
 
       before(:all) do
@@ -132,7 +136,7 @@ describe 'with release and stemcell and two deployments' do
           @size = persistent_disk(public_ip, 'vcap', @our_ssh_options)
         end
         use_persistent_disk(4096)
-        @second_deployment_result = @requirements.requirement(deployment, @spec, force: true)
+        @requirements.requirement(deployment, @spec, force: true)
       end
 
       it 'should migrate disk contents', ssh: true do

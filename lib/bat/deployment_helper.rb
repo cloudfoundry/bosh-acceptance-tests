@@ -97,6 +97,10 @@ module Bat
       @spec.fetch('properties', {}).fetch('name', 'bat')
     end
 
+    def director_ip
+      @env.director
+    end
+
     def use_vip
       @spec['properties']['use_vip'] = true
     end
