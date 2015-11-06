@@ -110,23 +110,6 @@ describe Bat::Stemcell do
     end
   end
 
-  describe '#supports_vip?' do
-    {
-      'bosh-openstack-kvm-centos-go_agent'        => true,
-      'bosh-openstack-kvm-ubuntu-trusty-go_agent' => true,
-      'bosh-aws-xen-ubuntu-trusty-go_agent'       => true,
-      'bosh-aws-xen-centos-7-go_agent'            => true,
-      'bosh-vsphere-esxi-ubuntu-trusty-go_agent'  => false,
-      'bosh-vsphere-esxi-centos-7-go_agent'       => false,
-      'bosh-vcloud-esxi-ubuntu-trusty-go_agent'   => false,
-    }.each do |stemcell_name, expected|
-      it "returns #{expected} for #{stemcell_name}" do
-        stemcell = Bat::Stemcell.new(stemcell_name, nil)
-        expect(stemcell.supports_vip?).to be(expected)
-      end
-    end
-  end
-
   describe '#to_s' do
     it 'returns "<name>-<version>"' do
       expect(stemcell.to_s).to eq('STEMCELL_NAME-STEMCELL_NAME')

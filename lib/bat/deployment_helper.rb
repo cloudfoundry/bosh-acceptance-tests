@@ -129,6 +129,10 @@ module Bat
       static_ips.first
     end
 
+    def includes_vip?
+      !!(@spec['properties']['vip'])
+    end
+
     def vip
       @spec['properties']['vip']
     end

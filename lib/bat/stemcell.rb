@@ -63,10 +63,6 @@ module Bat
       name =~ /aws/
     end
 
-    def supports_vip?
-      !!(name =~ /aws/ || name =~ /openstack/)
-    end
-
     def ==(other)
       to_s == other.to_s
     end

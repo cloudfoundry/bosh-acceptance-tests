@@ -123,7 +123,7 @@ describe 'with release and stemcell and subsequent deployments' do
     end
 
     it 'should have network access to the vm using the vip' do
-      skip "vip network isn't supported" unless @requirements.stemcell.supports_vip?
+      skip "vip network isn't supported" unless includes_vip?
 
       expect(vip).not_to be_nil
       expect(ssh(vip, 'vcap', '/sbin/ifconfig eth0', @our_ssh_options)).to match /#{static_ip}/
