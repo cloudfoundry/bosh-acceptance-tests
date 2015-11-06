@@ -116,6 +116,8 @@ describe 'with release and stemcell and subsequent deployments' do
     end
 
     it 'should have network access to the vm using the manual static ip' do
+      skip "not applicable for dynamic networking" if dynamic_networking?
+
       expect(static_ip).not_to be_nil
       expect(ssh_sudo(director_ip, 'vcap', "ping -qc1 #{static_ip}; echo $?", ssh_options)).to end_with("0\n")
     end

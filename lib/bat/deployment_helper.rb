@@ -189,8 +189,8 @@ module Bat
       @spec['properties']['instance_type'] = @spec['properties']['flavor_with_no_ephemeral_disk']
     end
 
-    def dynamic_network?
-      network_type == 'dynamic'
+    def dynamic_networking?
+      @spec['properties']['networks'].any? { |n| n['type'] == 'dynamic' }
     end
 
     def network_type
