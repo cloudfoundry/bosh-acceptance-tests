@@ -56,12 +56,12 @@ describe 'with release, stemcell and deployment' do
 
   describe 'job' do
     it 'should recreate a job' do
-      expect(bosh_safe('recreate batlight 0')).to succeed_with /batlight\/0 has been recreated/
+      expect(bosh_safe('recreate batlight 0')).to succeed_with /batlight\/0 recreated/
     end
 
     it 'should stop and start a job' do
-      expect(bosh_safe('stop batlight 0')).to succeed_with /batlight\/0 has been stopped/
-      expect(bosh_safe('start batlight 0')).to succeed_with /batlight\/0 has been started/
+      expect(bosh_safe('stop batlight 0')).to succeed_with /batlight\/0 stopped/
+      expect(bosh_safe('start batlight 0')).to succeed_with /batlight\/0 started/
     end
   end
 
