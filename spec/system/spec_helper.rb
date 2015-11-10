@@ -55,6 +55,7 @@ requirements = Bat::Requirements.new(
 RSpec.configure do |config|
   config.include(Bat::BoshHelper)
   config.include(Bat::DeploymentHelper)
+  config.include(Bat::SpecStateHelper)
 
   # inject dependencies into tests
   config.before(:all) do
@@ -81,13 +82,12 @@ RSpec.configure do |config|
   end
 
   if env.debug_mode
+    logger.debug('Debug mode is turned on, failing fast')
     config.fail_fast = true
   end
 
   config.after(:each) do |example|
-    if example.exception
-      @spec_state.register_fail
-    end
+    check_for_failure(spec_state, example)
   end
 end
 

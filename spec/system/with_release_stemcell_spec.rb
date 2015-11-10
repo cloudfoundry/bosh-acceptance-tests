@@ -25,7 +25,8 @@ describe 'with release and stemcell and subsequent deployments' do
       @requirements.requirement(deployment, @spec)
     end
 
-    after do
+    after do |example|
+      check_for_failure(@spec_state, example)
       @requirements.cleanup(deployment)
     end
 
