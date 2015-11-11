@@ -119,15 +119,19 @@ describe 'with release and stemcell and subsequent deployments' do
     it 'should have network access to the vm using the manual static ip' do
       skip "not applicable for dynamic networking" if dynamic_networking?
 
-      expect(static_ip).not_to be_nil
-      expect(ssh_sudo(director_ip, 'vcap', "ping -qc1 #{static_ip}; echo $?", ssh_options)).to end_with("0\n")
+      vm = wait_for_vm('colocated/0')
+      expect(vm).to_not be_nil
+      expect(static_ip).to_not be_nil
+      expect(ssh(public_ip, 'vcap', 'hostname', @our_ssh_options)).to match /#{vm[:agent_id]}/
     end
 
     it 'should have network access to the vm using the vip' do
       skip "vip network isn't supported" unless includes_vip?
 
-      expect(vip).not_to be_nil
-      expect(ssh(vip, 'vcap', '/sbin/ifconfig eth0', @our_ssh_options)).to match /#{static_ip}/
+      vm = wait_for_vm('colocated/0')
+      expect(vm).to_not be_nil
+      expect(vip).to_not be_nil
+      expect(ssh(vip, 'vcap', 'hostname', @our_ssh_options)).to match /#{vm[:agent_id]}/
     end
 
     context 'changing the persistent disk size' do
