@@ -104,7 +104,7 @@ module Bat
         expect(@bosh_runner.bosh_safe("deployment #{what.to_path}")).to succeed
         expect(@bosh_runner.bosh_safe('deploy')).to succeed
       end
-    rescue
+    rescue RSpec::Expectations::ExpectationNotMetError
       @spec_state.register_fail
       raise
     end
