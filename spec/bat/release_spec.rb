@@ -29,14 +29,14 @@ describe Bat::Release do
         bat_dev_releases_dir = File.join(bat_path, 'dev_releases')
         FileUtils.mkdir_p(bat_dev_releases_dir)
 
-        deployment_file = File.join(bat_dev_releases_dir, 'bat-1.1-dev.yml')
+        deployment_file = File.join(bat_dev_releases_dir, 'bat-1.1+dev.yml')
         File.open(deployment_file, 'w') { |f| f.write("CONTENT: #{deployment_file}") }
       end
 
       it 'creates a Release named "bat" with versions found in the path specified' do
         release = Bat::Release.from_path(bat_path)
         expect(release.name).to eq('bat')
-        expect(release.sorted_versions).to eq(%w(0 1 1.1-dev 12))
+        expect(release.sorted_versions).to eq(%w(0 1 1.1+dev 12))
         expect(release.path).to eq(bat_path)
       end
     end

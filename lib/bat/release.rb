@@ -66,7 +66,7 @@ module Bat
     private
 
     def dev?
-      version =~ /-dev$/
+      version =~ /\+dev$/
     end
   end
 end
