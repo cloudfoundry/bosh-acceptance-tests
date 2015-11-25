@@ -25,12 +25,12 @@ describe Bat::BoshHelper do
 
     context 'when both env var BAT_VCAP_PRIVATE_KEY is set' do
       before { allow(env).to receive(:vcap_private_key).and_return('fake_private_key') }
-      its(:ssh_options) { should eq(private_key: 'fake_private_key', password: 'fake_password') }
+      it { expect(bosh_helper.ssh_options).to eq(private_key: 'fake_private_key', password: 'fake_password') }
     end
 
     context 'when BAT_VCAP_PRIVATE_KEY is not set in env' do
       before { allow(env).to receive(:vcap_private_key).and_return(nil) }
-      its(:ssh_options) { should eq(password: 'fake_password', private_key: nil) }
+      it { expect(bosh_helper.ssh_options).to eq(password: 'fake_password', private_key: nil) }
     end
   end
 

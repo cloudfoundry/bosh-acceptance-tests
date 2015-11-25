@@ -4,11 +4,6 @@ cat > "Gemfile" <<EOF
 # encoding: UTF-8
 source 'https://rubygems.org'
 gem 'bosh_common'
-gem 'bosh-core'
-gem 'bosh_cpi'
 gem 'bosh_cli'
-gem 'rake', '~>10.0'
 gem 'rspec', '~> 3.0.0'
-gem 'rspec-its'
-gem 'rspec-instafail'
 EOF
