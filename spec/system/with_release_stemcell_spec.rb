@@ -87,7 +87,8 @@ describe 'with release and stemcell and subsequent deployments' do
       ]
       use_job('colocated')
       use_templates(%w[batarang batlight])
-      use_persistent_disk(2048)
+
+      use_persistent_disk(2048) unless rackhd?
 
       @requirements.requirement(deployment, @spec)
     end
@@ -96,11 +97,12 @@ describe 'with release and stemcell and subsequent deployments' do
       @requirements.cleanup(deployment)
     end
 
-    it 'should set vcap password', ssh: true do
-      expect(ssh_sudo(public_ip, 'vcap', 'whoami', @our_ssh_options)).to eq("root\n")
+    it 'should set vcap password', ssh: true, core: true do
+      ssh_command = "echo #{@env.vcap_password} | sudo -p '' -S whoami"
+      expect(bosh_ssh('colocated', 0, ssh_command).output).to match /root/
     end
 
-    it 'should not change the deployment on a noop' do
+    it 'should not change the deployment on a noop', core: true do
       deployment_result = bosh('deploy')
       events(get_task_id(deployment_result.output)).each do |event|
         if event['stage']
@@ -109,10 +111,10 @@ describe 'with release and stemcell and subsequent deployments' do
       end
     end
 
-    it 'should use job colocation', ssh: true do
+    it 'should use job colocation', ssh: true, core: true do
       @jobs.each do |job|
-        grep_cmd = "ps -ef | grep #{job} | grep -v grep"
-        expect(ssh(public_ip, 'vcap', grep_cmd, @our_ssh_options)).to match /#{job}/
+        ssh_command = "ps -ef | grep #{job} | grep -v grep"
+        expect(bosh_ssh('colocated', 0, ssh_command).output).to match /#{job}/
       end
     end
 
@@ -125,7 +127,7 @@ describe 'with release and stemcell and subsequent deployments' do
       expect(ssh(public_ip, 'vcap', 'hostname', @our_ssh_options)).to match /#{vm[:agent_id]}/
     end
 
-    it 'should have network access to the vm using the vip' do
+    it 'should have network access to the vm using the vip', core: true do
       skip "vip network isn't supported" unless includes_vip?
 
       vm = wait_for_vm('colocated/0')
@@ -140,7 +142,7 @@ describe 'with release and stemcell and subsequent deployments' do
       before(:all) do
         ssh(public_ip, 'vcap', "echo 'foobar' > #{SAVE_FILE}", @our_ssh_options)
         unless warden?
-          @size = persistent_disk(public_ip, 'vcap', @our_ssh_options)
+          @size = persistent_disk('colocated', 0)
         end
         use_persistent_disk(4096)
         @requirements.requirement(deployment, @spec, force: true)
@@ -149,7 +151,7 @@ describe 'with release and stemcell and subsequent deployments' do
       it 'should migrate disk contents', ssh: true do
         # Warden df don't work so skip the persistent disk size check
         unless warden?
-          expect(persistent_disk(public_ip, 'vcap', @our_ssh_options)).to_not eq(@size)
+          expect(persistent_disk('colocated', 0)).to_not eq(@size)
         end
         expect(ssh(public_ip, 'vcap', "cat #{SAVE_FILE}", @our_ssh_options)).to match /foobar/
       end

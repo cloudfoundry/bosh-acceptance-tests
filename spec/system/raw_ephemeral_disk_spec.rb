@@ -1,6 +1,6 @@
 require 'system/spec_helper'
 
-describe 'raw_instance_storage' do
+describe 'raw_instance_storage', core: true do
   before(:all) do
     @requirements.requirement(@requirements.release)
     @requirements.requirement(@requirements.stemcell)

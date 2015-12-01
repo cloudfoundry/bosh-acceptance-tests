@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'bat/deployment'
 require 'fileutils'
 
-describe Bat::Deployment do
+describe Bat::Deployment, core: true do
   subject(:deployment) { Bat::Deployment.new('FAKE_DEPLOYMENT_SPEC') }
 
   # Make sure mktmpdir is always same but unique

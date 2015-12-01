@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'bat/bosh_runner'
 require 'logger'
 
-describe Bat::BoshRunner do
+describe Bat::BoshRunner, core: true do
   describe '#bosh' do
     subject { described_class.new('fake-bosh-exe', 'fake-path-to-bosh-config', logger) }
     let(:logger) { instance_double('Logger', info: nil) }

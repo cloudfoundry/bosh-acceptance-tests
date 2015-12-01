@@ -17,7 +17,7 @@ describe 'network configuration' do
     @requirements.cleanup(deployment)
   end
 
-  describe 'resolving DNS entries' do
+  describe 'resolving DNS entries', core: true do
     before { skip 'director not configured with dns' unless dns? }
 
     let(:dns) { Resolv::DNS.new(nameserver: @env.dns_host) }
@@ -47,7 +47,7 @@ describe 'network configuration' do
     end
   end
 
-  describe 'changing instance DNS' do
+  describe 'changing instance DNS', core: true do
     before do
       skip 'director not configured with dns' unless dns?
       unless @requirements.stemcell.supports_network_reconfiguration?
@@ -76,7 +76,7 @@ describe 'network configuration' do
       skip "not using manual networking" unless manual_networking?
     end
 
-    it 'changes static IP address' do
+    it 'changes static IP address', core: true do
       unless @requirements.stemcell.supports_changing_static_ip?(network_type)
         skip "network reconfiguration does not work for #{@requirements.stemcell}"
       end
@@ -86,7 +86,8 @@ describe 'network configuration' do
       expect(bosh("deployment #{deployment.to_path}")).to succeed
       expect(bosh('deploy')).to succeed
 
-      expect(ssh(public_ip, 'vcap', 'PATH=/sbin:/usr/sbin:$PATH; ifconfig', ssh_options)).to include(second_static_ip)
+      ssh_command = "PATH=/sbin:/usr/sbin:$PATH; ifconfig"
+      expect(bosh_ssh("batlight", 0, ssh_command).output).to include(second_static_ip)
     end
 
     it 'deploys multiple manual networks' do
