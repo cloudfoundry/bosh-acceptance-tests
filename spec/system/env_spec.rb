@@ -1,7 +1,7 @@
 require 'system/spec_helper'
 
 describe 'initialization', :skip_task_check do
-  describe 'environment requirements' do
+  describe 'environment requirements', core: true do
     it 'should have a readable stemcell' do
       expect(File.exist?(@requirements.stemcell.to_path)).to be(true)
     end
@@ -24,7 +24,7 @@ describe 'initialization', :skip_task_check do
     end
   end
 
-  describe 'director' do
+  describe 'director', core: true do
     it 'should be targetable' do
       expect(@bosh_runner.bosh("target #{@env.director}")).to succeed_with /Target \w*\s*set/
     end

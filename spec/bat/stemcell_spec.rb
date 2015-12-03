@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'bat/stemcell'
 require 'fileutils'
 
-describe Bat::Stemcell do
+describe Bat::Stemcell, core: true do
   subject(:stemcell) { Bat::Stemcell.new('STEMCELL_NAME', 'STEMCELL_NAME') }
 
   describe '.from_path' do

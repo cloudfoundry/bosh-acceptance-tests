@@ -3,7 +3,7 @@ require 'bat/env'
 require 'bat/bosh_runner'
 require 'bat/bosh_helper'
 
-describe Bat::BoshHelper do
+describe Bat::BoshHelper, core: true do
   subject(:bosh_helper) do
     Class.new { include Bat::BoshHelper }.new
   end
