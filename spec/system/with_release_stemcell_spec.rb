@@ -7,14 +7,9 @@ describe 'with release and stemcell and subsequent deployments' do
     load_deployment_spec
   end
 
-  context 'with no ephemeral disk' do
+  context 'with no ephemeral disk', root_partition: true do
     before do
-      skip 'only openstack is configurable without ephemeral disk' unless @requirements.stemcell.supports_root_partition?
-
       reload_deployment_spec
-      # using password 'foobar'
-      use_password('$6$tHAu4zCTso$pAQok0MTHP4newel7KMhTzMI4tQrAWwJ.X./fFAKjbWkCb5sAaavygXAspIGWn8qVD8FeT.Z/XN4dvqKzLHhl0')
-      @our_ssh_options = ssh_options.merge(password: 'foobar')
       use_static_ip
       use_vip
       use_job('batlight')
@@ -30,8 +25,8 @@ describe 'with release and stemcell and subsequent deployments' do
       @requirements.cleanup(deployment)
     end
 
-    it 'creates ephemeral and swap partitions on the root device if no ephemeral disk', ssh: true do
-      setting_value = agent_config(public_ip).
+    it 'creates ephemeral and swap partitions on the root device if no ephemeral disk', ssh: true, core: true do
+      setting_value = agent_config().
         fetch('Platform', {}).
         fetch('Linux', {}).
         fetch('CreatePartitionIfNoEphemeralDisk', false)
@@ -39,19 +34,20 @@ describe 'with release and stemcell and subsequent deployments' do
       skip 'root disk ephemeral partition requires a stemcell with CreatePartitionIfNoEphemeralDisk enabled' unless setting_value
 
       # expect ephemeral mount point to be a mounted partition on the root disk
-      expect(mounts(public_ip)).to include(hash_including('path' => '/var/vcap/data'))
+      expect(mounts()).to include(hash_including('path' => '/var/vcap/data'))
 
       # expect swap to be a mounted partition on the root disk
-      expect(swaps(public_ip)).to include(hash_including('type' => 'partition'))
+      expect(swaps()).to include(hash_including('type' => 'partition'))
     end
 
-    def agent_config(ip)
-      output = ssh_sudo(ip, 'vcap', 'cat /var/vcap/bosh/agent.json', @our_ssh_options)
-      JSON.parse(output)
+    def agent_config()
+      output = bosh_ssh('batlight', 0, 'sudo cat /var/vcap/bosh/agent.json').output
+      # regex to extract json file content from bosh response
+      JSON.parse(/\{(?:[^{}]|\g<0>)*\}/.match(output)[0])
     end
 
-    def mounts(ip)
-      output = ssh(ip, 'vcap', 'mount', @our_ssh_options)
+    def mounts()
+      output = bosh_ssh('batlight', 0, 'mount').output
       output.lines.map do |line|
         matches = /(?<point>.*) on (?<path>.*) type (?<type>.*) \((?<options>.*)\)/.match(line)
         next if matches.nil?
@@ -59,8 +55,8 @@ describe 'with release and stemcell and subsequent deployments' do
       end.compact
     end
 
-    def swaps(ip)
-      output = ssh(ip, 'vcap', 'swapon -s', @our_ssh_options)
+    def swaps()
+      output = bosh_ssh('batlight', 0, 'swapon -s').output
       output.lines.to_a[1..-1].map do |line|
         matches = /(?<point>.+)\s+(?<type>.+)\s+(?<size>.+)\s+(?<used>.+)\s+(?<priority>.+)/.match(line)
         next if matches.nil?
@@ -73,12 +69,11 @@ describe 'with release and stemcell and subsequent deployments' do
     end
   end
 
-  context 'with ephemeral and persistent disk' do
+  context 'with persistent disk size changing', persistent_disk: true do
+    SAVE_FILE = '/var/vcap/store/batarang/save'
+
     before(:all) do
       reload_deployment_spec
-      # using password 'foobar'
-      use_password('$6$tHAu4zCTso$pAQok0MTHP4newel7KMhTzMI4tQrAWwJ.X./fFAKjbWkCb5sAaavygXAspIGWn8qVD8FeT.Z/XN4dvqKzLHhl0')
-      @our_ssh_options = ssh_options.merge(password: 'foobar')
       use_static_ip
       use_vip
       @jobs = %w[
@@ -90,17 +85,56 @@ describe 'with release and stemcell and subsequent deployments' do
       use_persistent_disk(2048)
 
       @requirements.requirement(deployment, @spec)
+
+      bosh_ssh('colocated', 0, "echo 'foobar' > #{SAVE_FILE}")
+      unless warden?
+        @size = persistent_disk('colocated', 0)
+      end
+      use_persistent_disk(4096)
+      @requirements.requirement(deployment, @spec, force: true)
     end
 
     after(:all) do
       @requirements.cleanup(deployment)
     end
 
-    it 'should set vcap password', ssh: true do
-      expect(ssh_sudo(public_ip, 'vcap', 'whoami', @our_ssh_options)).to eq("root\n")
+    it 'should migrate disk contents', ssh: true do
+      # Warden df don't work so skip the persistent disk size check
+      unless warden?
+        expect(persistent_disk('colocated', 0)).to_not eq(@size)
+      end
+      expect(bosh_ssh('colocated', 0, "cat #{SAVE_FILE}").output).to match /foobar/
+    end
+  end
+
+  describe 'general stemcell configuration' do
+    before(:all) do
+      reload_deployment_spec
+      # using password 'foobar'
+      use_password('$6$tHAu4zCTso$pAQok0MTHP4newel7KMhTzMI4tQrAWwJ.X./fFAKjbWkCb5sAaavygXAspIGWn8qVD8FeT.Z/XN4dvqKzLHhl0')
+      use_static_ip
+      use_vip
+      @jobs = %w[
+        /var/vcap/packages/batlight/bin/batlight
+        /var/vcap/packages/batarang/bin/batarang
+      ]
+      use_job('colocated')
+      use_templates(%w[batarang batlight])
+
+      @requirements.requirement(deployment, @spec)
     end
 
-    it 'should not change the deployment on a noop' do
+    after(:all) do
+      @requirements.cleanup(deployment)
+    end
+
+    # this test case will not test password for vcap correctly after changing to bosh_ssh.
+    # even with ssh, if we set private_key in our ssh_option, we still failing testing password.
+    it 'should set vcap password', ssh: true, core: true do
+      expect(bosh_ssh('colocated', 0, 'sudo whoami').output).to match /root/
+    end
+
+    it 'should not change the deployment on a noop', core: true do
       deployment_result = bosh('deploy')
       events(get_task_id(deployment_result.output)).each do |event|
         if event['stage']
@@ -109,50 +143,25 @@ describe 'with release and stemcell and subsequent deployments' do
       end
     end
 
-    it 'should use job colocation', ssh: true do
+    it 'should use job colocation', ssh: true, core: true do
       @jobs.each do |job|
-        grep_cmd = "ps -ef | grep #{job} | grep -v grep"
-        expect(ssh(public_ip, 'vcap', grep_cmd, @our_ssh_options)).to match /#{job}/
+        ssh_command = "ps -ef | grep #{job} | grep -v grep"
+        expect(bosh_ssh('colocated', 0, ssh_command).output).to match /#{job}/
       end
     end
 
-    it 'should have network access to the vm using the manual static ip' do
-      skip "not applicable for dynamic networking" if dynamic_networking?
-
+    it 'should have network access to the vm using the manual static ip', manual_networking: true do
       vm = wait_for_vm('colocated/0')
       expect(vm).to_not be_nil
       expect(static_ip).to_not be_nil
-      expect(ssh(public_ip, 'vcap', 'hostname', @our_ssh_options)).to match /#{vm[:agent_id]}/
+      expect(bosh_ssh('colocated', 0, 'hostname').output).to match /#{vm[:agent_id]}/
     end
 
-    it 'should have network access to the vm using the vip' do
-      skip "vip network isn't supported" unless includes_vip?
-
+    it 'should have network access to the vm using the vip', vip_networking: true do
       vm = wait_for_vm('colocated/0')
       expect(vm).to_not be_nil
       expect(vip).to_not be_nil
-      expect(ssh(vip, 'vcap', 'hostname', @our_ssh_options)).to match /#{vm[:agent_id]}/
-    end
-
-    context 'changing the persistent disk size' do
-      SAVE_FILE = '/var/vcap/store/batarang/save'
-
-      before(:all) do
-        ssh(public_ip, 'vcap', "echo 'foobar' > #{SAVE_FILE}", @our_ssh_options)
-        unless warden?
-          @size = persistent_disk(public_ip, 'vcap', @our_ssh_options)
-        end
-        use_persistent_disk(4096)
-        @requirements.requirement(deployment, @spec, force: true)
-      end
-
-      it 'should migrate disk contents', ssh: true do
-        # Warden df don't work so skip the persistent disk size check
-        unless warden?
-          expect(persistent_disk(public_ip, 'vcap', @our_ssh_options)).to_not eq(@size)
-        end
-        expect(ssh(public_ip, 'vcap', "cat #{SAVE_FILE}", @our_ssh_options)).to match /foobar/
-      end
+      expect(bosh_ssh('colocated', 0, 'hostname').output).to match /#{vm[:agent_id]}/
     end
   end
 end
