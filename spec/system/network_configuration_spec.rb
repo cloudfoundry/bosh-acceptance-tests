@@ -32,7 +32,7 @@ describe 'network configuration' do
 
     it 'reverse looks up instance' do
       name = dns.getname(public_ip).to_s
-      expect(name).to eq("0.batlight.static.bat.#{bosh_tld}")
+      expect(name).to include("0.batlight.static.bat.#{bosh_tld}")
     end
 
     it 'resolves instance names from deployed VM' do
