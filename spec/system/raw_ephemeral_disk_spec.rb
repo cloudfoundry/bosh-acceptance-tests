@@ -1,6 +1,6 @@
 require 'system/spec_helper'
 
-describe 'raw_instance_storage' do
+describe 'raw_instance_storage', core: true do
   before(:all) do
     @requirements.requirement(@requirements.release)
     @requirements.requirement(@requirements.stemcell)
@@ -33,7 +33,7 @@ describe 'raw_instance_storage' do
   end
 
   def labeled_partitions(ip)
-    output = ssh(ip, 'vcap', 'ls /dev/disk/by-partlabel', @our_ssh_options)
+    output = bosh_ssh("batlight", 0, 'ls /dev/disk/by-partlabel').output
     output.lines.map { |line| line.chomp }
   end
 end
