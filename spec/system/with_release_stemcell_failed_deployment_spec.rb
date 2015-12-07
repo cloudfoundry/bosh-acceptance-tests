@@ -1,6 +1,6 @@
 require 'system/spec_helper'
 
-describe 'with release, stemcell and failed deployment' do
+describe 'with release, stemcell and failed deployment', core: true do
   let(:deployment_manifest_bad) do
     use_failing_job
     with_deployment
