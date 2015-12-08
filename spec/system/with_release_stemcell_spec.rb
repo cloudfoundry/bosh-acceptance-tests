@@ -150,14 +150,14 @@ describe 'with release and stemcell and subsequent deployments' do
       end
     end
 
-    it 'should have network access to the vm using the manual static ip', manual_networking: true do
+    xit 'should have network access to the vm using the manual static ip', manual_networking: true do
       vm = wait_for_vm_state('colocated', '0', 'running')
       expect(vm).to_not be_nil
       expect(static_ip).to_not be_nil
       expect(bosh_ssh('colocated', 0, 'hostname').output).to match /#{vm[:agent_id]}/
     end
 
-    it 'should have network access to the vm using the vip', vip_networking: true do
+    xit 'should have network access to the vm using the vip', vip_networking: true do
       vm = wait_for_vm_state('colocated', '0', 'running')
       expect(vm).to_not be_nil
       expect(vip).to_not be_nil

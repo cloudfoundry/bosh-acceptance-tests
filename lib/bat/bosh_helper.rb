@@ -29,6 +29,10 @@ module Bat
       @env.bat_infrastructure == 'aws'
     end
 
+    def softlayer?
+      @env.bat_infrastructure == 'softlayer'
+    end
+
     def openstack?
       @env.bat_infrastructure == 'openstack'
     end
