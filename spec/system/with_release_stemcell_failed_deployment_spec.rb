@@ -33,7 +33,7 @@ describe 'with release, stemcell and failed deployment' do
       expect(failed_deployment_result).to_not succeed
 
       events(get_task_id(failed_deployment_result.output, 'error')).each do |event|
-        expect(event['task']).to_not match(/^batlight\/1/) if event['stage'] == 'Updating job'
+        expect(event['task']).to_not match(/^batlight\/.* (1)/) if event['stage'] == 'Updating job'
       end
     end
   end
@@ -52,7 +52,7 @@ describe 'with release, stemcell and failed deployment' do
       expect(failed_deployment_result).to_not succeed
 
       events(get_task_id(failed_deployment_result.output, 'error')).each do |event|
-        expect(event['task']).to_not match(/^batlight\/1/) if event['stage'] == 'Updating job'
+        expect(event['task']).to_not match(/^batlight\/.* (1)/) if event['stage'] == 'Updating job'
       end
     end
   end
