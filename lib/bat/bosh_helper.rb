@@ -114,7 +114,7 @@ module Bat
       @logger.info("Start waiting for vm #{name}")
       vm = nil
       5.times do
-        vm = get_vms.find { |v| v[:job_index] == name }
+        vm = get_vms.find { |v| v[:vm] =~ /#{name} \(.*\)/ }
         break if vm
       end
       @logger.info("Finished waiting for vm #{name} vm=#{vm.inspect}")
