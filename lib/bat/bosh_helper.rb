@@ -25,10 +25,6 @@ module Bat
       }
     end
 
-    def manual_networking?
-      @env.bat_networking == 'manual'
-    end
-
     def aws?
       @env.bat_infrastructure == 'aws'
     end
@@ -56,8 +52,8 @@ module Bat
       info['features']['dns']['extras']['domain_name'] if dns?
     end
 
-    def persistent_disk(host, user, options = {})
-      get_disks(host, user, options).each do |disk|
+    def persistent_disk(job, index)
+      get_disks(job, index).each do |disk|
         values = disk.last
         if values[:mountpoint] == '/var/vcap/store'
           return values[:blocks]
@@ -88,11 +84,29 @@ module Bat
       output
     end
 
-    def ssh_sudo(host, user, command, options)
-      if options[:password].nil?
-        raise 'Need to set sudo :password'
+    def bosh_ssh(job, index, command, options = {})
+      private_key = ssh_options[:private_key]
+
+      # Try our best to clean out old host fingerprints for director and vms
+      if File.exist?(File.expand_path('~/.ssh/known_hosts'))
+        Bosh::Exec.sh("ssh-keygen -R '#{@env.director}'")
+        Bosh::Exec.sh("ssh-keygen -R '#{static_ip}'")
       end
-      ssh(host, user, "echo #{options[:password]} | sudo -p '' -S #{command}", options)
+
+      if private_key
+        bosh_ssh_options = {
+          gateway_host: @env.director,
+          gateway_user: 'vcap',
+          gateway_identity_file: private_key,
+        }.map { |k, v| "--#{k} '#{v}'" }.join(' ')
+
+        # Note gateway_host + ip: ...fingerprint does not match for "micro.ci2.cf-app.com,54.208.15.101" (Net::SSH::HostKeyMismatch)
+        if File.exist?(File.expand_path('~/.ssh/known_hosts'))
+          Bosh::Exec.sh("ssh-keygen -R '#{@env.director},#{static_ip}'").output
+        end
+      end
+
+      bosh_safe("ssh #{job} #{index} '#{command}' #{bosh_ssh_options}")
     end
 
     def tarfile
@@ -139,11 +153,11 @@ module Bat
       output
     end
 
-    def get_disks(host, user, options)
+    def get_disks(job, index)
       disks = {}
       df_cmd = 'df -x tmpfs -x devtmpfs -x debugfs -l | tail -n +2'
 
-      df_output = ssh(host, user, df_cmd, options)
+      df_output = bosh_ssh(job, index, df_cmd)
       df_output.split("\n").each do |line|
         fields = line.split(/\s+/)
         disks[fields[0]] = {
