@@ -1,6 +1,6 @@
 require 'system/spec_helper'
 
-describe 'with release, stemcell and deployment', core: true do
+describe 'with release, stemcell and deployment' do
   before(:all) do
     @requirements.requirement(@requirements.stemcell)
     @requirements.requirement(@requirements.release)
@@ -20,8 +20,7 @@ describe 'with release, stemcell and deployment', core: true do
   describe 'agent' do
     it 'should survive agent dying', ssh: true do
       Dir.mktmpdir do |tmpdir|
-        ssh_command="echo #{@env.vcap_password} | sudo -S pkill -9 agent"
-        expect(bosh_ssh('batlight', 0, ssh_command)).to succeed
+        ssh(public_ip, 'vcap', "echo #{@env.vcap_password} | sudo -S pkill -9 agent", ssh_options)
         wait_for_vm('batlight/0')
         expect(bosh_safe("logs batlight 0 --agent --dir #{tmpdir}")).to succeed
       end
@@ -30,7 +29,28 @@ describe 'with release, stemcell and deployment', core: true do
 
   describe 'ssh' do
     it 'can bosh ssh into a vm' do
-      expect(bosh_ssh('batlight', 0, "uname -a").output).to match /Linux/
+      private_key = ssh_options[:private_key]
+
+      # Try our best to clean out old host fingerprints for director and vms
+      if File.exist?(File.expand_path('~/.ssh/known_hosts'))
+        Bosh::Exec.sh("ssh-keygen -R '#{@env.director}'")
+        Bosh::Exec.sh("ssh-keygen -R '#{static_ip}'")
+      end
+
+      if private_key
+        bosh_ssh_options = {
+          gateway_host: @env.director,
+          gateway_user: 'vcap',
+          gateway_identity_file: private_key,
+        }.map { |k, v| "--#{k} '#{v}'" }.join(' ')
+
+        # Note gateway_host + ip: ...fingerprint does not match for "micro.ci2.cf-app.com,54.208.15.101" (Net::SSH::HostKeyMismatch)
+        if File.exist?(File.expand_path('~/.ssh/known_hosts'))
+          Bosh::Exec.sh("ssh-keygen -R '#{@env.director},#{static_ip}'")
+        end
+      end
+
+      expect(bosh_safe("ssh batlight 0 'uname -a' #{bosh_ssh_options}")).to succeed_with /Linux/
     end
   end
 

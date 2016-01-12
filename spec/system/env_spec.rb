@@ -1,7 +1,6 @@
 require 'system/spec_helper'
 
-
-describe 'initialization', skip_task_check: true, core: true do
+describe 'initialization', :skip_task_check do
   describe 'environment requirements' do
     it 'should have a readable stemcell' do
       expect(File.exist?(@requirements.stemcell.to_path)).to be(true)

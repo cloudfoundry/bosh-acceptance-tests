@@ -68,6 +68,48 @@ describe Bat::Stemcell do
     end
   end
 
+  describe '#supports_network_reconfiguration?' do
+    {
+      # Go agent
+      'bosh-custom-xen-ubuntu-trusty-go_agent' => true,
+      'bosh-custom-xen-centos-go_agent' => true,
+      'bosh-aws-xen-hvm-ubuntu-trusty-go_agent' => true,
+      'bosh-aws-xen-centos-7-go_agent' => true,
+      'bosh-vsphere-esxi-ubuntu-trusty-go_agent' => true,
+      'bosh-vsphere-esxi-centos-go_agent' => true,
+      'bosh-vcloud-esxi-ubuntu-trusty-go_agent' => true,
+      'bosh-openstack-kvm-centos-7-go_agent' => true,
+      'bosh-openstack-kvm-ubuntu-trusty-go_agent' => true,
+
+      # Centos currently does not include open-vm-tools
+      'bosh-vcloud-esxi-centos-go_agent' => false,
+
+      # Warden CPI does not support network reconfig
+      'bosh-warden-boshlite-ubuntu-trusty-go_agent' => false,
+      'bosh-warden-boshlite-centos-go_agent' => false,
+
+    }.each do |stemcell_name, expected|
+      it "returns #{expected} for #{stemcell_name}" do
+        stemcell = Bat::Stemcell.new(stemcell_name, nil)
+        expect(stemcell.supports_network_reconfiguration?).to be(expected)
+      end
+    end
+  end
+
+  describe '#supports_root_partition?' do
+    {
+      'bosh-openstack-kvm-centos-go_agent' => false,
+      'bosh-openstack-kvm-ubuntu-trusty-go_agent' => true,
+      'bosh-vsphere-esxi-ubuntu-trusty-go_agent' => false,
+      'bosh-vcloud-esxi-ubuntu-trusty-go_agent' => false,
+    }.each do |stemcell_name, expected|
+      it "returns #{expected} for #{stemcell_name}" do
+        stemcell = Bat::Stemcell.new(stemcell_name, nil)
+        expect(stemcell.supports_root_partition?).to be(expected)
+      end
+    end
+  end
+
   describe '#to_s' do
     it 'returns "<name>-<version>"' do
       expect(stemcell.to_s).to eq('STEMCELL_NAME-STEMCELL_NAME')
