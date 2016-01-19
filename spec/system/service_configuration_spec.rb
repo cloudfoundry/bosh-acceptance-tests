@@ -42,7 +42,7 @@ describe 'service configuration', :type => 'os'  do
       rescue Exception => e
         @logger.info("Failed to run ssh command. Retrying. Message: #{e.message}")
       end
-      break unless (Time.now.to_i - start) < 120 && result != "UP\n"
+      break unless (Time.now.to_i - start) < 180 && result != "UP\n"
     end
 
     expect(result).to eq("UP\n")
