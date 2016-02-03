@@ -1,6 +1,6 @@
 require 'system/spec_helper'
 
-describe 'raw_instance_storage' do
+describe 'raw_instance_storage', raw_ephemeral_disk: true do
   before(:all) do
     @requirements.requirement(@requirements.release)
     @requirements.requirement(@requirements.stemcell)
@@ -12,8 +12,6 @@ describe 'raw_instance_storage' do
   end
 
   before do
-    skip 'raw_instance_storage cloud property not supported on this IaaS' unless @requirements.stemcell.supports_raw_ephemeral_storage?
-
     reload_deployment_spec
     # using password 'foobar'
     use_password('$6$tHAu4zCTso$pAQok0MTHP4newel7KMhTzMI4tQrAWwJ.X./fFAKjbWkCb5sAaavygXAspIGWn8qVD8FeT.Z/XN4dvqKzLHhl0')
@@ -29,11 +27,7 @@ describe 'raw_instance_storage' do
 
   it 'should attach all available instance disks and label them', ssh: true do
     # assumes aws.yml.erb specifies instance_type: m3.medium, which has 1 local disk
-    expect(labeled_partitions(public_ip)).to eq(["raw-ephemeral-0"])
-  end
-
-  def labeled_partitions(ip)
-    output = ssh(ip, 'vcap', 'ls /dev/disk/by-partlabel', @our_ssh_options)
-    output.lines.map { |line| line.chomp }
+    output = bosh_ssh('batlight', 0, 'ls /dev/disk/by-partlabel').output
+    expect(output).to include('raw-ephemeral-0')
   end
 end
