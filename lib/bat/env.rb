@@ -13,6 +13,13 @@ module Bat
     OPTIONAL_VARS = {
       vcap_private_key:     'BAT_VCAP_PRIVATE_KEY',
       debug_mode:           'BAT_DEBUG_MODE',
+      director_user:        'BAT_DIRECTOR_USER',
+      director_password:    'BAT_DIRECTOR_PASSWORD',
+    }.freeze
+
+    DEFAULT_VALUES = {
+      director_user:        'admin',
+      director_password:    'admin',
     }.freeze
 
     def self.from_env
@@ -28,7 +35,7 @@ module Bat
         instance_variable_set("@#{name}", val)
       end
       OPTIONAL_VARS.keys.each do |name|
-        val = vars[name]
+        val = vars[name] || DEFAULT_VALUES[name]
         instance_variable_set("@#{name}", val) if val
       end
     end

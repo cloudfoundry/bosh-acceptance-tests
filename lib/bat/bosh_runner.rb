@@ -4,9 +4,11 @@ module Bat
   class BoshRunner
     DEFAULT_POLL_INTERVAL = 1
 
-    def initialize(executable, cli_config_path, logger)
+    def initialize(executable, cli_config_path, director_user, director_password, logger)
       @executable = executable
       @cli_config_path = cli_config_path
+      @director_user = director_user
+      @director_password = director_password
       @logger = logger
     end
 
@@ -16,7 +18,7 @@ module Bat
       command = "#{@executable} --non-interactive " +
         "-P #{poll_interval} " +
         "--config #{@cli_config_path} " +
-        '--user admin --password admin ' +
+        "--user #{@director_user} --password #{@director_password} " +
         "#{arguments} 2>&1"
 
       begin
