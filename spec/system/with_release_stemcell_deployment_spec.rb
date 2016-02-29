@@ -21,7 +21,7 @@ describe 'with release, stemcell and deployment' do
     it 'should survive agent dying', ssh: true do
       Dir.mktmpdir do |tmpdir|
         ssh(public_ip, 'vcap', "echo #{@env.vcap_password} | sudo -S pkill -9 agent", ssh_options)
-        wait_for_vm('batlight/0')
+        wait_for_vm_state('batlight/0', 'running')
         expect(bosh_safe("logs batlight 0 --agent --dir #{tmpdir}")).to succeed
       end
     end
