@@ -114,14 +114,32 @@ module Bat
       @logger.info("Start waiting for vm #{name}")
       vm = nil
       5.times do
-        vm = get_vms.find { |v| v[:vm] =~ /#{name} \(.*\)/ }
+        vm = get_vm(name)
         break if vm
       end
       @logger.info("Finished waiting for vm #{name} vm=#{vm.inspect}")
       vm
     end
 
+    def wait_for_vm_state(name, state)
+      puts "Start waiting for vm #{name} to have state #{state}"
+      vm_in_state = nil
+      5.times do
+        vm = get_vm(name)
+        if vm && vm[:state] =~ /#{state}/
+          vm_in_state = vm
+          break
+        end
+      end
+      puts "Finished waiting for vm #{name} to have sate=#{state} vm=#{vm_in_state.inspect}"
+      vm_in_state
+    end
+
     private
+
+    def get_vm(name)
+      get_vms.find { |v| v[:vm] =~ /#{name} \(.*\)/ }
+    end
 
     def get_vms
       output = @bosh_runner.bosh('vms --details').output
