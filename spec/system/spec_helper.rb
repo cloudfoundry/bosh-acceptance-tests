@@ -36,12 +36,16 @@ spec_state = Bat::SpecState.new(
 bosh_runner = Bat::BoshRunner.new(
   'bundle exec bosh',
   bosh_config_file.path,
-  logger,
+  env.director_user,
+  env.director_password,
+  logger
 )
 
 bosh_api = Bat::BoshApi.new(
   env.director,
-  logger,
+  env.director_user,
+  env.director_password,
+  logger
 )
 
 requirements = Bat::Requirements.new(
@@ -49,7 +53,7 @@ requirements = Bat::Requirements.new(
   bosh_runner,
   bosh_api,
   spec_state,
-  logger,
+  logger
 )
 
 RSpec.configure do |config|

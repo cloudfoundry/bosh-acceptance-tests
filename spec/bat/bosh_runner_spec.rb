@@ -4,7 +4,7 @@ require 'logger'
 
 describe Bat::BoshRunner do
   describe '#bosh' do
-    subject { described_class.new('fake-bosh-exe', 'fake-path-to-bosh-config', logger) }
+    subject { described_class.new('fake-bosh-exe', 'fake-path-to-bosh-config', 'admin', 'admin', logger) }
     let(:logger) { instance_double('Logger', info: nil) }
 
     let(:bosh_exec) { class_double('Bosh::Exec').as_stubbed_const(transfer_nested_constants: true) }

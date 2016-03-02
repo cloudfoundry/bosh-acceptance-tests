@@ -1,8 +1,10 @@
 module Bat
   class BoshApi
-    def initialize(hostname, logger)
+    def initialize(hostname, director_user, director_password, logger)
       @logger = logger
       @director_url = "https://#{hostname}:25555"
+      @director_user = director_user
+      @director_password = director_password
     end
 
     def info
@@ -47,7 +49,7 @@ module Bat
     def http_client
       @http_client ||= HTTPClient.new.tap do |c|
         c.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        c.set_auth(@director_url, 'admin', 'admin')
+        c.set_auth(@director_url, @director_user, @director_password)
       end
     end
   end
