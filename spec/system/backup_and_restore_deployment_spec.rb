@@ -1,23 +1,23 @@
 require 'system/spec_helper'
 
 describe 'back and restore deployment' do
-  before(:all) do
-    @requirements.requirement(@requirements.stemcell)
-    @requirements.requirement(@requirements.release)
-  end
+  # before(:all) do
+  #   @requirements.requirement(@requirements.stemcell)
+  #   @requirements.requirement(@requirements.release)
+  # end
+  #
+  # before(:all) do
+  #   load_deployment_spec
+  #   use_static_ip
+  #   use_vip
+  #   @requirements.requirement(deployment, @spec) # 2.5 min on local vsphere
+  # end
+  #
+  # after(:all) do
+  #   @requirements.cleanup(deployment)
+  # end
 
-  before(:all) do
-    load_deployment_spec
-    use_static_ip
-    use_vip
-    @requirements.requirement(deployment, @spec) # 2.5 min on local vsphere
-  end
-
-  after(:all) do
-    @requirements.cleanup(deployment)
-  end
-
-  it 'should restore director DB' do
+  xit 'should restore director DB' do
     with_tmpdir do
       expect(bosh_safe('backup one_deployment.tgz')).to succeed_with /Backup of BOSH director was put in.*one_deployment\.tgz/
       expect(bosh_safe("delete deployment #{deployment_name}")).to succeed_with /Deleted deployment/
