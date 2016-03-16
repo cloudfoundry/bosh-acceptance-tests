@@ -37,7 +37,7 @@ describe Bat::BoshHelper do
   describe '#wait_for_vm' do
     # rubocop:disable LineLength
     let(:successful_bosh_vms_output) { <<OUTPUT }
-Deployment `jesse'
+Deployment 'jesse'
 
 Director task 1112
 
@@ -57,7 +57,7 @@ OUTPUT
 
     # rubocop:disable LineLength
     let(:bosh_vms_output_without_jesse) { <<OUTPUT }
-Deployment `jesse'
+Deployment 'jesse'
 
 Director task 1112
 
@@ -128,7 +128,7 @@ OUTPUT
   describe '#wait_for_vm_state' do
     # rubocop:disable LineLength
     let(:bosh_vms_output_with_jesse_in_running_state) { <<OUTPUT }
-Deployment `jesse'
+Deployment 'jesse'
 
 Director task 1112
 
@@ -144,7 +144,7 @@ Task 5402 done
 VMs total: 2
 OUTPUT
     let(:bosh_vms_output_with_jesse_in_unresponsive_state) { <<OUTPUT }
-Deployment `jesse'
+Deployment 'jesse'
 
 Director task 1112
 
@@ -161,7 +161,7 @@ Task 5402 done
 VMs total: 2
 OUTPUT
     let(:bosh_vms_output_without_jesse) { <<OUTPUT }
-Deployment `jesse'
+Deployment 'jesse'
 
 Director task 1112
 
