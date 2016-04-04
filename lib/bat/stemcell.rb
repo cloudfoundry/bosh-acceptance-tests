@@ -34,33 +34,12 @@ module Bat
       path
     end
 
-    def supports_network_reconfiguration?
-      !(name =~ /vcloud/ && name =~ /centos/) && name !~ /warden/
-    end
-
     def sudo_command
       if name =~ /centos/
         "echo #{ENV['BAT_VCAP_PASSWORD']} | sudo -S -p '' -i"
       else
         "echo #{ENV['BAT_VCAP_PASSWORD']} | sudo -S -p '' -s"
       end
-    end
-
-    def supports_root_partition?
-      !!(name =~ /openstack/ && name !~ /centos/)
-    end
-
-    def supports_changing_static_ip?(network_type)
-      # Does not support for openstack dynamic
-      supports_network_reconfiguration? && !(name =~ /openstack/ && network_type == 'dynamic')
-    end
-
-    def supports_multiple_manual_networks?
-      (name =~ /openstack/ && name =~ /go_agent/) || (name =~ /vsphere/ && name =~ /go_agent/)
-    end
-
-    def supports_raw_ephemeral_storage?
-      name =~ /aws/
     end
 
     def ==(other)

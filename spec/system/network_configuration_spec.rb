@@ -17,9 +17,7 @@ describe 'network configuration' do
     @requirements.cleanup(deployment)
   end
 
-  describe 'resolving DNS entries' do
-    before { skip 'director not configured with dns' unless dns? }
-
+  describe 'resolving DNS entries', dns: true do
     let(:dns) { Resolv::DNS.new(nameserver: @env.dns_host) }
 
     it 'forward looks up instance' do
@@ -37,24 +35,17 @@ describe 'network configuration' do
 
     it 'resolves instance names from deployed VM' do
       # Temporarily add to debug why dig is returning 'connection timed out'
-      resolv_conf = ssh(public_ip, 'vcap', 'cat /etc/resolv.conf', ssh_options)
+      resolv_conf = bosh_ssh('batlight', 0, 'cat /etc/resolv.conf').output
       @logger.info("Contents of resolv.conf '#{resolv_conf}'")
 
       bosh('logs batlight 0 --agent --dir /tmp')
 
       cmd = 'dig +short 0.batlight.static.bat.bosh a 0.batlight.static.bat.microbosh a'
-      expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to include(public_ip)
+      expect(bosh_ssh('batlight', 0, cmd).output).to include(public_ip)
     end
   end
 
-  describe 'changing instance DNS' do
-    before do
-      skip 'director not configured with dns' unless dns?
-      unless @requirements.stemcell.supports_network_reconfiguration?
-        skip "network reconfiguration does not work for #{@requirements.stemcell}"
-      end
-    end
-
+  describe 'changing instance DNS', dns: true, network_reconfiguration: true do
     let(:manifest_with_different_dns) do
       # Need to include a valid DNS host so that other tests
       # can still use dns resolution on the deployed VM
@@ -67,40 +58,28 @@ describe 'network configuration' do
     it 'successfully reconfigures VM with new DNS nameservers' do
       expect(bosh("deployment #{manifest_with_different_dns.to_path}")).to succeed
       expect(bosh('deploy')).to succeed
-      expect(ssh(public_ip, 'vcap', 'cat /etc/resolv.conf', ssh_options)).to include('127.0.0.5')
+      expect(bosh_ssh('batlight', 0, 'cat /etc/resolv.conf').output).to include('127.0.0.5')
     end
   end
 
-  context 'when using manual networking' do
-    before do
-      skip "not using manual networking" unless manual_networking?
-    end
-
-    it 'changes static IP address' do
-      unless @requirements.stemcell.supports_changing_static_ip?(network_type)
-        skip "network reconfiguration does not work for #{@requirements.stemcell}"
-      end
-
+  context 'when using manual networking', manual_networking: true do
+    it 'changes static IP address', changing_static_ip: true do
       use_second_static_ip
       deployment = with_deployment
       expect(bosh("deployment #{deployment.to_path}")).to succeed
       expect(bosh('deploy')).to succeed
 
-      expect(ssh(public_ip, 'vcap', 'PATH=/sbin:/usr/sbin:$PATH; ifconfig', ssh_options)).to include(second_static_ip)
+      expect(bosh_ssh('batlight', 0, 'PATH=/sbin:/usr/sbin:$PATH; ifconfig').output).to include(second_static_ip)
     end
 
-    it 'deploys multiple manual networks' do
-      unless @requirements.stemcell.supports_multiple_manual_networks?
-        skip "multiple manual networks are not supported for #{@requirements.stemcell}"
-      end
-
+    it 'deploys multiple manual networks', multiple_manual_networks: true do
       use_multiple_manual_networks
       deployment = with_deployment
       expect(bosh("deployment #{deployment.to_path}")).to succeed
       expect(bosh('deploy')).to succeed
 
-      expect(ssh(public_ip, 'vcap', 'PATH=/sbin:/usr/sbin:$PATH; ifconfig', ssh_options)).to include(static_ips[0])
-      expect(ssh(public_ip, 'vcap', 'PATH=/sbin:/usr/sbin:$PATH; ifconfig', ssh_options)).to include(static_ips[1])
+      expect(bosh_ssh('batlight', 0, 'PATH=/sbin:/usr/sbin:$PATH; ifconfig').output).to include(static_ips[0])
+      expect(bosh_ssh('batlight', 0, 'PATH=/sbin:/usr/sbin:$PATH; ifconfig').output).to include(static_ips[1])
     end
   end
 end
