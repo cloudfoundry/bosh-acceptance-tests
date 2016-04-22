@@ -12,6 +12,7 @@ compilation:
   reuse_compilation_vms: true
   cloud_properties:
     instance_type: m3.medium
+    availability_zone: <%= properties.availability_zone %>
     <% if properties.key_name %>
     key_name: <%= properties.key_name %>
     <% end %>
@@ -68,6 +69,7 @@ resource_pools:
       version: '<%= properties.stemcell.version %>'
     cloud_properties:
       instance_type: m3.medium
+      availability_zone: <%= properties.availability_zone %>
       <% if properties.key_name %>
       key_name: <%= properties.key_name %>
       <% end %>
