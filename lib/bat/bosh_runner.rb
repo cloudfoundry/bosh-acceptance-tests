@@ -29,7 +29,7 @@ module Bat
         if !e.message.include?('closed stream')
           raise
         end
-        @logger.info("Erorr is close stream. Ignoring....")
+        @logger.info("Error is close stream. Ignoring....")
       end
 
       @logger.info(result.output)
