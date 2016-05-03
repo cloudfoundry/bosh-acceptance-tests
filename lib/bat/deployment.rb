@@ -68,5 +68,9 @@ module Bat
     def keep?
       ENV['BAT_MANIFEST'] == 'keep'
     end
+
+    def to_s
+      "#{name}"
+    end
   end
 end
