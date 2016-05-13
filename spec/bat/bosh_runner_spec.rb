@@ -44,6 +44,7 @@ describe Bat::BoshRunner do
       it 'prints Bosh::Exec::Error messages and re-raises' do
         allow(bosh_exec).to receive(:sh).and_raise(Bosh::Exec::Error.new(1, 'fake command', 'fake output'))
 
+        expect(logger).to receive(:info).with('Bosh command failed: fake output')
         expect {
           subject.bosh('FAKE_ARG')
         }.to raise_error(Bosh::Exec::Error, /fake command/)
