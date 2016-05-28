@@ -18,6 +18,14 @@ describe 'with release, stemcell and deployment', core: true do
   end
 
   describe 'agent' do
+    before do
+      bosh('vm resurrection batlight 0 off')
+    end
+
+    after do
+      bosh('vm resurrection batlight 0 on')
+    end
+
     it 'should survive agent dying', ssh: true do
       Dir.mktmpdir do |tmpdir|
         ssh_command="echo #{@env.vcap_password} | sudo -S pkill -9 agent"
