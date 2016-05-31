@@ -124,29 +124,23 @@ module Bat
       list
     end
 
-    def wait_for_vm(name)
-      @logger.info("Start waiting for vm #{name}")
-      vm = nil
-      5.times do
-        vm = get_vm(name)
-        break if vm
-      end
-      @logger.info("Finished waiting for vm #{name} vm=#{vm.inspect}")
-      vm
-    end
-
-    def wait_for_vm_state(name, state)
+    def wait_for_vm_state(name, state, wait_time_in_seconds=300)
       puts "Start waiting for vm #{name} to have state #{state}"
       vm_in_state = nil
-      5.times do
+      10.times do
         vm = get_vm(name)
         if vm && vm[:state] =~ /#{state}/
           vm_in_state = vm
           break
         end
+        sleep wait_time_in_seconds/10
       end
-      puts "Finished waiting for vm #{name} to have sate=#{state} vm=#{vm_in_state.inspect}"
-      vm_in_state
+      if vm_in_state
+        @logger.info("Finished waiting for vm #{name} have state=#{state} vm=#{vm_in_state.inspect}")
+        vm_in_state
+      else
+        raise Exception, "VM is still not in expected state: #{state}"
+      end
     end
 
     private
