@@ -43,7 +43,7 @@ describe 'with release and stemcell and subsequent deployments' do
     def agent_config()
       output = bosh_ssh('batlight', 0, 'sudo cat /var/vcap/bosh/agent.json').output
       # regex to extract json file content from bosh response
-      JSON.parse(/\{(?:[^{}]|\g<0>)*\}/.match(output)[0])
+      JSON.parse(/(\{(?:[^{}]|\g<1>)*\})/.match(output)[0])
     end
 
     def mounts()
