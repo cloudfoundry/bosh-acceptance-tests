@@ -1,6 +1,6 @@
 require 'system/spec_helper'
 
-describe 'raw_instance_storage', raw_ephemeral_disk: true do
+describe 'raw_instance_storage', raw_ephemeral_storage: true do
   before(:all) do
     @requirements.requirement(@requirements.release)
     @requirements.requirement(@requirements.stemcell)
