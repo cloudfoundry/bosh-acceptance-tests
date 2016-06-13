@@ -13,3 +13,4 @@ blobs
 *~
 *#
 #*
+releases/**/*.tgz
