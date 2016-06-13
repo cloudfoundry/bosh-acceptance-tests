@@ -2,6 +2,7 @@
 name: batlight
 
 templates:
+  pre-start.erb: bin/pre-start
   batlight_ctl.erb: bin/batlight_ctl
   drain.erb: bin/drain
   properties.erb: config/properties
