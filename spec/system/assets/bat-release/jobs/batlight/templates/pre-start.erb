@@ -5,12 +5,8 @@
 # is assigned multiple IP address from the same subnet.
 # This command disables rp filtering.
 
-find /proc/sys/net/ipv4/conf/ -type f -name 'rp_filter' 2>/dev/null | grep -q '.*'
-rp_filters_exists=$?
-
-if [ "${rp_filters_exists}" -eq 0 ]; then
-  echo "Disabling rp_filter..."
-  echo 0 | tee /proc/sys/net/ipv4/conf/*/rp_filter > /dev/null
-fi
+for file in /proc/sys/net/ipv4/conf/*/rp_filter; do
+  [ -f $file ] && echo 0 > $file
+done
 
 exit 0
