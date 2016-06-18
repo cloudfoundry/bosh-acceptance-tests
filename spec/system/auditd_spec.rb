@@ -13,11 +13,11 @@ describe 'auditd, sshd, cron, rsyslogd', system_services_running: true do
   end
 
   it 'should be running' do
-    output = bosh_ssh('batlight', 0, 'ps aux | grep "[c]ron$"; ps aux | grep "sbin/auditd$"; ps aux | grep "sbin/sshd"; ps aux | grep "sbin/rsyslogd$"').output
+    output = bosh_ssh('batlight', 0, 'ps ax -o ucmd').output
+    running_services = output.split('\n').uniq
 
-    expect(output).to include('cron')
-    expect(output).to include('auditd')
-    expect(output).to include('/usr/sbin/sshd -D')
-    expect(output).to include('/usr/sbin/rsyslogd')
+    expect(running_services).to include('cron')
+    expect(running_services).to include('kauditd')
+    expect(running_services).to include('rsyslogd')
   end
 end
