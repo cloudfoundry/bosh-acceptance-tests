@@ -14,7 +14,7 @@ describe 'auditd, sshd, cron, rsyslogd', system_services_running: true do
 
   it 'should be running' do
     output = bosh_ssh('batlight', 0, 'ps ax -o ucmd').output
-    running_services = output.split('\n').uniq
+    running_services = output.split("\n").uniq
 
     expect(running_services).to include('cron')
     expect(running_services).to include('kauditd')
