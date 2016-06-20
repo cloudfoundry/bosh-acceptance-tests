@@ -18,6 +18,7 @@ describe 'auditd, sshd, cron, rsyslogd', system_services_running: true do
 
     expect(running_services).to include(/^crond?$/)
     expect(running_services).to include('kauditd')
+    expect(running_services).to include('auditd')
     expect(running_services).to include('rsyslogd')
   end
 end
