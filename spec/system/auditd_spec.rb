@@ -1,6 +1,6 @@
 require 'system/spec_helper'
 
-describe 'auditd, sshd, cron, rsyslogd', system_services_running: true do
+describe 'auditd, sshd, cron, rsyslogd', type: 'os' do
   before(:all) do
     @requirements.requirement(@requirements.stemcell)
     @requirements.requirement(@requirements.release)
