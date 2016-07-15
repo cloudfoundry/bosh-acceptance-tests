@@ -100,7 +100,7 @@ jobs:
     <% end %>
     networks:
     <% properties.job_networks.each_with_index do |network, i| %>
-      - name: <%= network.name %>
+      - name: default
         default: [dns, gateway]
       <% if properties.use_static_ip %>
         static_ips:
