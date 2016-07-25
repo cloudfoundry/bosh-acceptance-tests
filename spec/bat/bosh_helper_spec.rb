@@ -43,12 +43,12 @@ Director task 1112
 
 Task 5402 done
 
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+
-| VM                                              | State   | Resource Pool | IPs         | CID        | Agent ID                             | Resurrection |
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+
-| jessez/0 (29ae97ec-3106-450b-a848-98cb3b25d86f) | running | fake_pool     | 10.20.30.1  | i-cid      | fake-agent-id                        | active       |
-| uaa_z1/0 (a3cebb2f-2553-46e3-aa0d-d2075cd08760) | running | small_z1      | 10.50.91.2  | i-24cb6153 | da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49 | active       |
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+
++-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+--------+
+| VM                                              | State   | Resource Pool | IPs         | CID        | Agent ID                             | Resurrection | Ignore |
++-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+--------+
+| jessez/29ae97ec-3106-450b-a848-98cb3b25d86f (0) | running | fake_pool     | 10.20.30.1  | i-cid      | fake-agent-id                        | active       | false  |
+| uaa_z1/a3cebb2f-2553-46e3-aa0d-d2075cd08760 (0) | running | small_z1      | 10.50.91.2  | i-24cb6153 | da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49 | active       | false  |
++-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+--------+
 
 VMs total: 2
 OUTPUT
@@ -59,12 +59,12 @@ Director task 1112
 
 Task 5402 done
 
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+
-| VM                                              | State   | Resource Pool | IPs         | CID        | Agent ID                             | Resurrection |
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+
-| jessez/0 (29ae97ec-3106-450b-a848-98cb3b25d86f) | unresponsive agent | fake_pool     | 10.20.30.1  | i-cid      | fake-agent-id                        | active       |
-| uaa_z1/0 (a3cebb2f-2553-46e3-aa0d-d2075cd08760) | running | small_z1      | 10.50.91.2  | i-24cb6153 | da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49 | active       |
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+
++-------------------------------------------------+--------------------+---------------+-------------+------------+--------------------------------------+--------------+--------+
+| VM                                              | State              | Resource Pool | IPs         | CID        | Agent ID                             | Resurrection | Ignore |
++-------------------------------------------------+--------------------+---------------+-------------+------------+--------------------------------------+--------------+--------+
+| jessez/29ae97ec-3106-450b-a848-98cb3b25d86f (0) | unresponsive agent | fake_pool     | 10.20.30.1  | i-cid      | fake-agent-id                        | active       | false  |
+| uaa_z1/a3cebb2f-2553-46e3-aa0d-d2075cd08760 (0) | running            | small_z1      | 10.50.91.2  | i-24cb6153 | da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49 | active       | false  |
++-------------------------------------------------+--------------------+---------------+-------------+------------+--------------------------------------+--------------+--------+
 
 
 VMs total: 2
@@ -76,12 +76,11 @@ Director task 1112
 
 Task 5402 done
 
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+
-| VM                                              | State   | Resource Pool | IPs         | CID        | Agent ID                             | Resurrection |
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+
-| uaa_z1/0 (a3cebb2f-2553-46e3-aa0d-d2075cd08760) | running | small_z1      | 10.50.91.2  | i-24cb6153 | da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49 | active       |
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+
-
++-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+--------+
+| VM                                              | State   | Resource Pool | IPs         | CID        | Agent ID                             | Resurrection | Ignore |
++-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+--------+
+| uaa_z1/a3cebb2f-2553-46e3-aa0d-d2075cd08760 (0) | running | small_z1      | 10.50.91.2  | i-24cb6153 | da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49 | active       | false  |
++-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+--------+
 
 VMs total: 2
 OUTPUT
@@ -93,15 +92,47 @@ OUTPUT
       end
 
       it 'returns the vm details' do
-        expect(bosh_helper.wait_for_vm_state('jessez/0', 'running', 0)).to(eq(
-          vm: 'jessez/0 (29ae97ec-3106-450b-a848-98cb3b25d86f)',
+        expect(bosh_helper.wait_for_vm_state('jessez', '0', 'running', 0)).to(eq(
+          vm: 'jessez/29ae97ec-3106-450b-a848-98cb3b25d86f (0)',
           state: 'running',
           resource_pool: 'fake_pool',
           ips: '10.20.30.1',
           cid: 'i-cid',
+          ignore: 'false',
           agent_id: 'fake-agent-id',
           resurrection: 'active',
         ))
+      end
+
+      context 'when the director is using legacy vm names' do
+    let(:bosh_vms_output_with_jesse_in_running_state) { <<OUTPUT }
+Deployment 'jesse'
+
+Director task 1112
+
+Task 5402 done
+
++-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+
+| VM                                              | State   | Resource Pool | IPs         | CID        | Agent ID                             | Resurrection |
++-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+
+| jessez/0 (29ae97ec-3106-450b-a848-98cb3b25d86f) | running | fake_pool     | 10.20.30.1  | i-cid      | fake-agent-id                        | active       |
+| uaa_z1/0 (a3cebb2f-2553-46e3-aa0d-d2075cd08760) | running | small_z1      | 10.50.91.2  | i-24cb6153 | da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49 | active       |
++-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+
+
+VMs total: 2
+OUTPUT
+
+        it 'returns the vm details' do
+          expect(bosh_helper.wait_for_vm_state('jessez', '0', 'running', 0)).to(eq(
+            vm: 'jessez/0 (29ae97ec-3106-450b-a848-98cb3b25d86f)',
+            state: 'running',
+            resource_pool: 'fake_pool',
+            ips: '10.20.30.1',
+            cid: 'i-cid',
+            agent_id: 'fake-agent-id',
+            resurrection: 'active',
+          ))
+        end
       end
     end
 
@@ -112,7 +143,7 @@ OUTPUT
       end
 
       it 'returns nil' do
-        expect{bosh_helper.wait_for_vm_state('jessez/0', 'running', 0)}.to raise_error
+        expect{bosh_helper.wait_for_vm_state('jessez', '0', 'running', 0)}.to raise_error
       end
     end
 
@@ -123,7 +154,7 @@ OUTPUT
       end
 
       it 'returns nil' do
-        expect{bosh_helper.wait_for_vm_state('jessez/0', 'running', 0)}.to raise_error
+        expect{bosh_helper.wait_for_vm_state('jessez', '0', 'running', 0)}.to raise_error
       end
     end
 
@@ -140,12 +171,13 @@ OUTPUT
       end
 
       it 'returns the vm details' do
-        expect(bosh_helper.wait_for_vm_state('jessez/0', 'running', 0)).to(eq(
-          vm: 'jessez/0 (29ae97ec-3106-450b-a848-98cb3b25d86f)',
+        expect(bosh_helper.wait_for_vm_state('jessez', '0', 'running', 0)).to(eq(
+          vm: 'jessez/29ae97ec-3106-450b-a848-98cb3b25d86f (0)',
           state: 'running',
           resource_pool: 'fake_pool',
           ips: '10.20.30.1',
           cid: 'i-cid',
+          ignore: 'false',
           agent_id: 'fake-agent-id',
           resurrection: 'active',
         ))

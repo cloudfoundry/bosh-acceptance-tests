@@ -124,11 +124,11 @@ module Bat
       list
     end
 
-    def wait_for_vm_state(name, state, wait_time_in_seconds=300)
+    def wait_for_vm_state(name, index, state, wait_time_in_seconds=300)
       puts "Start waiting for vm #{name} to have state #{state}"
       vm_in_state = nil
       10.times do
-        vm = get_vm(name)
+        vm = get_vm(name, index)
         if vm && vm[:state] =~ /#{state}/
           vm_in_state = vm
           break
@@ -145,8 +145,10 @@ module Bat
 
     private
 
-    def get_vm(name)
-      get_vms.find { |v| v[:vm] =~ /#{name} \(.*\)/ }
+    def get_vm(name, index)
+      get_vms.find do |v|
+        v[:vm] =~ /#{name}\/[a-f0-9\-]{36} \(#{index}\)/ || v[:vm] =~ /#{name}\/#{index} \([a-f0-9\-]{36}\)/
+      end
     end
 
     def get_vms

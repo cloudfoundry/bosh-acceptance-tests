@@ -30,7 +30,7 @@ describe 'with release, stemcell and deployment', core: true do
       Dir.mktmpdir do |tmpdir|
         ssh_command="echo #{@env.vcap_password} | sudo -S pkill -9 agent"
         expect(bosh_ssh('batlight', 0, ssh_command)).to succeed
-        wait_for_vm_state('batlight/0', 'running')
+        wait_for_vm_state('batlight', '0', 'running')
         expect(bosh_safe("logs batlight 0 --agent --dir #{tmpdir}")).to succeed
       end
     end
