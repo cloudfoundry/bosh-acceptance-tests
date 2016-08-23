@@ -26,6 +26,40 @@ describe Bat::BoshRunner do
       subject.bosh('FAKE_ARGS')
     end
 
+    context 'when appending deploy options' do
+      it 'adds --no-redact to deploy command' do
+        expected_command = %W(
+        fake-bosh-exe
+        --non-interactive
+        -P 1
+        --config fake-path-to-bosh-config
+        --user admin --password admin
+        deploy --no-redact 2>&1
+      ).join(' ')
+
+        expect(logger).to receive(:info).with("Running bosh command --> #{expected_command}")
+        expect(bosh_exec).to receive(:sh).with(expected_command, {}).and_return(bosh_exec_result)
+
+        subject.bosh('deploy')
+      end
+
+      it 'does not add --no-redact to the deployment command' do
+        expected_command = %W(
+        fake-bosh-exe
+        --non-interactive
+        -P 1
+        --config fake-path-to-bosh-config
+        --user admin --password admin
+        deployment 2>&1
+      ).join(' ')
+
+        expect(logger).to receive(:info).with("Running bosh command --> #{expected_command}")
+        expect(bosh_exec).to receive(:sh).with(expected_command, {}).and_return(bosh_exec_result)
+
+        subject.bosh('deployment')
+      end
+    end
+
     it 'returns the result of Bosh::Exec' do
       allow(bosh_exec).to receive(:sh).and_return(bosh_exec_result)
 

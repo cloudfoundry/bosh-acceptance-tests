@@ -13,14 +13,7 @@ module Bat
     end
 
     def bosh(arguments, options = {})
-      poll_interval = options[:poll_interval] || DEFAULT_POLL_INTERVAL
-
-      command = "#{@executable} --non-interactive " +
-        "-P #{poll_interval} " +
-        "--config #{@cli_config_path} " +
-        "--user #{@director_user} --password #{@director_password} " +
-        "#{arguments} 2>&1"
-
+      command = build_command(arguments, options)
       begin
         @logger.info("Running bosh command --> #{command}")
         result = Bosh::Exec.sh(command, options)
@@ -43,6 +36,32 @@ module Bat
 
     def bosh_safe(command, options = {})
       bosh(command, options.merge(on_error: :return))
+    end
+
+    private
+
+    def build_command(arguments, options = {})
+      poll_interval = options[:poll_interval] || DEFAULT_POLL_INTERVAL
+      command = []
+      command << "#{@executable} --non-interactive"
+      command << "-P #{poll_interval}"
+      command << "--config #{@cli_config_path}"
+      command << "--user #{@director_user} --password #{@director_password}"
+      command << arguments
+
+      append_deploy_options(command) if deploy_command?(arguments)
+
+      command << '2>&1'
+
+      command.join(' ')
+    end
+
+    def deploy_command?(arguments)
+      arguments == 'deploy' || arguments.start_with?('deploy ')
+    end
+
+    def append_deploy_options(command)
+      command << '--no-redact'
     end
   end
 end
