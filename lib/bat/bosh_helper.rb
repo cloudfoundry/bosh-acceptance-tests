@@ -106,7 +106,7 @@ module Bat
         end
       end
 
-      bosh_safe("ssh #{job} #{index} '#{command}' #{bosh_ssh_options}")
+      bosh("ssh #{job} #{index} '#{command}' #{bosh_ssh_options}")
     end
 
     def tarfile
