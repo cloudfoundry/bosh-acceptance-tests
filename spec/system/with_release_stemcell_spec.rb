@@ -163,5 +163,11 @@ describe 'with release and stemcell and subsequent deployments' do
       expect(vip).to_not be_nil
       expect(bosh_ssh('colocated', 0, 'hostname').output).to match /#{vm[:agent_id]}/
     end
+
+    it 'should set the hostname to the agent id', core: true do
+      vm = wait_for_vm_state('colocated', '0', 'running')
+      expect(vm).to_not be_nil
+      expect(bosh_ssh('colocated', 0, 'hostname').output).to match /#{vm[:agent_id]}/
+    end
   end
 end
