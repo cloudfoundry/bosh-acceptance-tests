@@ -33,28 +33,14 @@ module Bat
 
       if !block_given?
         return deployment
-      elsif block.arity == 0
-        expect(@bosh_runner.bosh("deployment #{deployment.to_path}")).to succeed
-        expect(@bosh_runner.bosh('deploy')).to succeed
-        deployed = true
-        yield
       elsif block.arity == 1
         yield deployment
-      elsif block.arity == 2
-        expect(@bosh_runner.bosh("deployment #{deployment.to_path}")).to succeed
-        result = @bosh_runner.bosh('deploy')
-        expect(result).to succeed
-        deployed = true
-        yield deployment, result
       else
         raise "unknown arity: #{block.arity}"
       end
     ensure
       if block_given?
         deployment.delete if deployment
-        if deployed
-          expect(@bosh_runner.bosh("delete deployment #{deployment.name}")).to succeed
-        end
       end
     end
 
