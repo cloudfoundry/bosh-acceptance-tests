@@ -3,13 +3,14 @@ require 'bat/bosh_runner'
 require 'logger'
 
 describe Bat::BoshRunner do
+  subject { described_class.new('fake-bosh-exe', 'fake-path-to-bosh-config', 'admin', 'admin', logger) }
+
+  let(:logger) { instance_double('Logger', info: nil) }
+
+  let(:bosh_exec) { class_double('Bosh::Exec').as_stubbed_const(transfer_nested_constants: true) }
+  let(:bosh_exec_result) { instance_double('Bosh::Exec::Result', output: 'FAKE_OUTPUT') }
+
   describe '#bosh' do
-    subject { described_class.new('fake-bosh-exe', 'fake-path-to-bosh-config', 'admin', 'admin', logger) }
-    let(:logger) { instance_double('Logger', info: nil) }
-
-    let(:bosh_exec) { class_double('Bosh::Exec').as_stubbed_const(transfer_nested_constants: true) }
-    let(:bosh_exec_result) { instance_double('Bosh::Exec::Result', output: 'FAKE_OUTPUT') }
-
     it 'uses Bosh::Exec to shell out to bosh' do
       expected_command = %W(
         fake-bosh-exe
@@ -35,9 +36,9 @@ describe Bat::BoshRunner do
 
     context 'when options are passed' do
       it 'passes the options to Bosh::Exec' do
-        expect(bosh_exec).to receive(:sh).with(anything, { foo: :bar }).and_return(bosh_exec_result)
+        expect(bosh_exec).to receive(:sh).with(anything, {foo: :bar}).and_return(bosh_exec_result)
 
-        subject.bosh('FAKE_ARGS', { foo: :bar })
+        subject.bosh('FAKE_ARGS', {foo: :bar})
       end
     end
 
@@ -68,6 +69,43 @@ describe Bat::BoshRunner do
           subject.bosh('fake arg', &b)
         }.to yield_with_args(bosh_exec_result)
       end
+    end
+  end
+
+  describe '#set_director' do
+    let(:env) { 'my.bosh.director' }
+
+    it 'causes all future invocations of #bosh to add `--environment <env>`' do
+      expected_command = %W(
+        fake-bosh-exe
+        --non-interactive
+        --json
+        -P 1
+        --config fake-path-to-bosh-config
+        --client admin --client-secret admin
+        FAKE_ARGS 2>&1
+      ).join(' ')
+
+      expect(bosh_exec).to receive(:sh).with(expected_command, {}).and_return(bosh_exec_result)
+
+      subject.bosh('FAKE_ARGS')
+
+      expected_command = %W(
+        fake-bosh-exe
+        --non-interactive
+        --environment #{env}
+        --json
+        -P 1
+        --config fake-path-to-bosh-config
+        --client admin --client-secret admin
+        FAKE_ARGS 2>&1
+      ).join(' ')
+
+      subject.set_environment(env)
+
+      expect(bosh_exec).to receive(:sh).with(expected_command, {}).and_return(bosh_exec_result)
+
+      subject.bosh('FAKE_ARGS')
     end
   end
 end

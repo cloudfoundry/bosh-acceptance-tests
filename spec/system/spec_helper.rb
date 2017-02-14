@@ -75,7 +75,7 @@ end
 RSpec.configure do |config|
   # Preload stemcell and release for tests that need it (most of them)
   config.before(:suite) do
-    bosh_runner.bosh("target #{env.director}")
+    bosh_runner.set_environment(env.director)
     requirements.requirement(requirements.stemcell) # 2 min on local vsphere
     requirements.requirement(requirements.release)
   end

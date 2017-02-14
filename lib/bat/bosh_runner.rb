@@ -38,12 +38,17 @@ module Bat
       bosh(command, options.merge(on_error: :return))
     end
 
+    def set_environment(director_url)
+      @environment = director_url
+    end
+
     private
 
     def build_command(arguments, options = {})
       poll_interval = options[:poll_interval] || DEFAULT_POLL_INTERVAL
       command = []
       command << "#{@executable} --non-interactive"
+      command << "--environment #{@environment}" if @environment
       command << '--json'
       command << "-P #{poll_interval}"
       command << "--config #{@cli_config_path}"
