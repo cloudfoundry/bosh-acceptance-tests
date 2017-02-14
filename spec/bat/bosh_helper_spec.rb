@@ -34,135 +34,324 @@ describe Bat::BoshHelper do
     end
   end
 
-  describe '#wait_for_vm_state' do
+  describe '#wait_for_instance_state' do
     # rubocop:disable LineLength
-    let(:bosh_vms_output_with_jesse_in_running_state) { <<OUTPUT }
-Deployment 'jesse'
-
-Director task 1112
-
-Task 5402 done
-
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+--------+
-| VM                                              | State   | Resource Pool | IPs         | CID        | Agent ID                             | Resurrection | Ignore |
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+--------+
-| jessez/29ae97ec-3106-450b-a848-98cb3b25d86f (0) | running | fake_pool     | 10.20.30.1  | i-cid      | fake-agent-id                        | active       | false  |
-| uaa_z1/a3cebb2f-2553-46e3-aa0d-d2075cd08760 (0) | running | small_z1      | 10.50.91.2  | i-24cb6153 | da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49 | active       | false  |
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+--------+
-
-VMs total: 2
+    let(:bosh_instances_output_with_jesse_in_running_state) { <<-'OUTPUT' }
+{
+    "Tables": [
+        {
+            "Content": "instances",
+            "Header": [
+                "Instance",
+                "Process State",
+                "AZ",
+                "IPs",
+                "State",
+                "VM CID",
+                "VM Type",
+                "Disk CIDs",
+                "Agent ID",
+                "Index",
+                "Resurrection\nPaused",
+                "Bootstrap",
+                "Ignore"
+            ],
+            "Rows": [
+                [
+                    "jessez/29ae97ec-3106-450b-a848-98cb3b25d86f",
+                    "running",
+                    "z3",
+                    "10.20.30.1",
+                    "started",
+                    "i-cid",
+                    "default",
+                    "daafa7a0-1df2-4482-67e4-6ec795c76434",
+                    "fake-agent-id",
+                    "0",
+                    "false",
+                    "false",
+                    "false"
+                ],
+                [
+                    "uaa_z1/a3cebb2f-2553-46e3-aa0d-d2075cd08760",
+                    "running",
+                    "z1",
+                    "10.50.91.2",
+                    "started",
+                    "i-24cb6153",
+                    "default",
+                    "df5de774-8a0c-4e4c-7418-93e425de3aa2",
+                    "da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49",
+                    "0",
+                    "false",
+                    "false",
+                    "false"
+                ]
+            ],
+            "Notes": null
+        }
+    ],
+    "Blocks": null,
+    "Lines": [
+        "Using environment '0.0.0.0' as client 'admin'",
+        "Task 4",
+        ". Done",
+        "Succeeded"
+    ]
+}
 OUTPUT
-    let(:bosh_vms_output_with_jesse_in_unresponsive_state) { <<OUTPUT }
-Deployment 'jesse'
 
-Director task 1112
-
-Task 5402 done
-
-+-------------------------------------------------+--------------------+---------------+-------------+------------+--------------------------------------+--------------+--------+
-| VM                                              | State              | Resource Pool | IPs         | CID        | Agent ID                             | Resurrection | Ignore |
-+-------------------------------------------------+--------------------+---------------+-------------+------------+--------------------------------------+--------------+--------+
-| jessez/29ae97ec-3106-450b-a848-98cb3b25d86f (0) | unresponsive agent | fake_pool     | 10.20.30.1  | i-cid      | fake-agent-id                        | active       | false  |
-| uaa_z1/a3cebb2f-2553-46e3-aa0d-d2075cd08760 (0) | running            | small_z1      | 10.50.91.2  | i-24cb6153 | da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49 | active       | false  |
-+-------------------------------------------------+--------------------+---------------+-------------+------------+--------------------------------------+--------------+--------+
-
-
-VMs total: 2
+    let(:bosh_instances_output_with_jesse_in_unresponsive_state) { <<'OUTPUT' }
+{
+    "Tables": [
+        {
+            "Content": "instances",
+            "Header": [
+                "Instance",
+                "Process State",
+                "AZ",
+                "IPs",
+                "State",
+                "VM CID",
+                "VM Type",
+                "Disk CIDs",
+                "Agent ID",
+                "Index",
+                "Resurrection\nPaused",
+                "Bootstrap",
+                "Ignore"
+            ],
+            "Rows": [
+                [
+                    "jessez/29ae97ec-3106-450b-a848-98cb3b25d86f",
+                    "unresponsive agent",
+                    "z3",
+                    "10.20.30.1",
+                    "started",
+                    "i-cid",
+                    "default",
+                    "daafa7a0-1df2-4482-67e4-6ec795c76434",
+                    "fake-agent-id",
+                    "0",
+                    "false",
+                    "false",
+                    "false"
+                ],
+                [
+                    "uaa_z1/a3cebb2f-2553-46e3-aa0d-d2075cd08760",
+                    "running",
+                    "z1",
+                    "10.50.91.2",
+                    "started",
+                    "i-24cb6153",
+                    "default",
+                    "df5de774-8a0c-4e4c-7418-93e425de3aa2",
+                    "da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49",
+                    "0",
+                    "false",
+                    "false",
+                    "false"
+                ]
+            ],
+            "Notes": null
+        }
+    ],
+    "Blocks": null,
+    "Lines": [
+        "Using environment '0.0.0.0' as client 'admin'",
+        "Task 4",
+        ". Done",
+        "Succeeded"
+    ]
+}
 OUTPUT
-    let(:bosh_vms_output_without_jesse) { <<OUTPUT }
-Deployment 'jesse'
-
-Director task 1112
-
-Task 5402 done
-
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+--------+
-| VM                                              | State   | Resource Pool | IPs         | CID        | Agent ID                             | Resurrection | Ignore |
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+--------+
-| uaa_z1/a3cebb2f-2553-46e3-aa0d-d2075cd08760 (0) | running | small_z1      | 10.50.91.2  | i-24cb6153 | da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49 | active       | false  |
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+--------+
-
-VMs total: 2
+    let(:bosh_instances_output_without_jesse) { <<'OUTPUT' }
+{
+    "Tables": [
+        {
+            "Content": "instances",
+            "Header": [
+                "Instance",
+                "Process State",
+                "AZ",
+                "IPs",
+                "State",
+                "VM CID",
+                "VM Type",
+                "Disk CIDs",
+                "Agent ID",
+                "Index",
+                "Resurrection\nPaused",
+                "Bootstrap",
+                "Ignore"
+            ],
+            "Rows": [
+                [
+                    "uaa_z1/a3cebb2f-2553-46e3-aa0d-d2075cd08760",
+                    "running",
+                    "z1",
+                    "10.50.91.2",
+                    "started",
+                    "i-24cb6153",
+                    "default",
+                    "df5de774-8a0c-4e4c-7418-93e425de3aa2",
+                    "da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49",
+                    "0",
+                    "false",
+                    "false",
+                    "false"
+                ]
+            ],
+            "Notes": null
+        }
+    ],
+    "Blocks": null,
+    "Lines": [
+        "Using environment '0.0.0.0' as client 'admin'",
+        "Task 4",
+        ". Done",
+        "Succeeded"
+    ]
+}
 OUTPUT
       # rubocop:enable LineLength
-    context 'when "vm" in expected state' do
+    context 'when "instance" in expected state' do
       before do
-        fake_result = double('fake bosh exec result', output: bosh_vms_output_with_jesse_in_running_state)
-        allow(bosh_runner).to receive(:bosh).with('vms --details').and_return(fake_result)
+        fake_result = double('fake bosh exec result', output: bosh_instances_output_with_jesse_in_running_state)
+        allow(bosh_runner).to receive(:bosh).with('instances --details').and_return(fake_result)
       end
 
-      it 'returns the vm details' do
-        expect(bosh_helper.wait_for_vm_state('jessez', '0', 'running', 0)).to(eq(
-          vm: 'jessez/29ae97ec-3106-450b-a848-98cb3b25d86f (0)',
-          state: 'running',
-          resource_pool: 'fake_pool',
+      it 'returns the instance details' do
+        expect(bosh_helper.wait_for_instance_state('jessez', '0', 'running', 0)).to(eq(
+          instance: 'jessez/29ae97ec-3106-450b-a848-98cb3b25d86f',
+          process_state: 'running',
           ips: '10.20.30.1',
-          cid: 'i-cid',
+          vm_cid: 'i-cid',
+          vm_type: 'default',
           ignore: 'false',
           agent_id: 'fake-agent-id',
-          resurrection: 'active',
+          resurrection_paused: 'false',
+          az: 'z3',
+          bootstrap: 'false',
+          disk_cids: 'daafa7a0-1df2-4482-67e4-6ec795c76434',
+          index: '0',
+          state: 'started',
         ))
       end
 
-      context 'when the director is using legacy vm names' do
-    let(:bosh_vms_output_with_jesse_in_running_state) { <<OUTPUT }
-Deployment 'jesse'
-
-Director task 1112
-
-Task 5402 done
-
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+
-| VM                                              | State   | Resource Pool | IPs         | CID        | Agent ID                             | Resurrection |
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+
-| jessez/0 (29ae97ec-3106-450b-a848-98cb3b25d86f) | running | fake_pool     | 10.20.30.1  | i-cid      | fake-agent-id                        | active       |
-| uaa_z1/0 (a3cebb2f-2553-46e3-aa0d-d2075cd08760) | running | small_z1      | 10.50.91.2  | i-24cb6153 | da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49 | active       |
-+-------------------------------------------------+---------+---------------+-------------+------------+--------------------------------------+--------------+
-
-VMs total: 2
+      context 'when the director is using legacy instance names' do
+    let(:bosh_instances_output_with_jesse_in_running_state) { <<'OUTPUT' }
+{
+    "Tables": [
+        {
+            "Content": "instances",
+            "Header": [
+                "Instance",
+                "Process State",
+                "AZ",
+                "IPs",
+                "State",
+                "VM CID",
+                "VM Type",
+                "Disk CIDs",
+                "Agent ID",
+                "Index",
+                "Resurrection\nPaused",
+                "Bootstrap",
+                "Ignore"
+            ],
+            "Rows": [
+                [
+                    "jessez/0 (29ae97ec-3106-450b-a848-98cb3b25d86f)",
+                    "running",
+                    "z3",
+                    "10.20.30.1",
+                    "started",
+                    "i-cid",
+                    "default",
+                    "daafa7a0-1df2-4482-67e4-6ec795c76434",
+                    "fake-agent-id",
+                    "0",
+                    "false",
+                    "false",
+                    "false"
+                ],
+                [
+                    "uaa_z1/0 (a3cebb2f-2553-46e3-aa0d-d2075cd08760)",
+                    "running",
+                    "z1",
+                    "10.50.91.2",
+                    "started",
+                    "i-24cb6153",
+                    "default",
+                    "df5de774-8a0c-4e4c-7418-93e425de3aa2",
+                    "da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49",
+                    "0",
+                    "false",
+                    "false",
+                    "false"
+                ]
+            ],
+            "Notes": null
+        }
+    ],
+    "Blocks": null,
+    "Lines": [
+        "Using environment '0.0.0.0' as client 'admin'",
+        "Task 4",
+        ". Done",
+        "Succeeded"
+    ]
+}
 OUTPUT
 
-        it 'returns the vm details' do
-          expect(bosh_helper.wait_for_vm_state('jessez', '0', 'running', 0)).to(eq(
-            vm: 'jessez/0 (29ae97ec-3106-450b-a848-98cb3b25d86f)',
-            state: 'running',
-            resource_pool: 'fake_pool',
+        it 'returns the instance details' do
+          expect(bosh_helper.wait_for_instance_state('jessez', '0', 'running', 0)).to(eq(
+            instance: 'jessez/0 (29ae97ec-3106-450b-a848-98cb3b25d86f)',
+            process_state: 'running',
             ips: '10.20.30.1',
-            cid: 'i-cid',
+            vm_cid: 'i-cid',
+            vm_type: 'default',
+            ignore: 'false',
             agent_id: 'fake-agent-id',
-            resurrection: 'active',
+            resurrection_paused: 'false',
+            az: 'z3',
+            bootstrap: 'false',
+            disk_cids: 'daafa7a0-1df2-4482-67e4-6ec795c76434',
+            index: '0',
+            state: 'started',
           ))
         end
       end
     end
 
-    context 'when "vm" in different state' do
+    context 'when "instance" in different state' do
       before do
-        fake_result = double('fake bosh exec result', output: bosh_vms_output_with_jesse_in_unresponsive_state)
-        allow(bosh_runner).to receive(:bosh).with('vms --details').and_return(fake_result)
+        fake_result = double('fake bosh exec result', output: bosh_instances_output_with_jesse_in_unresponsive_state)
+        allow(bosh_runner).to receive(:bosh).with('instances --details').and_return(fake_result)
       end
 
       it 'returns nil' do
-        expect{bosh_helper.wait_for_vm_state('jessez', '0', 'running', 0)}.to raise_error
+        expect{bosh_helper.wait_for_instance_state('jessez', '0', 'running', 0)}.to raise_error
       end
     end
 
-    context 'when "vm" is missing in "bosh vms" output' do
+    context 'when "instance" is missing in "bosh instances" output' do
       before do
-        fake_result = double('fake bosh exec result', output: bosh_vms_output_without_jesse)
-        allow(bosh_runner).to receive(:bosh).with('vms --details').and_return(fake_result)
+        fake_result = double('fake bosh exec result', output: bosh_instances_output_without_jesse)
+        allow(bosh_runner).to receive(:bosh).with('instances --details').and_return(fake_result)
       end
 
       it 'returns nil' do
-        expect{bosh_helper.wait_for_vm_state('jessez', '0', 'running', 0)}.to raise_error
+        expect{bosh_helper.wait_for_instance_state('jessez', '0', 'running', 0)}.to raise_error
       end
     end
 
-    context 'when "vm" was not in desired state at first, but appear after 4 retries' do
-      let(:bad_result) { double('fake exec result', output: bosh_vms_output_with_jesse_in_unresponsive_state) }
-      let(:good_result) { double('fake good exec result', output: bosh_vms_output_with_jesse_in_running_state) }
+    context 'when "instance" was not in desired state at first, but appear after 4 retries' do
+      let(:bad_result) { double('fake exec result', output: bosh_instances_output_with_jesse_in_unresponsive_state) }
+      let(:good_result) { double('fake good exec result', output: bosh_instances_output_with_jesse_in_running_state) }
       before do
-        allow(bosh_runner).to receive(:bosh).with('vms --details').and_return(
+        allow(bosh_runner).to receive(:bosh).with('instances --details').and_return(
             bad_result,
             bad_result,
             bad_result,
@@ -170,16 +359,21 @@ OUTPUT
         )
       end
 
-      it 'returns the vm details' do
-        expect(bosh_helper.wait_for_vm_state('jessez', '0', 'running', 0)).to(eq(
-          vm: 'jessez/29ae97ec-3106-450b-a848-98cb3b25d86f (0)',
-          state: 'running',
-          resource_pool: 'fake_pool',
+      it 'returns the instance details' do
+        expect(bosh_helper.wait_for_instance_state('jessez', '0', 'running', 0)).to(eq(
+          instance: 'jessez/29ae97ec-3106-450b-a848-98cb3b25d86f',
+          process_state: 'running',
           ips: '10.20.30.1',
-          cid: 'i-cid',
+          vm_cid: 'i-cid',
+          vm_type: 'default',
           ignore: 'false',
           agent_id: 'fake-agent-id',
-          resurrection: 'active',
+          resurrection_paused: 'false',
+          az: 'z3',
+          bootstrap: 'false',
+          disk_cids: 'daafa7a0-1df2-4482-67e4-6ec795c76434',
+          index: '0',
+          state: 'started',
         ))
       end
     end

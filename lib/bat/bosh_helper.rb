@@ -124,46 +124,51 @@ module Bat
       list
     end
 
-    def wait_for_vm_state(name, index, state, wait_time_in_seconds=300)
-      puts "Start waiting for vm #{name} to have state #{state}"
-      vm_in_state = nil
+    def wait_for_instance_state(name, index, state, wait_time_in_seconds=300)
+      puts "Start waiting for instance #{name} to have state #{state}"
+      instance_in_state = nil
       10.times do
-        vm = get_vm(name, index)
-        if vm && vm[:state] =~ /#{state}/
-          vm_in_state = vm
+        instance = get_instance(name, index)
+        if instance && instance[:process_state] =~ /#{state}/
+          instance_in_state = instance
           break
         end
         sleep wait_time_in_seconds/10
       end
-      if vm_in_state
-        @logger.info("Finished waiting for vm #{name} have state=#{state} vm=#{vm_in_state.inspect}")
-        vm_in_state
+      if instance_in_state
+        @logger.info("Finished waiting for instance #{name} have state=#{state} instance=#{instance_in_state.inspect}")
+        instance_in_state
       else
-        raise Exception, "VM is still not in expected state: #{state}"
+        raise Exception, "Instance is still not in expected state: #{state}"
       end
     end
 
     private
 
-    def get_vm(name, index)
-      get_vms.find do |v|
-        v[:vm] =~ /#{name}\/[a-f0-9\-]{36} \(#{index}\)/ || v[:vm] =~ /#{name}\/#{index} \([a-f0-9\-]{36}\)/
+    def get_instance(name, index)
+      instance = get_instances.find do |i|
+        i[:instance] =~ /#{name}\/[a-f0-9\-]{36}/ || i[:instance] =~ /#{name}\/#{index} \([a-f0-9\-]{36}\)/ && i[:index] == index
       end
+
+      instance
     end
 
-    def get_vms
-      output = @bosh_runner.bosh('vms --details').output
-      table = output.lines.grep(/\|/)
+    def get_instances
+      output = @bosh_runner.bosh('instances --details').output
+      output_hash = JSON.parse(output)
 
-      table = table.map { |line| line.split('|').map(&:strip).reject(&:empty?) }
-      headers = table.shift || []
+      table = output_hash["Tables"][0]
+
+      headers = table["Header"]
       headers.map! do |header|
-        header.downcase.tr('/ ', '_').to_sym
+        header = header.gsub(/[\s\n]/, '_')
+        header.downcase.to_sym
       end
       output = []
-      table.each do |row|
+      table["Rows"].each do |row|
         output << Hash[headers.zip(row)]
       end
+
       output
     end
 

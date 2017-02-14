@@ -201,7 +201,7 @@ module Bat
     end
 
     def events(task_id)
-      result = @bosh_runner.bosh("task #{task_id} --raw")
+      result = @bosh_runner.bosh("task #{task_id}")
       expect(result).to succeed_with /Task \d+ \w+/
 
       event_list = []
