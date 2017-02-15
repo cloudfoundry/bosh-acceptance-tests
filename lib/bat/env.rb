@@ -3,6 +3,7 @@ module Bat
     REQUIRED_VARS = {
       director:             'BAT_DIRECTOR',
       stemcell_path:        'BAT_STEMCELL',
+      bosh_cli_path:        'BAT_BOSH_CLI',
       deployment_spec_path: 'BAT_DEPLOYMENT_SPEC',
       vcap_password:        'BAT_VCAP_PASSWORD',
       dns_host:             'BAT_DNS_HOST',

@@ -51,6 +51,7 @@ describe Bat::Env do
   def required_vars
     {
         director:             'director',
+        bosh_cli_path:        '/path/bosh-cli',
         stemcell_path:        '/path/stemcell',
         deployment_spec_path: 'BAT_DEPLOYMENT_SPEC',
         vcap_password:        'BAT_VCAP_PASSWORD',

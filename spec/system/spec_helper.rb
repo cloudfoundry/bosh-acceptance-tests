@@ -34,7 +34,7 @@ spec_state = Bat::SpecState.new(
 )
 
 bosh_runner = Bat::BoshRunner.new(
-  'bundle exec bosh',
+  ENV['BAT_BOSH_CLI'],
   bosh_config_file.path,
   env.director_user,
   env.director_password,
