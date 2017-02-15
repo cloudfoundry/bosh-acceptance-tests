@@ -2,7 +2,6 @@ require 'rspec'
 require 'bat/env'
 
 describe Bat::Env do
-
   context 'when required env vars are missing' do
     let(:env_vars) { {} }
 
@@ -43,6 +42,14 @@ describe Bat::Env do
 
         it 'takes the provided value' do
           expect(@env.director_user).to eq('my_user')
+        end
+      end
+
+      context 'director_suffix is provided' do
+        let(:env_vars) { required_vars.merge({director_suffix: 'BAT_DIRECTOR_SUFFIX'}) }
+
+        it 'exposes the values as instance variables' do
+          expect(@env.director_suffix).to eq('BAT_DIRECTOR_SUFFIX')
         end
       end
     end
