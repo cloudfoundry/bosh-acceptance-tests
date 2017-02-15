@@ -2,7 +2,6 @@ require 'common/exec'
 
 module Bat
   class BoshRunner
-    DEFAULT_POLL_INTERVAL = 1
 
     def initialize(executable, cli_config_path, director_user, director_password, logger)
       @executable = executable
@@ -45,17 +44,13 @@ module Bat
     private
 
     def build_command(arguments, options = {})
-      poll_interval = options[:poll_interval] || DEFAULT_POLL_INTERVAL
       command = []
       command << "#{@executable} --non-interactive"
       command << "--environment #{@environment}" if @environment
       command << '--json'
-      command << "-P #{poll_interval}"
       command << "--config #{@cli_config_path}"
       command << "--client #{@director_user} --client-secret #{@director_password}"
       command << arguments
-
-      append_deploy_options(command) if deploy_command?(arguments)
 
       command << '2>&1'
 

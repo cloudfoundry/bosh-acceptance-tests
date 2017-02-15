@@ -16,7 +16,6 @@ describe Bat::BoshRunner do
         fake-bosh-exe
         --non-interactive
         --json
-        -P 1
         --config fake-path-to-bosh-config
         --client admin --client-secret admin
         FAKE_ARGS 2>&1
@@ -80,7 +79,6 @@ describe Bat::BoshRunner do
         fake-bosh-exe
         --non-interactive
         --json
-        -P 1
         --config fake-path-to-bosh-config
         --client admin --client-secret admin
         FAKE_ARGS 2>&1
@@ -95,7 +93,6 @@ describe Bat::BoshRunner do
         --non-interactive
         --environment #{env}
         --json
-        -P 1
         --config fake-path-to-bosh-config
         --client admin --client-secret admin
         FAKE_ARGS 2>&1
