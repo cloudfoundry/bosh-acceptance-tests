@@ -56,8 +56,7 @@ describe 'network configuration' do
     after { manifest_with_different_dns.delete }
 
     it 'successfully reconfigures VM with new DNS nameservers' do
-      expect(bosh("deployment #{manifest_with_different_dns.to_path}")).to succeed
-      expect(bosh('deploy')).to succeed
+      expect(bosh("-d #{manifest_with_different_dns.name} deploy #{manifest_with_different_dns.to_path}")).to succeed
       expect(bosh_ssh('batlight', 0, 'cat /etc/resolv.conf').output).to include('127.0.0.5')
     end
   end
@@ -66,8 +65,7 @@ describe 'network configuration' do
     it 'changes static IP address', changing_static_ip: true do
       use_second_static_ip
       deployment = with_deployment
-      expect(bosh("deployment #{deployment.to_path}")).to succeed
-      expect(bosh('deploy')).to succeed
+      expect(bosh("-d #{deployment.name} deploy #{deployment.to_path}")).to succeed
 
       expect(bosh_ssh('batlight', 0, 'PATH=/sbin:/usr/sbin:$PATH; ifconfig').output).to include(second_static_ip)
     end
@@ -75,8 +73,7 @@ describe 'network configuration' do
     it 'deploys multiple manual networks', multiple_manual_networks: true do
       use_multiple_manual_networks
       deployment = with_deployment
-      expect(bosh("deployment #{deployment.to_path}")).to succeed
-      expect(bosh('deploy')).to succeed
+      expect(bosh("-d #{deployment.name} deploy #{deployment.to_path}")).to succeed
 
       expect(bosh_ssh('batlight', 0, 'PATH=/sbin:/usr/sbin:$PATH; ifconfig').output).to include(static_ips[0])
       expect(bosh_ssh('batlight', 0, 'PATH=/sbin:/usr/sbin:$PATH; ifconfig').output).to include(static_ips[1])

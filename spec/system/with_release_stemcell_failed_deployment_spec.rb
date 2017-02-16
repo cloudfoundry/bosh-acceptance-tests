@@ -19,14 +19,13 @@ describe 'with release, stemcell and failed deployment', core: true do
   end
 
   after do
-    bosh("delete deployment #{deployment_name}")
+    bosh("-d #{deployment_manifest_good.name} delete-deployment")
     deployment_manifest_bad.delete
   end
 
   context 'A brand new deployment' do
     it 'should stop the deployment if the canary fails' do
-      expect(bosh_safe("deployment #{deployment_manifest_bad.to_path}")).to succeed
-      failed_deployment_result = bosh('deploy', on_error: :return)
+      failed_deployment_result = bosh("-d #{deployment_manifest_bad.name} deploy #{deployment_manifest_bad}", on_error: :return)
 
       # possibly check for:
       # Error 400007: 'batlight/0' is not running after update
@@ -41,14 +40,11 @@ describe 'with release, stemcell and failed deployment', core: true do
   context 'A deployment already exists' do
     it 'should stop the deployment if the canary fails' do
       deployment_manifest_good = with_deployment
-      expect(bosh_safe("deployment #{deployment_manifest_good.to_path}")).to succeed
-      expect(bosh_safe('deploy')).to succeed
-
-      expect(bosh_safe("deployment #{deployment_manifest_bad.to_path}")).to succeed
+      expect(bosh_safe("-d #{deployment_manifest_good.name} deploy #{deployment_manifest_good.to_path}")).to succeed
 
       # possibly check for:
       # Error 400007: 'batlight/0' is not running after update
-      failed_deployment_result = bosh_safe('deploy')
+      failed_deployment_result = bosh_safe("-d #{deployment_manifest_bad.name} deploy #{deployment_manifest_bad.to_path}").to succeed
       expect(failed_deployment_result).to_not succeed
 
       events(get_task_id(failed_deployment_result.output, 'error')).each do |event|
