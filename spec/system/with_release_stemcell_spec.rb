@@ -40,14 +40,14 @@ describe 'with release and stemcell and subsequent deployments' do
       expect(swaps()).to include(hash_including('type' => 'partition'))
     end
 
-    def agent_config()
-      output = bosh_ssh('batlight', 0, 'sudo cat /var/vcap/bosh/agent.json').output
+    def agent_config
+      output = bosh_ssh('batlight', 0, 'sudo cat /var/vcap/bosh/agent.json', deployment: deployment.name).output
       # regex to extract json file content from bosh response
       JSON.parse(/(\{(?:[^{}]|\g<1>)*\})/.match(output)[0])
     end
 
-    def mounts()
-      output = bosh_ssh('batlight', 0, 'mount').output
+    def mounts
+      output = bosh_ssh('batlight', 0, 'mount', deployment: deployment.name).output
       output.lines.map do |line|
         matches = /(?<point>.*) on (?<path>.*) type (?<type>.*) \((?<options>.*)\)/.match(line)
         next if matches.nil?
@@ -55,8 +55,8 @@ describe 'with release and stemcell and subsequent deployments' do
       end.compact
     end
 
-    def swaps()
-      output = bosh_ssh('batlight', 0, 'PATH=$PATH:/usr/sbin swapon -s').output
+    def swaps
+      output = bosh_ssh('batlight', 0, 'PATH=$PATH:/usr/sbin swapon -s', deployment: deployment.name).output
       output.lines.to_a[1..-1].map do |line|
         matches = /(?<point>.+)\s+(?<type>.+)\s+(?<size>.+)\s+(?<used>.+)\s+(?<priority>.+)/.match(line)
         next if matches.nil?
@@ -86,9 +86,9 @@ describe 'with release and stemcell and subsequent deployments' do
 
       @requirements.requirement(deployment, @spec)
 
-      bosh_ssh('colocated', 0, "sudo sh -c \"echo 'foobar' > #{SAVE_FILE}\"")
+      bosh_ssh('colocated', 0, "sudo sh -c \"echo 'foobar' > #{SAVE_FILE}\"", deployment: deployment.name)
       unless warden?
-        @size = persistent_disk('colocated', 0)
+        @size = persistent_disk('colocated', 0, deployment: deployment)
       end
       use_persistent_disk(4096)
       @requirements.requirement(deployment, @spec, force: true)
@@ -101,9 +101,9 @@ describe 'with release and stemcell and subsequent deployments' do
     it 'should migrate disk contents', ssh: true do
       # Warden df don't work so skip the persistent disk size check
       unless warden?
-        expect(persistent_disk('colocated', 0)).to_not eq(@size)
+        expect(persistent_disk('colocated', 0, deployment: deployment)).to_not eq(@size)
       end
-      expect(bosh_ssh('colocated', 0, "cat #{SAVE_FILE}").output).to match /foobar/
+      expect(bosh_ssh('colocated', 0, "cat #{SAVE_FILE}", deployment: deployment.name).output).to match /foobar/
     end
   end
 
@@ -131,12 +131,12 @@ describe 'with release and stemcell and subsequent deployments' do
     # this test case will not test password for vcap correctly after changing to bosh_ssh.
     # even with ssh, if we set private_key in our ssh_option, we still failing testing password.
     it 'should set vcap password', ssh: true, core: true do
-      expect(bosh_ssh('colocated', 0, 'sudo whoami').output).to match /root/
+      expect(bosh_ssh('colocated', 0, 'sudo whoami', deployment: deployment.name).output).to match /root/
     end
 
     it 'should not change the deployment on a noop', core: true do
-      deployment_result = bosh('deploy')
-      events(get_task_id(deployment_result.output)).each do |event|
+      bosh("deploy #{deployment.to_path}", deployment: deployment.name)
+      events(get_most_recent_task_id).each do |event|
         if event['stage']
           expect(event['stage']).to_not match(/^Updating/)
         end
@@ -146,7 +146,7 @@ describe 'with release and stemcell and subsequent deployments' do
     it 'should use job colocation', ssh: true, core: true do
       @jobs.each do |job|
         ssh_command = "ps -ef | grep #{job} | grep -v grep"
-        expect(bosh_ssh('colocated', 0, ssh_command).output).to match /#{job}/
+        expect(bosh_ssh('colocated', 0, ssh_command, deployment: deployment.name).output).to match /#{job}/
       end
     end
 
@@ -154,14 +154,14 @@ describe 'with release and stemcell and subsequent deployments' do
       instance = wait_for_instance_state('colocated', '0', 'running')
       expect(instance).to_not be_nil
       expect(static_ip).to_not be_nil
-      expect(bosh_ssh('colocated', 0, 'hostname').output).to match /#{vm[:agent_id]}/
+      expect(bosh_ssh('colocated', 0, 'hostname', deployment: deployment.name).output).to match /#{instance[:agent_id]}/
     end
 
     it 'should have network access to the vm using the vip', vip_networking: true do
       instance = wait_for_instance_state('colocated', '0', 'running')
       expect(instance).to_not be_nil
       expect(vip).to_not be_nil
-      expect(bosh_ssh('colocated', 0, 'hostname').output).to match /#{vm[:agent_id]}/
+      expect(bosh_ssh('colocated', 0, 'hostname', deployment: deployment.name).output).to match /#{instance[:agent_id]}/
     end
   end
 end

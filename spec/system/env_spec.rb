@@ -27,7 +27,7 @@ describe 'initialization', skip_task_check: true, core: true do
 
   describe 'director' do
     it 'should be usable as env' do
-      expect(@bosh_runner.bosh("-e #{@env.director} env")).to succeed_with /Using environment '#{@env.director}'/
+      expect(@bosh_runner.bosh('env')).to succeed
     end
 
     it 'should not have bat deployments' do

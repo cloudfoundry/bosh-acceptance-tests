@@ -35,13 +35,13 @@ describe 'network configuration' do
 
     it 'resolves instance names from deployed VM' do
       # Temporarily add to debug why dig is returning 'connection timed out'
-      resolv_conf = bosh_ssh('batlight', 0, 'cat /etc/resolv.conf').output
+      resolv_conf = bosh_ssh('batlight', 0, 'cat /etc/resolv.conf', deployment: deployment.name).output
       @logger.info("Contents of resolv.conf '#{resolv_conf}'")
 
-      bosh('logs batlight 0 --agent --dir /tmp')
+      bosh('logs batlight/0 --agent --dir /tmp', deployment: deployment.name)
 
       cmd = 'dig +short 0.batlight.static.bat.bosh a 0.batlight.static.bat.microbosh a'
-      expect(bosh_ssh('batlight', 0, cmd).output).to include(public_ip)
+      expect(bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output).to include(public_ip)
     end
   end
 
@@ -57,7 +57,7 @@ describe 'network configuration' do
 
     it 'successfully reconfigures VM with new DNS nameservers' do
       expect(bosh("-d #{manifest_with_different_dns.name} deploy #{manifest_with_different_dns.to_path}")).to succeed
-      expect(bosh_ssh('batlight', 0, 'cat /etc/resolv.conf').output).to include('127.0.0.5')
+      expect(bosh_ssh('batlight', 0, 'cat /etc/resolv.conf', deployment: deployment.name).output).to include('127.0.0.5')
     end
   end
 
@@ -67,7 +67,7 @@ describe 'network configuration' do
       deployment = with_deployment
       expect(bosh("-d #{deployment.name} deploy #{deployment.to_path}")).to succeed
 
-      expect(bosh_ssh('batlight', 0, 'PATH=/sbin:/usr/sbin:$PATH; ifconfig').output).to include(second_static_ip)
+      expect(bosh_ssh('batlight', 0, 'PATH=/sbin:/usr/sbin:$PATH; ifconfig', deployment: deployment.name).output).to include(second_static_ip)
     end
 
     it 'deploys multiple manual networks', multiple_manual_networks: true do
@@ -75,8 +75,8 @@ describe 'network configuration' do
       deployment = with_deployment
       expect(bosh("-d #{deployment.name} deploy #{deployment.to_path}")).to succeed
 
-      expect(bosh_ssh('batlight', 0, 'PATH=/sbin:/usr/sbin:$PATH; ifconfig').output).to include(static_ips[0])
-      expect(bosh_ssh('batlight', 0, 'PATH=/sbin:/usr/sbin:$PATH; ifconfig').output).to include(static_ips[1])
+      expect(bosh_ssh('batlight', 0, 'PATH=/sbin:/usr/sbin:$PATH; ifconfig', deployment: deployment.name).output).to include(static_ips[0])
+      expect(bosh_ssh('batlight', 0, 'PATH=/sbin:/usr/sbin:$PATH; ifconfig', deployment: deployment.name).output).to include(static_ips[1])
     end
   end
 end

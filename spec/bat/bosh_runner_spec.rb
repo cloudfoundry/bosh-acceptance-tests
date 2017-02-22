@@ -39,6 +39,24 @@ describe Bat::BoshRunner do
 
         subject.bosh('FAKE_ARGS', {foo: :bar})
       end
+
+      context 'when deployment option is passed' do
+        it 'removes the option from Bosh::Exec call' do
+          expected_command = %W(
+            fake-bosh-exe
+            --non-interactive
+            --json
+            --config fake-path-to-bosh-config
+            --client admin --client-secret admin
+            --deployment bat
+            FAKE_ARGS 2>&1
+          ).join(' ')
+
+          expect(bosh_exec).to receive(:sh).with(expected_command, {foo: :bar}).and_return(bosh_exec_result)
+
+          subject.bosh('FAKE_ARGS', {foo: :bar, deployment: 'bat'})
+        end
+      end
     end
 
     context 'when bosh command raises an error' do

@@ -12,7 +12,11 @@ module Bat
     end
 
     def bosh(arguments, options = {})
-      command = build_command(arguments, options)
+      command_options = {}
+      if options[:deployment]
+        command_options[:deployment] = options.delete(:deployment)
+      end
+      command = build_command(arguments, command_options)
       begin
         @logger.info("Running bosh command --> #{command}")
         result = Bosh::Exec.sh(command, options)
@@ -50,6 +54,7 @@ module Bat
       command << '--json'
       command << "--config #{@cli_config_path}"
       command << "--client #{@director_user} --client-secret #{@director_password}"
+      command << "--deployment #{options[:deployment]}" if options[:deployment]
       command << arguments
 
       command << '2>&1'

@@ -19,44 +19,54 @@ describe 'with release, stemcell and deployment', core: true do
 
   describe 'agent' do
     before do
-      bosh('vm resurrection batlight 0 off')
+      bosh('update-resurrection off')
     end
 
     after do
-      bosh('vm resurrection batlight 0 on')
+      bosh('update-resurrection on')
     end
 
     it 'should survive agent dying', ssh: true do
       Dir.mktmpdir do |tmpdir|
         ssh_command="echo #{@env.vcap_password} | sudo -S pkill -9 agent"
-        expect(bosh_ssh('batlight', 0, ssh_command)).to succeed
+        expect(bosh_ssh('batlight', 0, ssh_command, deployment: deployment.name)).to succeed
         wait_for_instance_state('batlight', '0', 'running')
-        expect(bosh_safe("logs batlight 0 --agent --dir #{tmpdir}")).to succeed
+        expect(bosh_safe("logs batlight/0 --agent --dir #{tmpdir}", deployment: deployment.name)).to succeed
       end
     end
   end
 
   describe 'ssh' do
     it 'can bosh ssh into a vm' do
-      expect(bosh_ssh('batlight', 0, "uname -a").output).to match /Linux/
+      expect(bosh_ssh('batlight', 0, "uname -a", deployment: deployment.name).output).to match /Linux/
     end
   end
 
   describe 'job' do
     it 'should recreate a job' do
-      expect(bosh_safe('recreate batlight 0')).to succeed_with /batlight\/0 recreated/
+      old_vm_cid = JSON.parse(bosh_safe('instances --details', deployment: deployment.name).output)['Tables'].first['Rows']
+      expect(bosh_safe('recreate batlight/0', deployment: deployment.name)).to succeed
+      new_vm_cid = JSON.parse(bosh_safe('instances --details', deployment: deployment.name).output)['Tables'].first['Rows']
+      expect(old_vm_cid).not_to eq(new_vm_cid)
     end
 
     it 'should stop and start a job' do
-      expect(bosh_safe('stop batlight 0')).to succeed_with /batlight\/0 stopped/
-      expect(bosh_safe('start batlight 0')).to succeed_with /batlight\/0 started/
+      expect(bosh_safe('stop batlight/0', deployment: deployment.name)).to succeed
+      bosh_instances = bosh_safe('instances', deployment: deployment.name).output
+      batlight_0_process_state = JSON.parse(bosh_instances)['Tables'].first['Rows'].first[1]
+      expect(batlight_0_process_state).to match("stopped")
+
+      expect(bosh_safe('start batlight/0', deployment: deployment.name)).to succeed
+      bosh_instances = bosh_safe('instances', deployment: deployment.name).output
+      batlight_0_process_state = JSON.parse(bosh_instances)['Tables'].first['Rows'].first[1]
+      expect(batlight_0_process_state).to match("running")
     end
   end
 
   describe 'logs' do
     it 'should get agent log' do
       with_tmpdir do
-        expect(bosh_safe('logs batlight 0 --agent')).to succeed_with /Logs saved in/
+        expect(bosh_safe('logs batlight/0 --agent', deployment: deployment.name)).to succeed_with /Downloading resource/
         files = tar_contents(tarfile)
         expect(files).to include './current'
       end
@@ -64,7 +74,7 @@ describe 'with release, stemcell and deployment', core: true do
 
     it 'should get job logs' do
       with_tmpdir do
-        expect(bosh_safe('logs batlight 0')).to succeed_with /Logs saved in/
+        expect(bosh_safe('logs batlight/0', deployment: deployment.name)).to succeed_with /Downloading resource/
         files = tar_contents(tarfile)
         expect(files).to include './batlight/batlight.stdout.log'
         expect(files).to include './batlight/batlight.stderr.log'

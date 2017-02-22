@@ -179,16 +179,20 @@ module Bat
       @spec['properties'].fetch('network', {}).fetch('type', nil)
     end
 
-    def get_task_id(output, state = 'done')
-      task_regex = /Task (\d+) #{state}/
-      expect(output).to match(task_regex)
-      match = output.match(task_regex)
-      match[1]
+    def get_most_recent_task_id
+      output = @bosh_runner.bosh("tasks --recent=1").output
+      JSON.parse(output)["Tables"].first["Rows"].first.first
     end
 
-    def events(task_id)
-      result = @bosh_runner.bosh("task #{task_id}")
-      expect(result).to succeed_with /Task \d+ \w+/
+    def events(task_id, expected_task_status = 'done')
+      result = @bosh_runner.bosh_safe("task #{task_id} --event")
+      if expected_task_status == 'error'
+        expect(result).to_not succeed
+      else
+        expect(result).to succeed
+      end
+
+      expect(result.output).to match /Task #{task_id} #{expected_task_status}/
 
       event_list = []
       result.output.split("\n").each do |line|
