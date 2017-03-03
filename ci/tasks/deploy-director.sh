@@ -12,11 +12,12 @@ function fromEnvironment() {
 }
 
 export BOSH_internal_cidr=$(fromEnvironment '.PublicCIDR')
-export BOSH_az=$(fromEnvironment 'AvailabilityZone')
+export BOSH_az=$(fromEnvironment '.AvailabilityZone')
 export BOSH_internal_gw=$(fromEnvironment '.PublicGateway')
 export BOSH_internal_ip=$(fromEnvironment '.StaticIP1')
 export BOSH_reserved_range="[$(fromEnvironment '.ReservedRange')]"
-export BOSH_security_groups="[$(fromEnvironment '.SecurityGroupID')]"
+export BOSH_subnet_id=$(fromEnvironment '.PublicSubnetID')
+export BOSH_default_security_groups="[$(fromEnvironment '.SecurityGroupID')]"
 
 export BOSH_local_aws_cpi_release="cpi-release/release.tgz"
 
