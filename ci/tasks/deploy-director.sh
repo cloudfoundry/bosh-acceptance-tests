@@ -11,11 +11,12 @@ function fromEnvironment() {
   cat $environment | jq -r "$key"
 }
 
-export BOSH_internal_cidr=$(fromEnvironment '.network1.vCenterCIDR')
-export BOSH_internal_gw=$(fromEnvironment '.network1.vCenterGateway')
-export BOSH_internal_ip=$(fromEnvironment '.network1["staticIP-1"]')
-export BOSH_network_name=$(fromEnvironment '.network1.vCenterVLAN')
-export BOSH_reserved_range="[$(fromEnvironment '.network1.reservedRange')]"
+export BOSH_internal_cidr=$(fromEnvironment '.PublicCIDR')
+export BOSH_az=$(fromEnvironment 'AvailabilityZone')
+export BOSH_internal_gw=$(fromEnvironment '.PublicGateway')
+export BOSH_internal_ip=$(fromEnvironment '.StaticIP1')
+export BOSH_reserved_range="[$(fromEnvironment '.ReservedRange')]"
+export BOSH_security_groups="[$(fromEnvironment '.SecurityGroupID')]"
 
 export BOSH_local_aws_cpi_release="cpi-release/release.tgz"
 
@@ -31,6 +32,7 @@ $bosh_cli interpolate bosh-deployment/bosh.yml \
   --vars-store director-creds.yml \
   -v director_name=bats-director \
   --ops-file bats/ci/assets/local-aws-cpi-release.yml \
+  --ops-file bats/ci/assets/ssh_key \
   --vars-env "BOSH" > director.yml
 
 $bosh_cli create-env director.yml -l director-creds.yml
