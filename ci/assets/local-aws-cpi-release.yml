@@ -1,9 +1,6 @@
 - type: replace
-  path: /releases/-
-  value:
-    name: bosh-aws-cpi
-    version: latest
-    url: file://((local_aws_cpi_release))
+  path: /releases/name=bosh-aws-cpi/url
+  value: file://((local_aws_cpi_release))
 
 - type: remove
   path: /releases/name=bosh-aws-cpi/sha1
