@@ -29,13 +29,14 @@ export bosh_cli=$(realpath bosh-cli/bosh-cli-*)
 chmod +x $bosh_cli
 
 $bosh_cli interpolate bats/ci/assets/ssh_key.yml --vars-store=/tmp/ssh_keystore
+$bosh_cli interpolate /tmp/ssh_keystore --path=/private_key/private_key > /tmp/ssh_private_key
 
 $bosh_cli interpolate bosh-deployment/bosh.yml \
   -o bosh-deployment/aws/cpi.yml \
   -o bats/ci/assets/local-aws-cpi-release.yml \
   --vars-store director-creds.yml \
   -v director_name=bats-director \
-  -v private_key=$($bosh_cli interpolate /tmp/ssh_keystore --path=/private_key/private_key) \
+  -v private_key=$(ruby -e 'puts File.read("/tmp/ssh_private_key").split("\n").join("\\n")') \
   --vars-env "BOSH" > director.yml
 
 $bosh_cli create-env director.yml -l director-creds.yml
