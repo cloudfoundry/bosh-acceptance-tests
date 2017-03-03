@@ -1,6 +1,5 @@
-- type: replace
-  path: /variables/-
-  value:
-    name: private_key
+---
+variables:
+  - name: private_key
     type: ssh
 

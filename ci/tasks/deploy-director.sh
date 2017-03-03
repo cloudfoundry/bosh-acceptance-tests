@@ -28,12 +28,14 @@ EOF
 export bosh_cli=$(realpath bosh-cli/bosh-cli-*)
 chmod +x $bosh_cli
 
+$bosh_cli interpolate bats/ci/assets/ssh_key.yml --vars-store=/tmp/ssh_keystore
+
 $bosh_cli interpolate bosh-deployment/bosh.yml \
   -o bosh-deployment/aws/cpi.yml \
   --vars-store director-creds.yml \
   -v director_name=bats-director \
-  --ops-file bats/ci/assets/local-aws-cpi-release.yml \
-  --ops-file bats/ci/assets/ssh_key.yml \
+  -v private_key=$($bosh_cli interpolate /tmp/ssh_keystore --path=/private_key/private_key) \
+  -o bats/ci/assets/local-aws-cpi-release.yml \
   --vars-env "BOSH" > director.yml
 
 $bosh_cli create-env director.yml -l director-creds.yml
