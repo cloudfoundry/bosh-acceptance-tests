@@ -46,7 +46,7 @@ resources:
 - name: bats
   type: git
   source:
-    branch: master
+    branch: gocli-bats
     uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
 jobs:
 - name: create-environment
