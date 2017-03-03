@@ -1,0 +1,126 @@
+groups:
+- name: bosh-aws-ubuntu-bats
+  jobs:
+  - ubuntu-bats
+- name: environments
+  jobs:
+  - create-environment
+  - destroy-environment
+resources:
+- name: bosh-candidate-release-tarballs
+  type: s3
+  source:
+    bucket: bosh-candidate-release-tarballs
+    regexp: bosh.*\+dev\.(\d+)\.tgz
+- name: bosh-deployment
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cloudfoundry/bosh-deployment.git
+- name: bosh-src
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cloudfoundry/bosh.git
+- name: cpi-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry-incubator/bosh-aws-cpi-release
+- name: environment
+  type: pool
+  source:
+    branch: master
+    pool: aws
+    private_key: {{github_deployment_key__bosh-bats-environments}}
+    uri: git@github.com:pivotal-cf-experimental/bats-concourse-pool.git
+- name: bosh-cli
+  type: s3
+  source:
+    bucket: bosh-cli-artifacts
+    regexp: bosh-cli-([0-9.]+)-linux-amd64
+    region_name: us-east-1
+- name: ubuntu-stemcell
+  type: bosh-io-stemcell
+  source:
+    name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+- name: bats
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
+jobs:
+- name: create-environment
+  plan:
+  - get: bosh-src
+  - put: environment
+- name: destroy-environment
+  plan:
+  - get: bosh-src
+  - put: environment
+    params:
+      acquire: true
+  - task: ensure-terminated
+    file: bosh-src/ci/pipelines/aws-bats/tasks/ensure-terminated.yml
+    params:
+      AWS_ACCESS_KEY_ID: {{aws_access_key__primary}}
+      AWS_DEFAULT_REGION: {{aws_region__primary}}
+      AWS_SECRET_ACCESS_KEY: {{aws_secret_key__primary}}
+  - put: environment
+    params:
+      remove: environment
+- name: ubuntu-bats
+  max_in_flight: 3
+  plan:
+  - do:
+    - aggregate:
+      - get: stemcell
+        trigger: true
+        resource: ubuntu-stemcell
+      - get: bosh-release
+        trigger: true
+        resource: bosh-candidate-release-tarballs
+      - get: cpi-release
+        trigger: true
+        params:
+          tarball: true
+      - get: bats
+      - get: bosh-cli
+      - get: bosh-deployment
+      - get: bosh-src
+    - put: environment
+      params:
+        acquire: true
+    - do:
+      - task: deploy-director
+        file: bats/ci/tasks/deploy-director.yml
+      #- task: prepare-manual-bats
+      #  file: certification/aws/tasks/prepare-manual-bats.yml
+      #  params:
+      #    AWS_ACCESS_KEY: {{aws_access_key__primary}}
+      #    AWS_REGION_NAME: {{aws_region__primary}}
+      #    AWS_SECRET_KEY: {{aws_secret_key__primary}}
+      #    BAT_VCAP_PASSWORD: c1oudc0w
+      #    BOSH_CLIENT: admin
+      #    BOSH_CLIENT_SECRET: admin
+      #    PUBLIC_KEY_NAME: bats-dev
+      #    STEMCELL_NAME: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+      #  input_mapping:
+      #    pipelines: bats
+      #- task: run-bats
+      #  file: certification/shared/tasks/run-bats.yml
+      #  input_mapping:
+      #    pipelines: certification
+      #ensure:
+      #  do:
+      #  - task: teardown
+      #    file: certification/shared/tasks/teardown.yml
+      #    params:
+      #      DEPLOYMENT_NAME: certification
+      #    input_mapping:
+      #      pipelines: certification
+    ensure:
+      do:
+      - put: environment
+        params:
+          release: environment
+
