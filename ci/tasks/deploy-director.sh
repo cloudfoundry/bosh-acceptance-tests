@@ -32,7 +32,7 @@ $bosh_cli interpolate bosh-deployment/bosh.yml \
   --vars-store director-creds.yml \
   -v director_name=bats-director \
   --ops-file bats/ci/assets/local-aws-cpi-release.yml \
-  --ops-file bats/ci/assets/ssh_key \
+  --ops-file bats/ci/assets/ssh_key.yml \
   --vars-env "BOSH" > director.yml
 
 $bosh_cli create-env director.yml -l director-creds.yml

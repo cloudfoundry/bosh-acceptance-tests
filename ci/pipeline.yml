@@ -93,6 +93,11 @@ jobs:
     - do:
       - task: deploy-director
         file: bats/ci/tasks/deploy-director.yml
+        params:
+          BOSH_access_key_id: {{BOSH_access_key_id}}
+          BOSH_secret_access_key: {{BOSH_secret_access_key}}
+          BOSH_region: {{BOSH_region}}
+          BOSH_default_key_name: {{BOSH_default_key_name}}
       #- task: prepare-manual-bats
       #  file: certification/aws/tasks/prepare-manual-bats.yml
       #  params:

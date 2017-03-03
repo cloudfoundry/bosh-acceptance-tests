@@ -22,7 +22,7 @@ outputs:
 params:
   BOSH_access_key_id: ""
   BOSH_secret_access_key: ""
-  BOSH_region: "us-east"
+  BOSH_region: "us-east-1"
   BOSH_default_key_name: "bats_key"
 
 run:
