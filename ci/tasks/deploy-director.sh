@@ -36,7 +36,7 @@ $bosh_cli interpolate bosh-deployment/bosh.yml \
   -o bats/ci/assets/local-aws-cpi-release.yml \
   --vars-store director-creds.yml \
   -v director_name=bats-director \
-  -v private_key=$(ruby -e 'puts File.read("/tmp/ssh_private_key").split("\n").join("\\n")') \
+  --var-file private_key=/tmp/ssh_private_key \
   --vars-env "BOSH" > director.yml
 
 $bosh_cli create-env director.yml -l director-creds.yml
