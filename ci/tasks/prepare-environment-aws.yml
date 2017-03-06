@@ -4,10 +4,9 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: bosh/main-ruby-go
+    repository: bosh/main-bats-aws
 
 inputs:
-- name: bats-config
 - name: bosh-src
 - name: bats
 - name: bosh-deployment
@@ -18,7 +17,14 @@ inputs:
 - name: environment
 
 outputs:
-- name: director-state
+- name: bats-config
+
+params:
+  BOSH_access_key_id: ""
+  BOSH_secret_access_key: ""
+  BOSH_region: "us-east-1"
+  STEMCELL_NAME: ""
 
 run:
-  path: bats/ci/tasks/deploy-director.sh
+  path: bats/ci/tasks/prepare-environment-aws.sh
+
