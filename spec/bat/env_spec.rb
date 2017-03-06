@@ -44,14 +44,6 @@ describe Bat::Env do
           expect(@env.director_user).to eq('my_user')
         end
       end
-
-      context 'director_suffix is provided' do
-        let(:env_vars) { required_vars.merge({director_suffix: 'BAT_DIRECTOR_SUFFIX'}) }
-
-        it 'exposes the values as instance variables' do
-          expect(@env.director_suffix).to eq('BAT_DIRECTOR_SUFFIX')
-        end
-      end
     end
   end
 
