@@ -46,7 +46,7 @@ export BOSH_reserved_range="[${RESERVED_RANGE}]"
 export BOSH_subnet_id=${SUBNET_ID}
 export BOSH_default_security_groups="[${DEFAULT_SECURITY_GROUPS}]"
 export BOSH_default_key_name="${KEYPAIR_NAME}"
-export BOSH_local_aws_cpi_release="cpi-release/release.tgz"
+export BOSH_local_aws_cpi_release="$PWD/cpi-release/release.tgz"
 
 cat > $OUTPUT_DIR/director-creds.yml <<EOF
 internal_ip: $BOSH_internal_ip
