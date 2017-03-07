@@ -18,6 +18,8 @@ chmod +x $bosh_cli
 
 DIRECTOR_CREDS=$bats_config/director-creds.yml
 
+cp cpi-release/*.tgz /tmp/release.tgz
+
 $bosh_cli create-env $bats_config/director.yml -l $DIRECTOR_CREDS
 
 # occasionally we get a race where director process hasn't finished starting
@@ -34,4 +36,4 @@ $bosh_cli -n update-cloud-config bosh-deployment/aws/cloud-config.yml \
           --vars-env "BOSH"
 
 mv $HOME/.bosh director-state/
-mv $DIRECTOR_CREDS director-state.json director-state/
+cp $DIRECTOR_CREDS $bats_config/director-state.json director-state/
