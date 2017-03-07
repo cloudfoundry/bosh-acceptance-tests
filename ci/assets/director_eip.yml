@@ -1,0 +1,32 @@
+---
+- type: replace
+  path: /cloud_provider/mbus
+  value: https://mbus:((mbus_bootstrap_password))@((elastic_ip)):6868
+
+- type: replace
+  path: /cloud_provider/ssh_tunnel/host
+  value: ((elastic_ip))
+
+- type: add
+  path: /networks/-
+  value:
+    name: vip
+    type: vip
+
+- type: add
+  path: /instance_groups/name=bosh/networks/-
+  value:
+    name: vip
+    static_ips: [((elastic_ip))]
+
+- type: add
+  path: /instance_groups/name=bosh/networks/name=default/default
+  value: [dns,gateway]
+
+- type: replace
+  path: /variables/name=director_ssl/options/common_name
+  value: ((elastic_ip))
+
+- type: replace
+  path: /variables/name=director_ssl/options/alternative_names
+  value: ((elastic_ip))

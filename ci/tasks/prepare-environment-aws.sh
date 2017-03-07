@@ -47,6 +47,7 @@ export BOSH_subnet_id=${SUBNET_ID}
 export BOSH_default_security_groups="[${DEFAULT_SECURITY_GROUPS}]"
 export BOSH_default_key_name="${KEYPAIR_NAME}"
 export BOSH_local_aws_cpi_release="/tmp/release.tgz"
+export BOSH_elastic_ip=$(fromEnvironment '.DirectorEIP')
 
 cat > $OUTPUT_DIR/director-creds.yml <<EOF
 internal_ip: $BOSH_internal_ip
@@ -57,6 +58,7 @@ EOF
 $bosh_cli interpolate bosh-deployment/bosh.yml \
   -o bosh-deployment/aws/cpi.yml \
   -o bats/ci/assets/local-aws-cpi-release.yml \
+  -o bats/ci/assets/director_eip.yml \
   --vars-store $OUTPUT_DIR/director-creds.yml \
   -v director_name=bats-director \
   --var-file private_key=$SSH_KEY_PATH \
