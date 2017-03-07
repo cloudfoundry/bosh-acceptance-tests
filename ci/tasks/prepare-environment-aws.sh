@@ -51,6 +51,7 @@ export BOSH_elastic_ip=$(fromEnvironment '.DirectorEIP')
 
 cat > $OUTPUT_DIR/director-creds.yml <<EOF
 internal_ip: $BOSH_internal_ip
+elastic_ip: $BOSH_elastic_ip
 EOF
 
 #TODO use stemcell
@@ -111,3 +112,7 @@ properties:
       subnet: ${SUBNET_ID}
       security_groups: [${DEFAULT_SECURITY_GROUPS}]
 EOF
+
+$bosh_cli -n interpolate bosh-deployment/aws/cloud-config.yml \
+          --ops-file bats/ci/assets/reserve-ips.yml \
+          --vars-env "BOSH" > ${OUTPUT_DIR}/cloud-config.yml
