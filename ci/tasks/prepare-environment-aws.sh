@@ -1,15 +1,15 @@
 #!/bin/bash
 
-set -eu
+set -e
 
 export AWS_ACCESS_KEY_ID=$BOSH_access_key_id
 export AWS_SECRET_ACCESS_KEY=$BOSH_secret_access_key
 export AWS_DEFAULT_REGION=$BOSH_region
+export bosh_cli=$(realpath bosh-cli/bosh-cli-*)
+chmod +x $bosh_cli
 
-set +u
 source /etc/profile.d/chruby.sh
 chruby 2.1.7
-set -u
 
 OUTPUT_DIR='bats-config'
 SSH_KEY_PATH="$OUTPUT_DIR/ssh_key.pem"
