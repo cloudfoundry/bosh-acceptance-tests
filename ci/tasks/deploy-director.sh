@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
@@ -15,6 +13,7 @@ DIRECTOR_CREDS=$bats_config/director-creds.yml
 cp cpi-release/*.tgz /tmp/release.tgz
 
 $bosh_cli create-env $bats_config/director.yml -l $DIRECTOR_CREDS
+deploy_successful=$?
 
 # occasionally we get a race where director process hasn't finished starting
 # before nginx is reachable causing "Cannot talk to director..." messages.
@@ -29,3 +28,5 @@ $bosh_cli -n update-cloud-config $bats_config/cloud-config.yml
 
 mv $HOME/.bosh director-state/
 cp $bats_config/director.yml $DIRECTOR_CREDS $bats_config/director-state.json director-state/
+
+exit $deploy_successful

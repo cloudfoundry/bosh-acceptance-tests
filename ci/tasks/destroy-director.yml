@@ -10,6 +10,7 @@ inputs:
 - name: bats
 - name: director-state
 - name: bosh-cli
+- name: cpi-release
 
 params:
   deployment_name: ""

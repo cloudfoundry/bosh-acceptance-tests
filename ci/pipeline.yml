@@ -98,14 +98,11 @@ jobs:
           BOSH_secret_access_key: {{aws_secret_key__primary}}
           BOSH_region: {{aws_region__primary}}
           STEMCELL_NAME: "bosh-aws-xen-hvm-ubuntu-trusty-go_agent"
-
       - task: deploy-director
         file: bats/ci/tasks/deploy-director.yml
         params: {}
-      #- task: run-bats
-      #  file: certification/shared/tasks/run-bats.yml
-      #  input_mapping:
-      #    pipelines: certification
+      - task: run-bats
+        file: bats/ci/tasks/run-bats.yml
       ensure:
         task: destroy-director
         file: bats/ci/tasks/destroy-director.yml
