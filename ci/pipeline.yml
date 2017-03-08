@@ -102,35 +102,17 @@ jobs:
       - task: deploy-director
         file: bats/ci/tasks/deploy-director.yml
         params: {}
-      #- task: prepare-manual-bats
-      #  file: certification/aws/tasks/prepare-manual-bats.yml
-      #  params:
-      #    AWS_ACCESS_KEY: {{aws_access_key__primary}}
-      #    AWS_REGION_NAME: {{aws_region__primary}}
-      #    AWS_SECRET_KEY: {{aws_secret_key__primary}}
-      #    BAT_VCAP_PASSWORD: c1oudc0w
-      #    BOSH_CLIENT: admin
-      #    BOSH_CLIENT_SECRET: admin
-      #    PUBLIC_KEY_NAME: bats-dev
-      #    STEMCELL_NAME: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
-      #  input_mapping:
-      #    pipelines: bats
       #- task: run-bats
       #  file: certification/shared/tasks/run-bats.yml
       #  input_mapping:
       #    pipelines: certification
-      #ensure:
-      #  do:
-      #  - task: teardown
-      #    file: certification/shared/tasks/teardown.yml
-      #    params:
-      #      DEPLOYMENT_NAME: certification
-      #    input_mapping:
-      #      pipelines: certification
-    - ensure:
+      ensure:
       - task: destroy-director
         file: bats/ci/tasks/destroy-director.yml
-      - put: environment
-        params:
-          release: environment
+          params:
+            deployment_name: certification
+    ensure:
+    - put: environment
+      params:
+        release: environment
 

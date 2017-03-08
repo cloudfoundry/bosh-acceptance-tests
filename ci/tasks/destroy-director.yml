@@ -11,5 +11,8 @@ inputs:
 - name: director-state
 - name: bosh-cli
 
+params:
+  deployment_name: ""
+
 run:
   path: bats/ci/tasks/destroy-director.sh

@@ -11,4 +11,10 @@ chmod +x $bosh_cli
 director_state="$PWD/director-state"
 director_creds=${director_state}/director-creds.yml
 
-$bosh_cli delete-env ${director_state}/director.yml -l $director_creds
+export BOSH_ENVIRONMENT=`$bosh_cli int $director_creds --path /elastic_ip`
+export BOSH_CA_CERT=`$bosh_cli int $director_creds --path /director_ssl/ca`
+export BOSH_CLIENT=admin
+export BOSH_CLIENT_SECRET=`$bosh_cli int $director_creds --path /admin_password`
+
+$bosh_cli delete-deployment -n -d $deployment_name
+$bosh_cli delete-env -n ${director_state}/director.yml -l $director_creds
