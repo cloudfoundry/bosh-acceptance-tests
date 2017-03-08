@@ -1,0 +1,14 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: bosh/main-ruby-go
+
+inputs:
+- name: director-state
+- name: bosh-cli
+
+run:
+  path: bats/ci/tasks/destroy_director.sh

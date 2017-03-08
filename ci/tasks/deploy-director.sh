@@ -2,15 +2,6 @@
 
 set -e
 
-source /etc/profile.d/chruby.sh
-chruby 2.1.7
-
-function fromEnvironment() {
-  local key="$1"
-  local environment=environment/metadata
-  cat $environment | jq -r "$key"
-}
-
 bats_config="$PWD/bats-config"
 
 export bosh_cli=$(realpath bosh-cli/bosh-cli-*)
@@ -34,4 +25,4 @@ export BOSH_CLIENT_SECRET=`$bosh_cli int $DIRECTOR_CREDS --path /admin_password`
 $bosh_cli -n update-cloud-config $bats_config/cloud-config.yml
 
 mv $HOME/.bosh director-state/
-cp $DIRECTOR_CREDS $bats_config/director-state.json director-state/
+cp $bats_config/director.yml $DIRECTOR_CREDS $bats_config/director-state.json director-state/
