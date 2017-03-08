@@ -127,10 +127,9 @@ jobs:
       #      DEPLOYMENT_NAME: certification
       #    input_mapping:
       #      pipelines: certification
-    ensure:
-      do:
-      - task: destroy_director
-        file: bats/ci/tasks/destroy_director.yml
+    - ensure:
+      - task: destroy-director
+        file: bats/ci/tasks/destroy-director.yml
       - put: environment
         params:
           release: environment

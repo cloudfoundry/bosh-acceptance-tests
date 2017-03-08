@@ -7,8 +7,9 @@ image_resource:
     repository: bosh/main-ruby-go
 
 inputs:
+- name: bats
 - name: director-state
 - name: bosh-cli
 
 run:
-  path: bats/ci/tasks/destroy_director.sh
+  path: bats/ci/tasks/destroy-director.sh
