@@ -24,7 +24,7 @@ source "$(realpath bats-config/bats.env)"
 : ${BAT_DNS_HOST:?}
 : ${BAT_INFRASTRUCTURE:?}
 : ${BAT_NETWORKING:?}
-#: ${BAT_VCAP_PASSWORD:?}
+: ${BAT_VCAP_PASSWORD:?}
 
 : ${BAT_VCAP_PRIVATE_KEY:=""}
 : ${BAT_VIP:=""}

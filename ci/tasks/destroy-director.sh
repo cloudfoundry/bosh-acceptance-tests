@@ -21,5 +21,5 @@ export BOSH_CLIENT_SECRET=`$bosh_cli int $director_creds --path /admin_password`
 set +e
 
 $bosh_cli delete-deployment -n -d $deployment_name
-$bosh_cli clean-up --all
+$bosh_cli clean-up -n --all
 $bosh_cli delete-env -n ${director_state}/director.yml -l $director_creds
