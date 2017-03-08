@@ -2,6 +2,9 @@
 
 set -e
 
+source /etc/profile.d/chruby.sh
+chruby 2.1.7
+
 export bosh_cli=$(realpath bosh-cli/bosh-cli-*)
 chmod +x $bosh_cli
 

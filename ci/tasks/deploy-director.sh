@@ -2,6 +2,9 @@
 
 set -e
 
+source /etc/profile.d/chruby.sh
+chruby 2.1.7
+
 bats_config="$PWD/bats-config"
 
 export bosh_cli=$(realpath bosh-cli/bosh-cli-*)
