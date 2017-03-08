@@ -2,7 +2,6 @@
 
 set -e
 
-source pipelines/shared/utils.sh
 source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
@@ -12,8 +11,6 @@ export BAT_DEPLOYMENT_SPEC=$(realpath bats-config/bats-config.yml)
 export BAT_BOSH_CLI=$(realpath bosh-cli/bosh-cli-*)
 chmod +x $BAT_BOSH_CLI
 bats_dir=$(realpath bats)
-
-export BAT_DIRECTOR_SUFFIX=".sslip.io"
 
 # disable host key checking for deployed VMs
 mkdir -p $HOME/.ssh
@@ -27,7 +24,7 @@ source "$(realpath bats-config/bats.env)"
 : ${BAT_DNS_HOST:?}
 : ${BAT_INFRASTRUCTURE:?}
 : ${BAT_NETWORKING:?}
-: ${BAT_VCAP_PASSWORD:?}
+#: ${BAT_VCAP_PASSWORD:?}
 
 : ${BAT_VCAP_PRIVATE_KEY:=""}
 : ${BAT_VIP:=""}
