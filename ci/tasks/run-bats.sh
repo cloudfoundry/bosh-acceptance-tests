@@ -33,7 +33,8 @@ source "$(realpath bats-config/bats.env)"
 : ${BAT_RSPEC_FLAGS:=""}
 : ${BAT_DIRECTOR_USER:=""}
 : ${BAT_DIRECTOR_PASSWORD:=""}
-: ${BAT_DIRECTOR_CA:=""}
+
+export BAT_DIRECTOR_CA=$(realpath bats-config/ca)
 
 if [ -n "${BAT_VCAP_PRIVATE_KEY}" ]; then
   ssh_key_path="$(realpath ${BAT_VCAP_PRIVATE_KEY})"

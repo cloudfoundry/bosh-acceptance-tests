@@ -72,6 +72,10 @@ SECURITY_GROUP=$(fromEnvironment '.SecurityGroupID')
 BOSH_CLIENT=admin
 BOSH_CLIENT_SECRET=$($bosh_cli int $OUTPUT_DIR/director-creds.yml --path=/admin_password)
 
+cat > "${OUTPUT_DIR}/ca" <<EOF
+$($bosh_cli int $OUTPUT_DIR/director-creds.yml --path /director_ssl/ca)
+EOF
+
 cat > "${OUTPUT_DIR}/bats.env" <<EOF
 export BAT_DIRECTOR=${DIRECTOR_EIP}
 export BAT_DNS_HOST=${DIRECTOR_EIP}
@@ -85,7 +89,6 @@ export BAT_SECURITY_GROUP_NAME=${SECURITY_GROUP}
 export BAT_RSPEC_FLAGS="--tag ~multiple_manual_networks --tag ~root_partition"
 export BAT_DIRECTOR_USER="${BOSH_CLIENT}"
 export BAT_DIRECTOR_PASSWORD="${BOSH_CLIENT_SECRET}"
-export BAT_DIRECTOR_CA=$($bosh_cli int $OUTPUT_DIR/director-creds.yml --path /director_ssl/ca)
 EOF
 
 # BATs spec generation
