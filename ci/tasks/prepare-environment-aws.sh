@@ -60,7 +60,9 @@ $bosh_cli interpolate bosh-deployment/bosh.yml \
   -o bosh-deployment/aws/cpi.yml \
   -o bats/ci/assets/local-aws-cpi-release.yml \
   -o bats/ci/assets/director_eip.yml \
+  -o bosh-deployment/powerdns.yml \
   --vars-store $OUTPUT_DIR/director-creds.yml \
+  -v dns_recursor_ip=8.8.8.8 \
   -v director_name=bats-director \
   --var-file private_key=$SSH_KEY_PATH \
   --vars-env "BOSH" > $OUTPUT_DIR/director.yml
@@ -71,10 +73,10 @@ SUBNET_ID=$(fromEnvironment '.PublicSubnetID')
 SECURITY_GROUP=$(fromEnvironment '.SecurityGroupID')
 BOSH_CLIENT=admin
 BOSH_CLIENT_SECRET=$($bosh_cli int $OUTPUT_DIR/director-creds.yml --path=/admin_password)
+DIRECTOR_CA_PATH="${OUTPUT_DIR}/ca"
 
-cat > "${OUTPUT_DIR}/ca" <<EOF
-$($bosh_cli int $OUTPUT_DIR/director-creds.yml --path /director_ssl/ca)
-EOF
+$bosh_cli int $OUTPUT_DIR/director-creds.yml --path /director_ssl/ca > ${DIRECTOR_CA_PATH}
+
 
 cat > "${OUTPUT_DIR}/bats.env" <<EOF
 export BAT_DIRECTOR=${DIRECTOR_EIP}
@@ -89,6 +91,7 @@ export BAT_SECURITY_GROUP_NAME=${SECURITY_GROUP}
 export BAT_RSPEC_FLAGS="--tag ~multiple_manual_networks --tag ~root_partition"
 export BAT_DIRECTOR_USER="${BOSH_CLIENT}"
 export BAT_DIRECTOR_PASSWORD="${BOSH_CLIENT_SECRET}"
+export BAT_DIRECTOR_CA=${DIRECTOR_CA_PATH}
 EOF
 
 # BATs spec generation
