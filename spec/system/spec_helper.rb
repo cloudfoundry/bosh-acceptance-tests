@@ -38,6 +38,7 @@ bosh_runner = Bat::BoshRunner.new(
   bosh_config_file.path,
   env.director_user,
   env.director_password,
+  env.director_ca,
   logger
 )
 

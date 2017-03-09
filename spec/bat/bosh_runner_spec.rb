@@ -3,10 +3,10 @@ require 'bat/bosh_runner'
 require 'logger'
 
 describe Bat::BoshRunner do
-  subject { described_class.new('fake-bosh-exe', 'fake-path-to-bosh-config', 'admin', 'admin', logger) }
+  subject { described_class.new('fake-bosh-exe', 'fake-path-to-bosh-config', 'admin', 'admin', ca_cert, logger) }
 
   let(:logger) { instance_double('Logger', info: nil) }
-
+  let(:ca_cert) { nil }
   let(:bosh_exec) { class_double('Bosh::Exec').as_stubbed_const(transfer_nested_constants: true) }
   let(:bosh_exec_result) { instance_double('Bosh::Exec::Result', output: 'FAKE_OUTPUT') }
 
@@ -31,6 +31,25 @@ describe Bat::BoshRunner do
       allow(bosh_exec).to receive(:sh).and_return(bosh_exec_result)
 
       expect(subject.bosh('FAKE_ARGS')).to eq(bosh_exec_result)
+    end
+
+    context 'when a ca_cert is provided' do
+      let(:ca_cert) { 'CACERT' }
+
+      it 'passes the ca_cert to Bosh::Exec' do
+        expected_command = %W(
+        fake-bosh-exe
+        --non-interactive
+        --json
+        --config fake-path-to-bosh-config
+        --client admin --client-secret admin
+        --ca-cert CACERT
+        FAKE_ARGS 2>&1
+      ).join(' ')
+
+        expect(bosh_exec).to receive(:sh).with(expected_command, {}).and_return(bosh_exec_result)
+        subject.bosh('FAKE_ARGS')
+      end
     end
 
     context 'when options are passed' do

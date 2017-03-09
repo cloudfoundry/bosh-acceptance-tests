@@ -33,6 +33,14 @@ describe Bat::Env do
         expect(@env.instance_variable_defined? '@debug_mode').to be false
       end
 
+      context 'env_vars include a director_ca' do
+        let(:env_vars) { required_vars.merge({director_ca: 'BAT_DIRECTOR_CA'}) }
+
+        it 'sets director_ca' do
+          expect(@env.director_ca).to eq('BAT_DIRECTOR_CA')
+        end
+      end
+
       context 'when default value exists' do
         let(:env_vars) { required_vars.merge({director_user: 'my_user'}) }
 

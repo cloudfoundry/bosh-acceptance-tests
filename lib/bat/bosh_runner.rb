@@ -3,11 +3,12 @@ require 'common/exec'
 module Bat
   class BoshRunner
 
-    def initialize(executable, cli_config_path, director_user, director_password, logger)
+    def initialize(executable, cli_config_path, director_user, director_password, director_ca, logger)
       @executable = executable
       @cli_config_path = cli_config_path
       @director_user = director_user
       @director_password = director_password
+      @director_ca = director_ca
       @logger = logger
     end
 
@@ -54,6 +55,7 @@ module Bat
       command << '--json'
       command << "--config #{@cli_config_path}"
       command << "--client #{@director_user} --client-secret #{@director_password}"
+      command << "--ca-cert #{@director_ca}" if @director_ca
       command << "--deployment #{options[:deployment]}" if options[:deployment]
       command << arguments
 

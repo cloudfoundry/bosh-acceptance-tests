@@ -16,6 +16,7 @@ module Bat
       debug_mode:           'BAT_DEBUG_MODE',
       director_user:        'BAT_DIRECTOR_USER',
       director_password:    'BAT_DIRECTOR_PASSWORD',
+      director_ca:          'BAT_DIRECTOR_CA',
     }.freeze
 
     DEFAULT_VALUES = {
