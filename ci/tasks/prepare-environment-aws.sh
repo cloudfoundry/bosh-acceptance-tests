@@ -113,7 +113,7 @@ properties:
       cidr: ${INTERNAL_CIDR}
       reserved: [${RESERVED_RANGE}]
       static: [${STATIC_RANGE}]
-      gateway: ${INTERNAL_GATEWAY}
+      gateway: ${INTERNAL_GW}
       subnet: ${SUBNET_ID}
       security_groups: [${DEFAULT_SECURITY_GROUPS}]
 EOF
