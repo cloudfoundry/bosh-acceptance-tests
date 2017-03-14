@@ -1,6 +1,5 @@
 ---
 name: <%= properties.name || "bat" %>
-director_uuid: <%= properties.uuid %>
 
 releases:
   - name: bat
@@ -13,9 +12,6 @@ compilation:
   cloud_properties:
     instance_type: m3.medium
     availability_zone: <%= properties.availability_zone %>
-    <% if properties.key_name %>
-    key_name: <%= properties.key_name %>
-    <% end %>
 
 update:
   canaries: <%= properties.canaries || 1 %>
@@ -26,7 +22,6 @@ update:
 networks:
 - name: static
   type: vip
-  cloud_properties: {}
 
 <% properties.networks.each do |network| %>
 - name: <%= network.name %>
@@ -70,17 +65,9 @@ resource_pools:
     cloud_properties:
       instance_type: m3.medium
       availability_zone: <%= properties.availability_zone %>
-      <% if properties.key_name %>
-      key_name: <%= properties.key_name %>
-      <% end %>
       <% if properties.raw_instance_storage %>
       raw_instance_storage: <%= properties.raw_instance_storage %>
       <% end %>
-    <% if properties.password %>
-    env:
-      bosh:
-        password: <%= properties.password %>
-    <% end %>
 
 jobs:
   - name: <%= properties.job || "batlight" %>

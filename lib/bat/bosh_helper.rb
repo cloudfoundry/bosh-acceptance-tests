@@ -20,8 +20,7 @@ module Bat
 
     def ssh_options
       {
-        private_key: @env.vcap_private_key,
-        password: @env.vcap_password
+        private_key: @env.private_key
       }
     end
 
@@ -71,8 +70,8 @@ module Bat
       options[:user_known_hosts_file] = %w[/dev/null]
       options[:keys] = [private_key] unless private_key.nil?
 
-      if options[:keys].nil? && options[:password].nil?
-        raise 'Need to set ssh :password, :keys, or :private_key'
+      if options[:keys].nil?
+        raise 'Need to set ssh :keys, or :private_key'
       end
 
       @logger.info("--> ssh options: #{options.inspect}")
@@ -96,7 +95,7 @@ module Bat
       bosh_ssh_options = ''
       if private_key
         bosh_ssh_options << " --gw-host #{@env.director}"
-        bosh_ssh_options << ' --gw-user vcap'
+        bosh_ssh_options << ' --gw-user #{@env.private_key_user}'
         bosh_ssh_options << " --gw-private-key #{private_key}"
 
         # Note gateway_host + ip: ...fingerprint does not match for "micro.ci2.cf-app.com,54.208.15.101" (Net::SSH::HostKeyMismatch)

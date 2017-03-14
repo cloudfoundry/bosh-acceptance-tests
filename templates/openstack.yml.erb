@@ -1,6 +1,5 @@
 ---
 name: <%= properties.name || "bat" %>
-director_uuid: <%= properties.uuid %>
 
 releases:
   - name: bat
@@ -12,9 +11,6 @@ compilation:
   reuse_compilation_vms: true
   cloud_properties:
     instance_type: <%= properties.instance_type || 'm1.small' %>
-    <% if properties.key_name %>
-    key_name: <%= properties.key_name %>
-    <% end %>
     <% if properties.availability_zone %>
     availability_zone: <%= properties.availability_zone %>
     <% end %>
@@ -28,7 +24,6 @@ update:
 networks:
 - name: static
   type: vip
-  cloud_properties: {}
 
 <% properties.networks.each do |network| %>
 - name: <%= network.name %>
@@ -70,9 +65,6 @@ resource_pools:
       version: '<%= properties.stemcell.version %>'
     cloud_properties:
       instance_type: <%= properties.instance_type || 'm1.small' %>
-      <% if properties.key_name %>
-      key_name: <%= properties.key_name %>
-      <% end %>
       <% if properties.availability_zone %>
       availability_zone: <%= properties.availability_zone %>
       <% end %>
@@ -110,7 +102,6 @@ jobs:
         static_ips:
           - <%= properties.vip %>
     <% end %>
-
 
 properties:
   openstack:

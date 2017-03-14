@@ -1,4 +1,5 @@
 require 'common/exec'
+require 'base64'
 
 module Bat
   class BoshRunner
@@ -55,7 +56,7 @@ module Bat
       command << '--json'
       command << "--config #{@cli_config_path}"
       command << "--client #{@director_user} --client-secret #{@director_password}"
-      command << "--ca-cert #{@director_ca}" if @director_ca
+      command << "--ca-cert <(echo '#{Base64.encode64(@director_ca)}' | base64 -d)" if @director_ca
       command << "--deployment #{options[:deployment]}" if options[:deployment]
       command << arguments
 

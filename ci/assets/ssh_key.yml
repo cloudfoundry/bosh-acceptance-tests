@@ -1,5 +1,0 @@
----
-variables:
-  - name: private_key
-    type: ssh
-

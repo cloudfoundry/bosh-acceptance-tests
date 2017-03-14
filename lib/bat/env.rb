@@ -1,27 +1,25 @@
 module Bat
   class Env
     REQUIRED_VARS = {
-      director:             'BAT_DIRECTOR',
       stemcell_path:        'BAT_STEMCELL',
       bosh_cli_path:        'BAT_BOSH_CLI',
       deployment_spec_path: 'BAT_DEPLOYMENT_SPEC',
-      vcap_password:        'BAT_VCAP_PASSWORD',
       dns_host:             'BAT_DNS_HOST',
+
       bat_infrastructure:   'BAT_INFRASTRUCTURE',
       bat_networking:       'BAT_NETWORKING',
-    }.freeze
 
-    OPTIONAL_VARS = {
-      vcap_private_key:     'BAT_VCAP_PRIVATE_KEY',
-      debug_mode:           'BAT_DEBUG_MODE',
+      private_key:          'BAT_PRIVATE_KEY',
+      private_key_user:     'BAT_PRIVATE_KEY_USER',
+
+      director:             'BAT_DIRECTOR',
       director_user:        'BAT_DIRECTOR_USER',
       director_password:    'BAT_DIRECTOR_PASSWORD',
       director_ca:          'BAT_DIRECTOR_CA',
     }.freeze
 
-    DEFAULT_VALUES = {
-      director_user:        'admin',
-      director_password:    'admin',
+    OPTIONAL_VARS = {
+      debug_mode:           'BAT_DEBUG_MODE',
     }.freeze
 
     def self.from_env
@@ -37,7 +35,7 @@ module Bat
         instance_variable_set("@#{name}", val)
       end
       OPTIONAL_VARS.keys.each do |name|
-        val = vars[name] || DEFAULT_VALUES[name]
+        val = vars[name]
         instance_variable_set("@#{name}", val) if val
       end
     end
