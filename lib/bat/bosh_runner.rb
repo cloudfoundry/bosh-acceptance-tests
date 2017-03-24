@@ -56,7 +56,7 @@ module Bat
       command << '--json'
       command << "--config #{@cli_config_path}"
       command << "--client #{@director_user} --client-secret #{@director_password}"
-      command << "--ca-cert '#{@director_ca.gsub("\n", "\\n")}'"
+      command << "--ca-cert $'#{@director_ca.gsub("\n", "\\n")}'"
       command << "--deployment #{options[:deployment]}" if options[:deployment]
       command << arguments
 
