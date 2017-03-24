@@ -52,11 +52,11 @@ module Bat
     def build_command(arguments, options = {})
       command = []
       command << "#{@executable} --non-interactive"
-      command << "--environment #{@environment}" if @environment
+      command << "--environment #{@environment}"
       command << '--json'
       command << "--config #{@cli_config_path}"
       command << "--client #{@director_user} --client-secret #{@director_password}"
-      command << "--ca-cert <(echo '#{Base64.encode64(@director_ca)}' | base64 -d)" if @director_ca
+      command << "--ca-cert '#{@director_ca.gsub("\n", "\\n")}'"
       command << "--deployment #{options[:deployment]}" if options[:deployment]
       command << arguments
 
