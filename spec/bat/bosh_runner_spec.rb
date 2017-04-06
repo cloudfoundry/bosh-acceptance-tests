@@ -34,22 +34,51 @@ describe Bat::BoshRunner do
     end
 
     context 'when a ca_cert is provided' do
-      let(:ca_cert) { 'CACERT' }
 
-      it 'passes the ca_cert to Bosh::Exec' do
-        expected_command = %W(
+      before(:each) do
+        subject.set_environment('10.0.0.10')
+      end
+
+      context 'when ca_cert is given as content represented as string' do
+        let(:ca_cert) { '-----BEGIN CERTIFICATE-----\nCACERT\n-----END CERTIFICATE-----' }
+
+        it 'passes the ca_cert to Bosh::Exec' do
+          expected_command = %W(
         fake-bosh-exe
         --non-interactive
+        --environment 10.0.0.10
         --json
         --config fake-path-to-bosh-config
         --client admin --client-secret admin
-        --ca-cert CACERT
+        --ca-cert '-----BEGIN CERTIFICATE-----\nCACERT\n-----END CERTIFICATE-----'
         FAKE_ARGS 2>&1
       ).join(' ')
 
-        expect(bosh_exec).to receive(:sh).with(expected_command, {}).and_return(bosh_exec_result)
-        subject.bosh('FAKE_ARGS')
+          expect(bosh_exec).to receive(:sh).with(expected_command, {}).and_return(bosh_exec_result)
+          subject.bosh('FAKE_ARGS')
+        end
       end
+
+      context 'when ca_cert is given as path to a file' do
+        let(:ca_cert) { '/some/ca_cert/file' }
+
+        it 'passes the ca_cert to Bosh::Exec' do
+          expected_command = %W(
+        fake-bosh-exe
+        --non-interactive
+        --environment 10.0.0.10
+        --json
+        --config fake-path-to-bosh-config
+        --client admin --client-secret admin
+        --ca-cert '/some/ca_cert/file'
+        FAKE_ARGS 2>&1
+      ).join(' ')
+
+          expect(bosh_exec).to receive(:sh).with(expected_command, {}).and_return(bosh_exec_result)
+          subject.bosh('FAKE_ARGS')
+        end
+      end
+
     end
 
     context 'when options are passed' do
