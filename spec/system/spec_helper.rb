@@ -8,7 +8,6 @@ require 'common/exec'
 
 require 'bat/env'
 require 'bat/bosh_runner'
-require 'bat/bosh_api'
 require 'bat/requirements'
 require 'bat/spec_state'
 require 'bat/stemcell'
