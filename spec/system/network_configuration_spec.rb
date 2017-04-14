@@ -23,14 +23,14 @@ describe 'network configuration' do
     it 'forward looks up instance' do
       address = nil
       expect {
-        address = dns.getaddress("0.batlight.static.bat.#{bosh_tld}").to_s
+        address = dns.getaddress("0.batlight.static.bat.bosh").to_s
       }.not_to raise_error, 'this test tries to resolve to the public IP of director, so you need to have incoming UDP enabled for it'
       expect(address).to eq(public_ip)
     end
 
     it 'reverse looks up instance' do
       names = dns.getnames(public_ip)
-      expect(names.to_s).to include("0.batlight.static.bat.#{bosh_tld}.")
+      expect(names.to_s).to include("0.batlight.static.bat.bosh.")
     end
 
     it 'resolves instance names from deployed VM' do

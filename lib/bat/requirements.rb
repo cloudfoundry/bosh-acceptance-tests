@@ -2,10 +2,9 @@ module Bat
   class Requirements
     include RSpec::Matchers
 
-    def initialize(stemcell_path, bosh_runner, bosh_api, spec_state, logger)
+    def initialize(stemcell_path, bosh_runner, spec_state, logger)
       @stemcell_path = stemcell_path
       @bosh_runner = bosh_runner
-      @bosh_api = bosh_api
       @spec_state = spec_state
       @logger = logger
     end
@@ -17,10 +16,6 @@ module Bat
     def release
       release_dir = File.join(SPEC_ROOT, 'system', 'assets', 'bat-release')
       @release ||= Bat::Release.from_path(release_dir)
-    end
-
-    def previous_release
-      @previous_release ||= release.previous
     end
 
     def requirement(what, deployment_spec = nil, options = {})
@@ -51,15 +46,15 @@ module Bat
       @logger.info("Starting cleanup #{what}")
       case what
         when Bat::Stemcell
-          if @bosh_api.stemcells.include?(what)
+          if @bosh_runner.stemcells.include?(what)
             expect(@bosh_runner.bosh_safe("delete-stemcell #{what.name}/#{what.version}")).to succeed
           end
         when Bat::Release
-          if @bosh_api.releases.include?(what)
+          if @bosh_runner.releases.include?(what)
             expect(@bosh_runner.bosh_safe("delete-release #{what.name}")).to succeed
           end
         when Bat::Deployment
-          if @bosh_api.deployments.include?(what.name)
+          if @bosh_runner.deployments.include?(what.name)
             expect(@bosh_runner.bosh_safe("-d #{what.name} delete-deployment")).to succeed
             what.delete
           end
@@ -77,7 +72,7 @@ module Bat
     private
 
     def require_stemcell(what)
-      if @bosh_api.stemcells.include?(what)
+      if @bosh_runner.stemcells.include?(what)
         @logger.info('Stemcell already uploaded')
       else
         @logger.info('stemcell not uploaded')
@@ -86,7 +81,7 @@ module Bat
     end
 
     def require_release(what)
-      if @bosh_api.releases.include?(what)
+      if @bosh_runner.releases.include?(what)
         @logger.info('release already uploaded')
       else
         @logger.info('release not uploaded')
@@ -95,7 +90,7 @@ module Bat
     end
 
     def require_deployment(what, deployment_spec, options)
-      if @bosh_api.deployments.include?(what.name) && !options[:force]
+      if @bosh_runner.deployments.include?(what.name) && !options[:force]
         @logger.info('deployment already deployed, skipping deployment')
       else
         @logger.info('deployment not already deployed, deploying...')

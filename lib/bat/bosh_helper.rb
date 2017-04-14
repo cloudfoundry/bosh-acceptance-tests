@@ -36,19 +36,8 @@ module Bat
       @env.bat_infrastructure == 'warden'
     end
 
-    def compiled_package_cache?
-      info = @bosh_api.info
-      info['features'] && info['features']['compiled_package_cache']
-    end
-
     def dns?
-      info = @bosh_api.info
-      info['features'] && info['features']['dns']['status']
-    end
-
-    def bosh_tld
-      info = @bosh_api.info
-      info['features']['dns']['extras']['domain_name'] if dns?
+      @bosh_api.info["Tables"][0]["Rows"][0]["features"].include?("dns: enabled")
     end
 
     def persistent_disk(job, index, options)
@@ -84,28 +73,8 @@ module Bat
     end
 
     def bosh_ssh(job, index, command, options = {})
-      private_key = ssh_options[:private_key]
-
-      # Try our best to clean out old host fingerprints for director and vms
-      if File.exist?(File.expand_path('~/.ssh/known_hosts'))
-        Bosh::Exec.sh("ssh-keygen -R '#{@env.director}'")
-        Bosh::Exec.sh("ssh-keygen -R '#{static_ip}'")
-      end
-
       bosh_ssh_options = ''
-      if private_key
-        bosh_ssh_options << " --gw-host #{@env.director}"
-        bosh_ssh_options << ' --gw-user #{@env.private_key_user}'
-        bosh_ssh_options << " --gw-private-key #{private_key}"
-
-        # Note gateway_host + ip: ...fingerprint does not match for "micro.ci2.cf-app.com,54.208.15.101" (Net::SSH::HostKeyMismatch)
-        if File.exist?(File.expand_path('~/.ssh/known_hosts'))
-          Bosh::Exec.sh("ssh-keygen -R '#{@env.director},#{static_ip}'").output
-        end
-      end
-
       bosh_ssh_options << ' --results' if options.delete(:result)
-
       bosh("ssh #{job}/#{index} '#{command}' #{bosh_ssh_options}", options)
     end
 

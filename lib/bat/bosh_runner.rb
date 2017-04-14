@@ -3,13 +3,8 @@ require 'base64'
 
 module Bat
   class BoshRunner
-
-    def initialize(executable, cli_config_path, director_user, director_password, director_ca, logger)
+    def initialize(executable, logger)
       @executable = executable
-      @cli_config_path = cli_config_path
-      @director_user = director_user
-      @director_password = director_password
-      @director_ca = director_ca
       @logger = logger
     end
 
@@ -43,8 +38,30 @@ module Bat
       bosh(command, options.merge(on_error: :return))
     end
 
-    def set_environment(director_url)
-      @environment = director_url
+    def info
+      bosh('env')
+    end
+
+    def deployments
+      result = {}
+      bosh('deployments')["Tables"][0]["Rows"].each { |r| result[r['name']] = true }
+      result
+    end
+
+    def releases
+      result = []
+      bosh('releases')["Tables"][0]["Rows"].each do |r|
+        result << Bat::Release.new(r['name'], [])
+      end
+      result
+    end
+
+    def stemcells
+      result = []
+      http_get('/stemcells').each do |s|
+        result << Bat::Stemcell.new(s['name'], s['version'])
+      end
+      result
     end
 
     private
@@ -52,16 +69,10 @@ module Bat
     def build_command(arguments, options = {})
       command = []
       command << "#{@executable} --non-interactive"
-      command << "--environment #{@environment}"
       command << '--json'
-      command << "--config #{@cli_config_path}"
-      command << "--client #{@director_user} --client-secret #{@director_password}"
-      command << "--ca-cert $'#{@director_ca.gsub("\n", "\\n")}'"
       command << "--deployment #{options[:deployment]}" if options[:deployment]
       command << arguments
-
       command << '2>&1'
-
       command.join(' ')
     end
 

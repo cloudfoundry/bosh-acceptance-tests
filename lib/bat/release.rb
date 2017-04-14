@@ -48,14 +48,6 @@ module Bat
       sorted_versions.last
     end
 
-    def previous
-      if sorted_versions.size < 2
-        raise "Found no previous version for #{@name} release"
-      else
-        Release.new(@name, sorted_versions.dup[0..-2], @path)
-      end
-    end
-
     def ==(other)
       if other.is_a?(Release) && other.name == name
         common_versions = other.sorted_versions & sorted_versions

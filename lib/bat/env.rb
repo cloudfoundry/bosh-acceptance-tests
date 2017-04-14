@@ -10,12 +10,6 @@ module Bat
       bat_networking:       'BAT_NETWORKING',
 
       private_key:          'BAT_PRIVATE_KEY',
-      private_key_user:     'BAT_PRIVATE_KEY_USER',
-
-      director:             'BAT_DIRECTOR',
-      director_user:        'BAT_DIRECTOR_USER',
-      director_password:    'BAT_DIRECTOR_PASSWORD',
-      director_ca:          'BAT_DIRECTOR_CA',
     }.freeze
 
     OPTIONAL_VARS = {

@@ -25,37 +25,10 @@ RSpec.configure do |config|
 end
 
 logger = Logger.new(STDOUT)
-bosh_config_file = Tempfile.new('bosh_config')
-
 env = Bat::Env.from_env
-
-spec_state = Bat::SpecState.new(
-  env.debug_mode
-)
-
-bosh_runner = Bat::BoshRunner.new(
-  ENV['BAT_BOSH_CLI'],
-  bosh_config_file.path,
-  env.director_user,
-  env.director_password,
-  env.director_ca,
-  logger
-)
-
-bosh_api = Bat::BoshApi.new(
-  env.director,
-  env.director_user,
-  env.director_password,
-  logger
-)
-
-requirements = Bat::Requirements.new(
-  env.stemcell_path,
-  bosh_runner,
-  bosh_api,
-  spec_state,
-  logger
-)
+spec_state = Bat::SpecState.new(env.debug_mode)
+bosh_runner = Bat::BoshRunner.new(ENV['BAT_BOSH_CLI'], logger)
+requirements = Bat::Requirements.new(env.stemcell_path, bosh_runner, bosh_api, spec_state, logger)
 
 RSpec.configure do |config|
   config.include(Bat::BoshHelper)
@@ -76,8 +49,6 @@ end
 RSpec.configure do |config|
   # Preload stemcell and release for tests that need it (most of them)
   config.before(:suite) do
-
-    bosh_runner.set_environment(env.director)
     requirements.requirement(requirements.stemcell) # 2 min on local vsphere
     requirements.requirement(requirements.release)
   end
