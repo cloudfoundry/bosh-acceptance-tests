@@ -58,7 +58,7 @@ module Bat
 
     def stemcells
       result = []
-      http_get('/stemcells').each do |s|
+      bosh('stemcells')["Tables"][0]["Rows"].each do |s|
         result << Bat::Stemcell.new(s['name'], s['version'])
       end
       result
