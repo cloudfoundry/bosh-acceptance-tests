@@ -36,10 +36,6 @@ module Bat
       @env.bat_infrastructure == 'warden'
     end
 
-    def dns?
-      @bosh_api.info["Tables"][0]["Rows"][0]["features"].include?("dns: enabled")
-    end
-
     def persistent_disk(job, index, options)
       get_disks(job, index, options).each do |disk|
         values = disk.last
