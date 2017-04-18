@@ -41,13 +41,12 @@ describe 'with release and stemcell and subsequent deployments' do
     end
 
     def agent_config
-      output = bosh_ssh('batlight', 0, 'sudo cat /var/vcap/bosh/agent.json', deployment: deployment.name).output
-      # regex to extract json file content from bosh response
-      JSON.parse(/(\{(?:[^{}]|\g<1>)*\})/.match(output)[0])
+      output = bosh_ssh('batlight', 0, 'sudo cat /var/vcap/bosh/agent.json', deployment: deployment.name, result: true, column: 'stdout').output
+      JSON.parse(output)
     end
 
     def mounts
-      output = bosh_ssh('batlight', 0, 'mount', deployment: deployment.name).output
+      output = bosh_ssh('batlight', 0, 'mount', deployment: deployment.name, result: true, column: 'stdout').output
       output.lines.map do |line|
         matches = /(?<point>.*) on (?<path>.*) type (?<type>.*) \((?<options>.*)\)/.match(line)
         next if matches.nil?
@@ -56,7 +55,7 @@ describe 'with release and stemcell and subsequent deployments' do
     end
 
     def swaps
-      output = bosh_ssh('batlight', 0, 'PATH=$PATH:/usr/sbin swapon -s', deployment: deployment.name).output
+      output = bosh_ssh('batlight', 0, 'swapon -s', deployment: deployment.name, result: true, column: 'stdout').output
       output.lines.to_a[1..-1].map do |line|
         matches = /(?<point>.+)\s+(?<type>.+)\s+(?<size>.+)\s+(?<used>.+)\s+(?<priority>.+)/.match(line)
         next if matches.nil?

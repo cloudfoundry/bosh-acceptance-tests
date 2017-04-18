@@ -14,6 +14,8 @@ module Bat
 
     def bosh(arguments, options = {})
       command_options = {}
+      command_options[:json] = options.fetch(:json, true)
+
       if options[:deployment]
         command_options[:deployment] = options.delete(:deployment)
       end
@@ -69,7 +71,7 @@ module Bat
     def build_command(arguments, options = {})
       command = []
       command << "#{@executable} --non-interactive"
-      command << '--json'
+      command << '--json' if options[:json]
       command << "--deployment #{options[:deployment]}" if options[:deployment]
       command << arguments
       command << '2>&1'

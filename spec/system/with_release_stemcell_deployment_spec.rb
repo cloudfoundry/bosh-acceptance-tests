@@ -28,7 +28,7 @@ describe 'with release, stemcell and deployment', core: true do
 
     it 'should survive agent dying', ssh: true do
       Dir.mktmpdir do |tmpdir|
-        ssh_command="echo #{@env.vcap_password} | sudo -S pkill -9 agent"
+        ssh_command="sudo -S pkill -9 agent"
         expect(bosh_ssh('batlight', 0, ssh_command, deployment: deployment.name)).to succeed
         wait_for_instance_state('batlight', '0', 'running')
         expect(bosh_safe("logs batlight/0 --agent --dir #{tmpdir}", deployment: deployment.name)).to succeed
@@ -44,21 +44,21 @@ describe 'with release, stemcell and deployment', core: true do
 
   describe 'job' do
     it 'should recreate a job' do
-      old_vm_cid = JSON.parse(bosh_safe('instances --details', deployment: deployment.name).output)['Tables'].first['Rows']
+      old_vm_cid = JSON.parse(bosh_safe('instances --details', deployment: deployment.name).output)['Tables'].first['Rows'].first["vm_cid"]
       expect(bosh_safe('recreate batlight/0', deployment: deployment.name)).to succeed
-      new_vm_cid = JSON.parse(bosh_safe('instances --details', deployment: deployment.name).output)['Tables'].first['Rows']
+      new_vm_cid = JSON.parse(bosh_safe('instances --details', deployment: deployment.name).output)['Tables'].first['Rows'].first["vm_cid"]
       expect(old_vm_cid).not_to eq(new_vm_cid)
     end
 
     it 'should stop and start a job' do
       expect(bosh_safe('stop batlight/0', deployment: deployment.name)).to succeed
       bosh_instances = bosh_safe('instances', deployment: deployment.name).output
-      batlight_0_process_state = JSON.parse(bosh_instances)['Tables'].first['Rows'].first[1]
+      batlight_0_process_state = JSON.parse(bosh_instances)['Tables'].first['Rows'].first["process_state"]
       expect(batlight_0_process_state).to match("stopped")
 
       expect(bosh_safe('start batlight/0', deployment: deployment.name)).to succeed
       bosh_instances = bosh_safe('instances', deployment: deployment.name).output
-      batlight_0_process_state = JSON.parse(bosh_instances)['Tables'].first['Rows'].first[1]
+      batlight_0_process_state = JSON.parse(bosh_instances)['Tables'].first['Rows'].first["process_state"]
       expect(batlight_0_process_state).to match("running")
     end
   end

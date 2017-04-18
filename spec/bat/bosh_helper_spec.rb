@@ -37,52 +37,52 @@ describe Bat::BoshHelper do
     "Tables": [
         {
             "Content": "instances",
-            "Header": [
-                "Instance",
-                "Process State",
-                "AZ",
-                "IPs",
-                "State",
-                "VM CID",
-                "VM Type",
-                "Disk CIDs",
-                "Agent ID",
-                "Index",
-                "Resurrection\nPaused",
-                "Bootstrap",
-                "Ignore"
-            ],
+            "Header": {
+                "instance":           "Instance",
+                "process_state":      "Process State",
+                "az":                 "AZ",
+                "ips":                "IPs",
+                "state":              "State",
+                "vm_cid":             "VM CID",
+                "vm_type":            "VM Type",
+                "disk_cids":          "Disk CIDs",
+                "agent_id":           "Agent ID",
+                "index":              "Index",
+                "resurrection_paused":"Resurrection\nPaused",
+                "bootstrap":          "Bootstrap",
+                "ignore":             "Ignore"
+            },
             "Rows": [
-                [
-                    "jessez/29ae97ec-3106-450b-a848-98cb3b25d86f",
-                    "running",
-                    "z3",
-                    "10.20.30.1",
-                    "started",
-                    "i-cid",
-                    "default",
-                    "daafa7a0-1df2-4482-67e4-6ec795c76434",
-                    "fake-agent-id",
-                    "0",
-                    "false",
-                    "false",
-                    "false"
-                ],
-                [
-                    "uaa_z1/a3cebb2f-2553-46e3-aa0d-d2075cd08760",
-                    "running",
-                    "z1",
-                    "10.50.91.2",
-                    "started",
-                    "i-24cb6153",
-                    "default",
-                    "df5de774-8a0c-4e4c-7418-93e425de3aa2",
-                    "da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49",
-                    "0",
-                    "false",
-                    "false",
-                    "false"
-                ]
+                {
+                  "instance":             "jessez/29ae97ec-3106-450b-a848-98cb3b25d86f",
+                  "process_state":        "running",
+                  "az":                   "z3",
+                  "ips":                  "10.20.30.1",
+                  "state":                "started",
+                  "vm_cid":               "i-cid",
+                  "vm_type":              "default",
+                  "disk_cids":            "daafa7a0-1df2-4482-67e4-6ec795c76434",
+                  "agent_id":             "fake-agent-id",
+                  "index":                "0",
+                  "resurrection_paused":  "false",
+                  "bootstrap":            "false",
+                  "ignore":               "false"
+                },
+                {
+                 "instance":              "uaa_z1/a3cebb2f-2553-46e3-aa0d-d2075cd08760",
+                 "process_state":         "running",
+                 "az":                    "z1",
+                 "ips":                   "10.50.91.2",
+                 "state":                 "started",
+                 "vm_cid":                "i-24cb6153",
+                 "vm_type":               "default",
+                 "disk_cids":             "df5de774-8a0c-4e4c-7418-93e425de3aa2",
+                 "agent_id":              "da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49",
+                 "index":                 "0",
+                 "resurrection_paused":   "false",
+                 "bootstrap":             "false",
+                 "ignore":                "false"
+                }
             ],
             "Notes": null
         }
@@ -102,52 +102,52 @@ OUTPUT
     "Tables": [
         {
             "Content": "instances",
-            "Header": [
-                "Instance",
-                "Process State",
-                "AZ",
-                "IPs",
-                "State",
-                "VM CID",
-                "VM Type",
-                "Disk CIDs",
-                "Agent ID",
-                "Index",
-                "Resurrection\nPaused",
-                "Bootstrap",
-                "Ignore"
-            ],
+            "Header": {
+                "instance":           "Instance",
+                "process_state":      "Process State",
+                "az":                 "AZ",
+                "ips":                "IPs",
+                "state":              "State",
+                "vm_cid":             "VM CID",
+                "vm_type":            "VM Type",
+                "disk_cids":          "Disk CIDs",
+                "agent_id":           "Agent ID",
+                "index":              "Index",
+                "resurrection_paused": "Resurrection\nPaused",
+                "bootstrap":          "Bootstrap",
+                "ignore":             "Ignore"
+            },
             "Rows": [
-                [
-                    "jessez/29ae97ec-3106-450b-a848-98cb3b25d86f",
-                    "unresponsive agent",
-                    "z3",
-                    "10.20.30.1",
-                    "started",
-                    "i-cid",
-                    "default",
-                    "daafa7a0-1df2-4482-67e4-6ec795c76434",
-                    "fake-agent-id",
-                    "0",
-                    "false",
-                    "false",
-                    "false"
-                ],
-                [
-                    "uaa_z1/a3cebb2f-2553-46e3-aa0d-d2075cd08760",
-                    "running",
-                    "z1",
-                    "10.50.91.2",
-                    "started",
-                    "i-24cb6153",
-                    "default",
-                    "df5de774-8a0c-4e4c-7418-93e425de3aa2",
-                    "da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49",
-                    "0",
-                    "false",
-                    "false",
-                    "false"
-                ]
+                {
+                   "instance":            "jessez/29ae97ec-3106-450b-a848-98cb3b25d86f",
+                   "process_state":       "unresponsive agent",
+                   "az":                  "z3",
+                   "ips":                 "10.20.30.1",
+                   "state":               "started",
+                   "vm_cid":              "i-cid",
+                   "vm_type":             "default",
+                   "disk_cids":           "daafa7a0-1df2-4482-67e4-6ec795c76434",
+                   "agent_id":            "fake-agent-id",
+                   "index":               "0",
+                   "resurrection_paused": "false",
+                   "bootstrap":           "false",
+                   "ignore":              "false"
+                },
+                {
+                  "instance":             "uaa_z1/a3cebb2f-2553-46e3-aa0d-d2075cd08760",
+                  "process_state":        "running",
+                  "az":                   "z1",
+                  "ips":                  "10.50.91.2",
+                  "state":                "started",
+                  "vm_cid":               "i-24cb6153",
+                  "vm_type":              "default",
+                  "disk_cids":            "df5de774-8a0c-4e4c-7418-93e425de3aa2",
+                  "agent_id":             "da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49",
+                  "index":                "0",
+                  "resurrection_paused":  "false",
+                  "bootstrap":            "false",
+                  "ignore":               "false"
+                }
             ],
             "Notes": null
         }
@@ -166,37 +166,37 @@ OUTPUT
     "Tables": [
         {
             "Content": "instances",
-            "Header": [
-                "Instance",
-                "Process State",
-                "AZ",
-                "IPs",
-                "State",
-                "VM CID",
-                "VM Type",
-                "Disk CIDs",
-                "Agent ID",
-                "Index",
-                "Resurrection\nPaused",
-                "Bootstrap",
-                "Ignore"
-            ],
+            "Header": {
+                "instance":            "Instance",
+                "process_state":       "Process State",
+                "az":                  "AZ",
+                "ips":                 "IPs",
+                "state":               "State",
+                "vm_cid":              "VM CID",
+                "vm_type":             "VM Type",
+                "disk_cids":           "Disk CIDs",
+                "agent_id":            "Agent ID",
+                "index":               "Index",
+                "resurrection_paused": "Resurrection\nPaused",
+                "bootstrap":           "Bootstrap",
+                "ignore":              "Ignore"
+            },
             "Rows": [
-                [
-                    "uaa_z1/a3cebb2f-2553-46e3-aa0d-d2075cd08760",
-                    "running",
-                    "z1",
-                    "10.50.91.2",
-                    "started",
-                    "i-24cb6153",
-                    "default",
-                    "df5de774-8a0c-4e4c-7418-93e425de3aa2",
-                    "da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49",
-                    "0",
-                    "false",
-                    "false",
-                    "false"
-                ]
+                {
+                 "instance":              "uaa_z1/a3cebb2f-2553-46e3-aa0d-d2075cd08760",
+                 "process_state":         "running",
+                 "az":                    "z1",
+                 "ips":                   "10.50.91.2",
+                 "state":                 "started",
+                 "vm_cid":                "i-24cb6153",
+                 "vm_type":               "default",
+                 "disk_cids":             "df5de774-8a0c-4e4c-7418-93e425de3aa2",
+                 "agent_id":              "da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49",
+                 "index":                 "0",
+                 "resurrection_paused":   "false",
+                 "bootstrap":             "false",
+                 "ignore":                "false"
+                }
             ],
             "Notes": null
         }
@@ -219,19 +219,19 @@ OUTPUT
 
       it 'returns the instance details' do
         expect(bosh_helper.wait_for_instance_state('jessez', '0', 'running', 0)).to(eq(
-          instance: 'jessez/29ae97ec-3106-450b-a848-98cb3b25d86f',
-          process_state: 'running',
-          ips: '10.20.30.1',
-          vm_cid: 'i-cid',
-          vm_type: 'default',
-          ignore: 'false',
-          agent_id: 'fake-agent-id',
-          resurrection_paused: 'false',
-          az: 'z3',
-          bootstrap: 'false',
-          disk_cids: 'daafa7a0-1df2-4482-67e4-6ec795c76434',
-          index: '0',
-          state: 'started',
+          'instance' => 'jessez/29ae97ec-3106-450b-a848-98cb3b25d86f',
+          'process_state' => 'running',
+          'ips' => '10.20.30.1',
+          'vm_cid' => 'i-cid',
+          'vm_type' => 'default',
+          'ignore' => 'false',
+          'agent_id' => 'fake-agent-id',
+          'resurrection_paused' => 'false',
+          'az' => 'z3',
+          'bootstrap' => 'false',
+          'disk_cids' => 'daafa7a0-1df2-4482-67e4-6ec795c76434',
+          'index' => '0',
+          'state' => 'started',
         ))
       end
 
@@ -241,52 +241,52 @@ OUTPUT
     "Tables": [
         {
             "Content": "instances",
-            "Header": [
-                "Instance",
-                "Process State",
-                "AZ",
-                "IPs",
-                "State",
-                "VM CID",
-                "VM Type",
-                "Disk CIDs",
-                "Agent ID",
-                "Index",
-                "Resurrection\nPaused",
-                "Bootstrap",
-                "Ignore"
-            ],
+            "Header": {
+                "instance":           "Instance",
+                "process_state":      "Process State",
+                "az":                 "AZ",
+                "ips":                "IPs",
+                "state":              "State",
+                "vm_cid":             "VM CID",
+                "vm_type":            "VM Type",
+                "disk_cids":          "Disk CIDs",
+                "agent_id":           "Agent ID",
+                "index":              "Index",
+                "resurrection_paused":"Resurrection\nPaused",
+                "bootstrap":          "Bootstrap",
+                "ignore":             "Ignore"
+            },
             "Rows": [
-                [
-                    "jessez/0 (29ae97ec-3106-450b-a848-98cb3b25d86f)",
-                    "running",
-                    "z3",
-                    "10.20.30.1",
-                    "started",
-                    "i-cid",
-                    "default",
-                    "daafa7a0-1df2-4482-67e4-6ec795c76434",
-                    "fake-agent-id",
-                    "0",
-                    "false",
-                    "false",
-                    "false"
-                ],
-                [
-                    "uaa_z1/0 (a3cebb2f-2553-46e3-aa0d-d2075cd08760)",
-                    "running",
-                    "z1",
-                    "10.50.91.2",
-                    "started",
-                    "i-24cb6153",
-                    "default",
-                    "df5de774-8a0c-4e4c-7418-93e425de3aa2",
-                    "da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49",
-                    "0",
-                    "false",
-                    "false",
-                    "false"
-                ]
+                {
+                 "instance":              "jessez/0 (29ae97ec-3106-450b-a848-98cb3b25d86f)",
+                 "process_state":         "running",
+                 "az":                    "z3",
+                 "ips":                   "10.20.30.1",
+                 "state":                 "started",
+                 "vm_cid":                "i-cid",
+                 "vm_type":               "default",
+                 "disk_cids":             "daafa7a0-1df2-4482-67e4-6ec795c76434",
+                 "agent_id":              "fake-agent-id",
+                 "index":                 "0",
+                 "resurrection_paused":   "false",
+                 "bootstrap":             "false",
+                 "ignore":                "false"
+                },
+                {
+                  "instance":             "uaa_z1/0 (a3cebb2f-2553-46e3-aa0d-d2075cd08760)",
+                  "process_state":        "running",
+                  "az":                   "z1",
+                  "ips":                  "10.50.91.2",
+                  "state":                "started",
+                  "vm_cid":               "i-24cb6153",
+                  "vm_type":              "default",
+                  "disk_cids":            "df5de774-8a0c-4e4c-7418-93e425de3aa2",
+                  "agent_id":             "da74e0d8-d2a6-4b2d-904a-b2f0e3dacc49",
+                  "index":                "0",
+                  "resurrection_paused":  "false",
+                  "bootstrap":            "false",
+                  "ignore":               "false"
+                }
             ],
             "Notes": null
         }
@@ -303,19 +303,19 @@ OUTPUT
 
         it 'returns the instance details' do
           expect(bosh_helper.wait_for_instance_state('jessez', '0', 'running', 0)).to(eq(
-            instance: 'jessez/0 (29ae97ec-3106-450b-a848-98cb3b25d86f)',
-            process_state: 'running',
-            ips: '10.20.30.1',
-            vm_cid: 'i-cid',
-            vm_type: 'default',
-            ignore: 'false',
-            agent_id: 'fake-agent-id',
-            resurrection_paused: 'false',
-            az: 'z3',
-            bootstrap: 'false',
-            disk_cids: 'daafa7a0-1df2-4482-67e4-6ec795c76434',
-            index: '0',
-            state: 'started',
+            'instance' => 'jessez/0 (29ae97ec-3106-450b-a848-98cb3b25d86f)',
+            'process_state' => 'running',
+            'ips' => '10.20.30.1',
+            'vm_cid' => 'i-cid',
+            'vm_type' => 'default',
+            'ignore' => 'false',
+            'agent_id' => 'fake-agent-id',
+            'resurrection_paused' => 'false',
+            'az' => 'z3',
+            'bootstrap' => 'false',
+            'disk_cids' => 'daafa7a0-1df2-4482-67e4-6ec795c76434',
+            'index' => '0',
+            'state' => 'started',
           ))
         end
       end
@@ -357,19 +357,19 @@ OUTPUT
 
       it 'returns the instance details' do
         expect(bosh_helper.wait_for_instance_state('jessez', '0', 'running', 0)).to(eq(
-          instance: 'jessez/29ae97ec-3106-450b-a848-98cb3b25d86f',
-          process_state: 'running',
-          ips: '10.20.30.1',
-          vm_cid: 'i-cid',
-          vm_type: 'default',
-          ignore: 'false',
-          agent_id: 'fake-agent-id',
-          resurrection_paused: 'false',
-          az: 'z3',
-          bootstrap: 'false',
-          disk_cids: 'daafa7a0-1df2-4482-67e4-6ec795c76434',
-          index: '0',
-          state: 'started',
+          'instance' => 'jessez/29ae97ec-3106-450b-a848-98cb3b25d86f',
+          'process_state' => 'running',
+          'ips' => '10.20.30.1',
+          'vm_cid' => 'i-cid',
+          'vm_type' => 'default',
+          'ignore' => 'false',
+          'agent_id' => 'fake-agent-id',
+          'resurrection_paused' => 'false',
+          'az' => 'z3',
+          'bootstrap' => 'false',
+          'disk_cids' => 'daafa7a0-1df2-4482-67e4-6ec795c76434',
+          'index' => '0',
+          'state' => 'started',
         ))
       end
     end

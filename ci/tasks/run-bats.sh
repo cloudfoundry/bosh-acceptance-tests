@@ -3,7 +3,7 @@
 set -e
 
 source /etc/profile.d/chruby.sh
-chruby 2.3.0
+chruby 2.3.1
 
 export BAT_STEMCELL=$(realpath stemcell/*.tgz)
 export BAT_DEPLOYMENT_SPEC=$(realpath bats-config/bats-config.yml)
@@ -22,6 +22,8 @@ EOF
 ssh_key_path=/tmp/bat_private_key
 echo "$BAT_PRIVATE_KEY" > $ssh_key_path
 chmod 600 $ssh_key_path
+
+export BOSH_GW_PRIVATE_KEY=$ssh_key_path
 
 pushd $(realpath bats)
   bundle install

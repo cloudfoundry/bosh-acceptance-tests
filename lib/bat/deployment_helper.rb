@@ -177,7 +177,7 @@ module Bat
 
     def get_most_recent_task_id
       output = @bosh_runner.bosh("tasks --recent=1").output
-      JSON.parse(output)["Tables"].first["Rows"].first.first
+      JSON.parse(output)["Tables"].first["Rows"].first["0"]
     end
 
     def events(task_id, expected_task_status = 'done')

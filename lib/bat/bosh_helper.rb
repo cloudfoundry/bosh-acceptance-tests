@@ -69,8 +69,12 @@ module Bat
     end
 
     def bosh_ssh(job, index, command, options = {})
+      options[:json] = false
+      column = options.delete[:column]
+
       bosh_ssh_options = ''
       bosh_ssh_options << ' --results' if options.delete(:result)
+      bosh_ssh_options << " --column=#{column}" if column
       bosh("ssh #{job}/#{index} -c '#{command}' #{bosh_ssh_options}", options)
     end
 
@@ -94,7 +98,7 @@ module Bat
       instance_in_state = nil
       10.times do
         instance = get_instance(name, index)
-        if instance && instance[:process_state] =~ /#{state}/
+        if instance && instance['process_state'] =~ /#{state}/
           instance_in_state = instance
           break
         end
@@ -112,7 +116,7 @@ module Bat
 
     def get_instance(name, index)
       instance = get_instances.find do |i|
-        i[:instance] =~ /#{name}\/[a-f0-9\-]{36}/ || i[:instance] =~ /#{name}\/#{index} \([a-f0-9\-]{36}\)/ && i[:index] == index
+        i['instance'] =~ /#{name}\/[a-f0-9\-]{36}/ || i['instance'] =~ /#{name}\/#{index} \([a-f0-9\-]{36}\)/ && i['index'] == index
       end
 
       instance
@@ -122,19 +126,7 @@ module Bat
       output = @bosh_runner.bosh('instances --details').output
       output_hash = JSON.parse(output)
 
-      table = output_hash["Tables"][0]
-
-      headers = table["Header"]
-      headers.map! do |header|
-        header = header.gsub(/[\s\n]/, '_')
-        header.downcase.to_sym
-      end
-      output = []
-      table["Rows"].each do |row|
-        output << Hash[headers.zip(row)]
-      end
-
-      output
+      output_hash["Tables"][0]["Rows"]
     end
 
     def get_disks(job, index, options)
