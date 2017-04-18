@@ -3,7 +3,7 @@
 set -e
 
 source /etc/profile.d/chruby.sh
-chruby 2.3.1
+chruby 2.1.7
 
 export BAT_STEMCELL=$(realpath stemcell/*.tgz)
 export BAT_DEPLOYMENT_SPEC=$(realpath bats-config/bats-config.yml)
