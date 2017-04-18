@@ -3,7 +3,7 @@
 set -e
 
 source /etc/profile.d/chruby.sh
-chruby 2.1.7
+chruby 2.3.0
 
 export BAT_STEMCELL=$(realpath stemcell/*.tgz)
 export BAT_DEPLOYMENT_SPEC=$(realpath bats-config/bats-config.yml)
@@ -24,7 +24,6 @@ echo "$BAT_PRIVATE_KEY" > $ssh_key_path
 chmod 600 $ssh_key_path
 
 pushd $(realpath bats)
-  ./write_gemfile
   bundle install
   bundle exec rspec spec $BAT_RSPEC_FLAGS
 popd

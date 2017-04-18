@@ -1,6 +1,9 @@
 require 'common/exec'
 require 'json'
 require 'base64'
+require 'bat/stemcell'
+require 'bat/release'
+require 'bat/deployment'
 
 module Bat
   class BoshRunner

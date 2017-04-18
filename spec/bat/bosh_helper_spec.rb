@@ -20,17 +20,13 @@ describe Bat::BoshHelper do
 
   describe '#ssh_options' do
     let(:env) { instance_double('Bat::Env') }
-    before { bosh_helper.instance_variable_set('@env', env) }
-    before { allow(env).to receive(:vcap_password).and_return('fake_password') }
-
-    context 'when both env var BAT_VCAP_PRIVATE_KEY is set' do
-      before { allow(env).to receive(:vcap_private_key).and_return('fake_private_key') }
-      it { expect(bosh_helper.ssh_options).to eq(private_key: 'fake_private_key', password: 'fake_password') }
+    before do
+      bosh_helper.instance_variable_set('@env', env)
+      allow(env).to receive(:private_key).and_return('fake_private_key')
     end
 
-    context 'when BAT_VCAP_PRIVATE_KEY is not set in env' do
-      before { allow(env).to receive(:vcap_private_key).and_return(nil) }
-      it { expect(bosh_helper.ssh_options).to eq(password: 'fake_password', private_key: nil) }
+    it 'returns the private key from the env' do
+      expect(bosh_helper.ssh_options).to eq(private_key: 'fake_private_key')
     end
   end
 

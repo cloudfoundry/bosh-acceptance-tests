@@ -3,21 +3,19 @@ require 'bat/bosh_runner'
 require 'logger'
 
 describe Bat::BoshRunner do
-  subject { described_class.new('fake-bosh-exe', 'fake-path-to-bosh-config', 'admin', 'admin', ca_cert, logger) }
+  subject { described_class.new('fake-bosh-exe', logger) }
 
   let(:logger) { instance_double('Logger', info: nil) }
-  let(:ca_cert) { nil }
   let(:bosh_exec) { class_double('Bosh::Exec').as_stubbed_const(transfer_nested_constants: true) }
-  let(:bosh_exec_result) { instance_double('Bosh::Exec::Result', output: 'FAKE_OUTPUT') }
 
   describe '#bosh' do
+    let(:bosh_exec_result) { instance_double('Bosh::Exec::Result', output: 'FAKE_OUTPUT') }
+
     it 'uses Bosh::Exec to shell out to bosh' do
       expected_command = %W(
         fake-bosh-exe
         --non-interactive
         --json
-        --config fake-path-to-bosh-config
-        --client admin --client-secret admin
         FAKE_ARGS 2>&1
       ).join(' ')
 
@@ -41,9 +39,6 @@ describe Bat::BoshRunner do
         fake-bosh-exe
         --non-interactive
         --json
-        --config fake-path-to-bosh-config
-        --client admin --client-secret admin
-        --ca-cert CACERT
         FAKE_ARGS 2>&1
       ).join(' ')
 
@@ -65,8 +60,6 @@ describe Bat::BoshRunner do
             fake-bosh-exe
             --non-interactive
             --json
-            --config fake-path-to-bosh-config
-            --client admin --client-secret admin
             --deployment bat
             FAKE_ARGS 2>&1
           ).join(' ')
@@ -108,38 +101,42 @@ describe Bat::BoshRunner do
     end
   end
 
-  describe '#set_director' do
-    let(:env) { 'my.bosh.director' }
+  describe '#deployments' do
+    let(:output_json) { JSON.dump({ Tables: [ Rows: [ { name: "some-deployment" } ]] }) }
+    let(:bosh_exec_result) { instance_double('Bosh::Exec::Result', output: output_json) }
 
-    it 'causes all future invocations of #bosh to add `--environment <env>`' do
-      expected_command = %W(
-        fake-bosh-exe
-        --non-interactive
-        --json
-        --config fake-path-to-bosh-config
-        --client admin --client-secret admin
-        FAKE_ARGS 2>&1
-      ).join(' ')
+    it 'returns a hash of the current deployments' do
+      allow(bosh_exec).to receive(:sh).and_return(bosh_exec_result)
 
-      expect(bosh_exec).to receive(:sh).with(expected_command, {}).and_return(bosh_exec_result)
+      deployments_output = subject.deployments
+      expect(deployments_output['some-deployment']).to eq(true)
+    end
+  end
 
-      subject.bosh('FAKE_ARGS')
+  describe '#releases' do
+    let(:output_json) { JSON.dump({ Tables: [Rows: [ { name: "some-release" }]] }) }
+    let(:bosh_exec_result) { instance_double('Bosh::Exec::Result', output: output_json) }
 
-      expected_command = %W(
-        fake-bosh-exe
-        --non-interactive
-        --environment #{env}
-        --json
-        --config fake-path-to-bosh-config
-        --client admin --client-secret admin
-        FAKE_ARGS 2>&1
-      ).join(' ')
+    it 'returns a list of releases' do
+      allow(bosh_exec).to receive(:sh).and_return(bosh_exec_result)
 
-      subject.set_environment(env)
+      releases = subject.releases
+      expect(releases.length).to eq(1)
+      expect(releases[0].name).to eq('some-release')
+    end
+  end
 
-      expect(bosh_exec).to receive(:sh).with(expected_command, {}).and_return(bosh_exec_result)
+  describe '#stemcells' do
+    let(:output_json) { JSON.dump({ Tables: [ Rows: [ { name: "some-stemcell", version: "fake-version" } ]] }) }
+    let(:bosh_exec_result) { instance_double('Bosh::Exec::Result', output: output_json) }
 
-      subject.bosh('FAKE_ARGS')
+    it 'returns a list of stemcells with name and version' do
+      allow(bosh_exec).to receive(:sh).and_return(bosh_exec_result)
+
+      stemcells = subject.stemcells
+      expect(stemcells.length).to eq(1)
+      expect(stemcells[0].name).to eq('some-stemcell')
+      expect(stemcells[0].version).to eq('fake-version')
     end
   end
 end

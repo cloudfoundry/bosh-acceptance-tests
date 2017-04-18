@@ -71,7 +71,7 @@ module Bat
     def bosh_ssh(job, index, command, options = {})
       bosh_ssh_options = ''
       bosh_ssh_options << ' --results' if options.delete(:result)
-      bosh("ssh #{job}/#{index} '#{command}' #{bosh_ssh_options}", options)
+      bosh("ssh #{job}/#{index} -c '#{command}' #{bosh_ssh_options}", options)
     end
 
     def tarfile

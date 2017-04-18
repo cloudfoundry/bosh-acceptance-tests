@@ -108,29 +108,6 @@ describe Bat::Release do
     end
   end
 
-  describe '#previous' do
-    subject(:release) { Bat::Release.new('FAKE_NAME', release_versions, '/tmp/fake/path') }
-
-    it 'returns a new Bat::Release whose #versions are missing the last element' do
-      previous_release = release.previous
-      expect(previous_release.name).to eq('FAKE_NAME')
-      expect(previous_release.sorted_versions).to eq(%w(FAKE_VERSION_1))
-      expect(previous_release.path).to eq('/tmp/fake/path')
-    end
-
-    it 'does not change #versions' do
-      expect { release.previous }.not_to change { release.sorted_versions }
-    end
-
-    context 'when there are fewer than two versions' do
-      let(:release_versions) { %w(FAKE_VERSION_0) }
-
-      it 'raises an error' do
-        expect { release.previous }.to raise_error(RuntimeError, /no previous version/)
-      end
-    end
-  end
-
   describe '#==' do
     it 'returns true if the other object is a Release with the same #name and any common #versions' do
       equal_release = Bat::Release.new(release_name, release_versions.sample(1))
