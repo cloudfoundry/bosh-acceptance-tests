@@ -1,4 +1,5 @@
 require 'common/exec'
+require 'json'
 require 'base64'
 
 module Bat
@@ -38,19 +39,15 @@ module Bat
       bosh(command, options.merge(on_error: :return))
     end
 
-    def info
-      bosh('env')
-    end
-
     def deployments
       result = {}
-      bosh('deployments')["Tables"][0]["Rows"].each { |r| result[r['name']] = true }
+      JSON.parse(bosh('deployments').output)["Tables"][0]["Rows"].each { |r| result[r['name']] = true }
       result
     end
 
     def releases
       result = []
-      bosh('releases')["Tables"][0]["Rows"].each do |r|
+      JSON.parse(bosh('releases').output)["Tables"][0]["Rows"].each do |r|
         result << Bat::Release.new(r['name'], [])
       end
       result
@@ -58,7 +55,7 @@ module Bat
 
     def stemcells
       result = []
-      bosh('stemcells')["Tables"][0]["Rows"].each do |s|
+      JSON.parse(bosh('stemcells').output)["Tables"][0]["Rows"].each do |s|
         result << Bat::Stemcell.new(s['name'], s['version'])
       end
       result
