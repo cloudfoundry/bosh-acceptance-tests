@@ -70,7 +70,7 @@ module Bat
 
     def bosh_ssh(job, index, command, options = {})
       options[:json] = false
-      column = options.delete[:column]
+      column = options.delete(:column)
 
       bosh_ssh_options = ''
       bosh_ssh_options << ' --results' if options.delete(:result)
