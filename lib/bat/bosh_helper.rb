@@ -73,9 +73,14 @@ module Bat
       column = options.delete(:column)
 
       bosh_ssh_options = ''
-      bosh_ssh_options << ' --results' if options.delete(:result)
+      bosh_ssh_options << '--results' if options.delete(:result)
       bosh_ssh_options << " --column=#{column}" if column
-      bosh("ssh #{job}/#{index} -c '#{command}' #{bosh_ssh_options}", options)
+      result = bosh("ssh #{job}/#{index} -c '#{command}' #{bosh_ssh_options}", options)
+
+      until JSON.parse(bosh("tasks --recent"))["Tables"][0]["Rows"].empty? do
+        @logger.info("Waiting for ssh cleanup to finish")
+      end
+      result
     end
 
     def tarfile

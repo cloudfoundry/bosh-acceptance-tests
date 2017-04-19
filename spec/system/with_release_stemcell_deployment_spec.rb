@@ -28,7 +28,7 @@ describe 'with release, stemcell and deployment', core: true do
 
     it 'should survive agent dying', ssh: true do
       Dir.mktmpdir do |tmpdir|
-        ssh_command="sudo -S pkill -9 agent"
+        ssh_command="sudo pkill -9 agent"
         expect(bosh_ssh('batlight', 0, ssh_command, deployment: deployment.name)).to succeed
         wait_for_instance_state('batlight', '0', 'running')
         expect(bosh_safe("logs batlight/0 --agent --dir #{tmpdir}", deployment: deployment.name)).to succeed
