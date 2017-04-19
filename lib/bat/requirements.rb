@@ -65,8 +65,8 @@ module Bat
     end
 
     def tasks_processing?
-      # `bosh tasks` exit code is 1 if no tasks running
-      @bosh_runner.bosh('tasks', on_error: :return).output =~ /processing/
+      tasks = JSON.parse(@bosh_runner.bosh('tasks').output)["Tables"][0]["Rows"]
+      !tasks.empty?
     end
 
     private

@@ -134,9 +134,11 @@ module Bat
       df_cmd = 'df -x tmpfs -x devtmpfs -x debugfs -l | tail -n +2'
 
       options[:result] = true
+      options[:json] = false
+      options[:column] = 'stdout'
 
-      df_output = JSON.parse(bosh_ssh(job, index, df_cmd, options).output)
-      df_output['Tables'][0]['Rows'][0][1].split("\r\n").each do |line|
+      df_output = bosh_ssh(job, index, df_cmd, options).output
+      df_output.split("\r\n").each do |line|
         fields = line.split(/\s+/)
         disks[fields[0]] = {
           blocks: fields[1],
