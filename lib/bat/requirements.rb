@@ -66,7 +66,7 @@ module Bat
 
     def tasks_processing?
       tasks = JSON.parse(@bosh_runner.bosh('tasks').output)["Tables"][0]["Rows"]
-      tasks_without_ssh_cleanup = tasks.reject { |task| task['description'].match('ssh: cleanup') }
+      tasks_without_ssh_cleanup = tasks.reject { |task| task['description'].match(/^ssh: cleanup/) }
       !tasks_without_ssh_cleanup.empty?
     end
 

@@ -4,19 +4,15 @@ require 'bat/bosh_runner'
 require 'bat/bosh_helper'
 
 describe Bat::BoshHelper do
-  subject(:bosh_helper) do
-    Class.new { include Bat::BoshHelper }.new
+  subject(:bosh_helper) { Class.new { include Bat::BoshHelper }.new }
+
+  let(:bosh_runner) { instance_double('Bat::BoshRunner') }
+
+  before do
+    bosh_helper.instance_variable_set('@bosh_runner', bosh_runner)
+    stub_const('ENV', {})
+    bosh_helper.instance_variable_set('@logger', Logger.new('/dev/null'))
   end
-
-  before { bosh_helper.instance_variable_set('@bosh_runner', bosh_runner) }
-  let(:bosh_runner) { instance_double('Bat::BoshRunner') }
-
-  before { bosh_helper.instance_variable_set('@bosh_runner', bosh_runner) }
-  let(:bosh_runner) { instance_double('Bat::BoshRunner') }
-
-  before { stub_const('ENV', {}) }
-
-  before { bosh_helper.instance_variable_set('@logger', Logger.new('/dev/null')) }
 
   describe '#ssh_options' do
     let(:env) { instance_double('Bat::Env') }
@@ -27,6 +23,38 @@ describe Bat::BoshHelper do
 
     it 'returns the private key from the env' do
       expect(bosh_helper.ssh_options).to eq(private_key: 'fake_private_key')
+    end
+  end
+
+  describe "persistent_disk" do
+    let(:job_name) { 'some-job' }
+    let(:job_index) { 'some-index' }
+    let(:ssh_command) { "ssh #{job_name}/#{job_index} -c 'df -x tmpfs -x devtmpfs -x debugfs -l | tail -n +2' --results --column=stdout" }
+
+    before do
+      puts ssh_command
+      allow(bosh_runner).to receive(:bosh).with(ssh_command, { json: false })
+        .and_return(df_output)
+      allow(bosh_runner).to receive(:bosh).with('tasks --recent')
+        .and_return('{ "Tables": [{ "Rows": [] }] }')
+    end
+
+    context "when a persistent disk is present" do
+      let(:df_output) { Bosh::Exec::Result.new(ssh_command, '/dev/fake       3000 2000  1000   66% /var/vcap/store', 0) }
+
+      it "returns the size of the persistent disk" do
+        expect(bosh_helper.persistent_disk(job_name, job_index, {})).to eq('3000')
+      end
+    end
+
+    context "when a persistent disk is not found" do
+      let(:df_output) { Bosh::Exec::Result.new(ssh_command, '/dev/fake-ephemeral       3000 2000  1000   66% /var/vcap/data' , 0) }
+
+      it "raises error" do
+        expect {
+          bosh_helper.persistent_disk(job_name, job_index, {})
+        }.to raise_error(RuntimeError, 'Could not find persistent disk size')
+      end
     end
   end
 
