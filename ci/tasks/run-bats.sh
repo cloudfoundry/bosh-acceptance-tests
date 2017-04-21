@@ -12,13 +12,6 @@ chmod +x $BAT_BOSH_CLI
 
 source bats-config/bats.env
 
-# todo disable host key checking for deployed VMs
-mkdir -p $HOME/.ssh
-cat > $HOME/.ssh/config << EOF
-Host *
-    StrictHostKeyChecking no
-EOF
-
 ssh_key_path=/tmp/bat_private_key
 echo "$BAT_PRIVATE_KEY" > $ssh_key_path
 chmod 600 $ssh_key_path
