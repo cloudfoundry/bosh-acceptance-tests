@@ -37,10 +37,9 @@ module Bat
     end
 
     def persistent_disk(job, index, options)
-      get_disks(job, index, options).each do |disk|
-        values = disk.last
-        if values[:mountpoint] == '/var/vcap/store'
-          return values[:blocks]
+      get_disks(job, index, options).each do |_, disk|
+        if disk[:mountpoint] == '/var/vcap/store'
+          return disk[:blocks]
         end
       end
       raise 'Could not find persistent disk size'
@@ -138,7 +137,7 @@ module Bat
       options[:column] = 'stdout'
 
       df_output = bosh_ssh(job, index, df_cmd, options).output
-      df_output.split("\r\n").each do |line|
+      df_output.split("\n").each do |line|
         fields = line.split(/\s+/)
         disks[fields[0]] = {
           blocks: fields[1],

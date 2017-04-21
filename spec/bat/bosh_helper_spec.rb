@@ -26,31 +26,36 @@ describe Bat::BoshHelper do
     end
   end
 
-  describe "persistent_disk" do
+  describe 'persistent_disk' do
     let(:job_name) { 'some-job' }
     let(:job_index) { 'some-index' }
     let(:ssh_command) { "ssh #{job_name}/#{job_index} -c 'df -x tmpfs -x devtmpfs -x debugfs -l | tail -n +2' --results --column=stdout" }
 
     before do
-      puts ssh_command
       allow(bosh_runner).to receive(:bosh).with(ssh_command, { json: false })
-        .and_return(df_output)
+        .and_return(ssh_output)
       allow(bosh_runner).to receive(:bosh).with('tasks --recent')
         .and_return('{ "Tables": [{ "Rows": [] }] }')
     end
 
-    context "when a persistent disk is present" do
-      let(:df_output) { Bosh::Exec::Result.new(ssh_command, '/dev/fake       3000 2000  1000   66% /var/vcap/store', 0) }
+    context 'when a persistent disk is present' do
+      let(:df_output) do
+        %q(
+/dev/fake       3000 2000  1000   66% /var/vcap/store
+/dev/fake-ephemeral       3000 2000  1000   66% /var/vcap/data
+)
+      end
+      let(:ssh_output) { Bosh::Exec::Result.new(ssh_command, df_output, 0) }
 
-      it "returns the size of the persistent disk" do
+      it 'returns the size of the persistent disk' do
         expect(bosh_helper.persistent_disk(job_name, job_index, {})).to eq('3000')
       end
     end
 
-    context "when a persistent disk is not found" do
-      let(:df_output) { Bosh::Exec::Result.new(ssh_command, '/dev/fake-ephemeral       3000 2000  1000   66% /var/vcap/data' , 0) }
+    context 'when a persistent disk is not found' do
+      let(:ssh_output) { Bosh::Exec::Result.new(ssh_command, '/dev/fake-ephemeral       3000 2000  1000   66% /var/vcap/data' , 0) }
 
-      it "raises error" do
+      it 'raises error' do
         expect {
           bosh_helper.persistent_disk(job_name, job_index, {})
         }.to raise_error(RuntimeError, 'Could not find persistent disk size')
