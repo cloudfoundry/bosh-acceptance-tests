@@ -26,11 +26,11 @@ networks:
   subnets:
   - range: <%= network.cidr %>
     reserved:
-      <% network.reserved.each do |range| %>
+      <% network.reserved.split(", ").each do |range| %>
       - <%= range %>
       <% end %>
     static:
-      <% network.static.each do |range| %>
+      <% network.static.split(", ").each do |range| %>
       - <%= range %>
       <% end %>
     gateway: <%= network.gateway %>
