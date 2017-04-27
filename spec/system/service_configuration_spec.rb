@@ -27,7 +27,7 @@ describe 'service configuration', :type => 'os'  do
 
     # shutdown instance
     begin
-      ssh(ip, 'vcap', "#{sudo} reboot", ssh_options)
+      ssh(ip, 'jumpbox', "#{sudo} reboot", ssh_options)
     rescue IOError
       @logger.debug('Rebooting instance closed the ssh connection')
     end
@@ -38,7 +38,7 @@ describe 'service configuration', :type => 'os'  do
     loop do
       sleep 10
       begin
-        result = ssh(ip, 'vcap', "echo 'UP'", ssh_options)
+        result = ssh(ip, 'jumpbox', "echo 'UP'", ssh_options)
       rescue Exception => e
         @logger.info("Failed to run ssh command. Retrying. Message: #{e.message}")
       end
@@ -54,7 +54,7 @@ describe 'service configuration', :type => 'os'  do
   def dump_log(ip, log_path)
     @logger.info("Dumping log file '#{log_path}'")
     @logger.info("================================================================================")
-    ssh(ip, 'vcap', "([ -f '#{log_path}' ] && cat #{log_path})", ssh_options)
+    ssh(ip, 'jumpbox', "([ -f '#{log_path}' ] && cat #{log_path})", ssh_options)
   end
 
   def process_running_on_instance(ip, process_name)
@@ -63,7 +63,7 @@ describe 'service configuration', :type => 'os'  do
     pid = ''
     loop do
       sleep 1
-      pid = ssh(ip, 'vcap', "pgrep #{process_name}", ssh_options)
+      pid = ssh(ip, 'jumpbox', "pgrep #{process_name}", ssh_options)
       break unless (tries += 1) < 30 && (pid =~ /^\d+\n$/).nil?
     end
 
@@ -167,7 +167,7 @@ describe 'service configuration', :type => 'os'  do
             echo "FAILURE: expected /etc/service/monit to be younger than uptime, got a difference of ${diff} seconds"
           fi
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+        expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
       end
 
       context 'when monit dies' do
@@ -181,7 +181,7 @@ describe 'service configuration', :type => 'os'  do
             if [[ "${new_pid}" = "${old_pid}" || -z "${new_pid}" ]]; then echo 'FAILURE'; fi
             echo "SUCCESS"
           EOF
-          expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+          expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
         end
       end
 
@@ -196,7 +196,7 @@ describe 'service configuration', :type => 'os'  do
             if [[ "${new_pid}" = "${old_pid}" || -z "${new_pid}" ]]; then echo 'FAILURE'; fi
             echo "SUCCESS"
           EOF
-          expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+          expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
         end
       end
     end
@@ -231,7 +231,7 @@ describe 'service configuration', :type => 'os'  do
           fi
           echo "SUCCESS"
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+        expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
       end
 
       context 'when monit dies' do
@@ -246,7 +246,7 @@ describe 'service configuration', :type => 'os'  do
             _=$(killAndAwaitProcess monit)
             echo "SUCCESS"
           EOF
-          expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+          expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
         end
       end
 
@@ -262,7 +262,7 @@ describe 'service configuration', :type => 'os'  do
             _=$(killAndAwaitProcess bosh-agent)
             echo "SUCCESS"
           EOF
-          expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+          expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
         end
       end
     end
@@ -282,7 +282,7 @@ describe 'service configuration', :type => 'os'  do
       it 'mounts tmpfs to /var/vcap/data/sys/run' do
         # verify mount point for sys/run
         cmd = "if [ x`mount | grep -c /var/vcap/data/sys/run` = x1 ] ; then echo 'SUCCESS' ; fi"
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+        expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
       end
 
       it 'creates a symlink from /etc/sv/monit to /etc/service/monit' do
@@ -300,7 +300,7 @@ describe 'service configuration', :type => 'os'  do
           fi
           echo 'SUCCESS'
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+        expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
       end
 
       it 'does not keep pre-existing pid files in sys/run after instance reboot' do
@@ -328,7 +328,7 @@ describe 'service configuration', :type => 'os'  do
           touch /var/vcap/data/sys/run/foo.pid
           echo 'SUCCESS'
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+        expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
 
         # reboot instance
         instance_reboot(public_ip)
@@ -359,7 +359,7 @@ describe 'service configuration', :type => 'os'  do
           fi
           echo 'SUCCESS'
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+        expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
       end
     end
 
@@ -378,7 +378,7 @@ describe 'service configuration', :type => 'os'  do
             echo "FAILURE: foo not existing anymore"
           fi
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+        expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
       end
 
       it 'does not remove existing pid files' do
@@ -397,7 +397,7 @@ describe 'service configuration', :type => 'os'  do
             echo 'FAILURE: batlight.pid changed'
           fi
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+        expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
       end
 
       it 'does not recreates a symlink from /etc/sv/monit to /etc/service/monit' do
@@ -413,7 +413,7 @@ describe 'service configuration', :type => 'os'  do
             echo 'FAILURE: /etc/service/monit modified'
           fi
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+        expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
       end
 
       it 'does not restart monit' do
@@ -432,7 +432,7 @@ describe 'service configuration', :type => 'os'  do
             echo 'FAILURE: monit restarted'
           fi
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+        expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
       end
     end
   end
@@ -451,7 +451,7 @@ describe 'service configuration', :type => 'os'  do
 
           # kill batlight
           cmd = "#{sudo} pkill batlight && echo 'SUCCESS'"
-          expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+          expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
 
           # wait for batlight to come up again
           batlight_running_on_instance(public_ip)
@@ -464,14 +464,14 @@ describe 'service configuration', :type => 'os'  do
         it 'restarts it' do
           # kill monit
           cmd = "#{sudo} pkill monit && echo 'SUCCESS'"
-          expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+          expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
 
           # wait for monit to come up again
           monit_running_on_instance(public_ip)
 
           # kill batlight
           cmd = "#{sudo} pkill batlight && echo 'SUCCESS'"
-          expect(ssh(public_ip, 'vcap', cmd, ssh_options)).to eq("SUCCESS\n")
+          expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
 
           # wait for batlight to come up again
           batlight_running_on_instance(public_ip)
