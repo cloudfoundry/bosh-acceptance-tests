@@ -11,7 +11,7 @@ compilation:
   network: default
   reuse_compilation_vms: true
   cloud_properties:
-    instance_type: <%= properties.workers_instance_type || Standard_D3_v2 %>
+    instance_type: <%= properties.workers_instance_type || "Standard_D3_v2" %>
     <% if properties.key_name %>
     key_name: <%= properties.key_name %>
     <% end %>
@@ -77,7 +77,7 @@ resource_pools:
       name: <%= properties.stemcell.name %>
       version: '<%= properties.stemcell.version %>'
     cloud_properties:
-      instance_type: <%= properties.resource_pool_instance_type || Standard_D3_v2 %>
+      instance_type: <%= properties.resource_pool_instance_type || "Standard_D3_v2" %>
       <% if properties.key_name %>
       key_name: <%= properties.key_name %>
       <% end %>
