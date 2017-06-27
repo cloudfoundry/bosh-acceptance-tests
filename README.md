@@ -4,7 +4,10 @@ The BOSH Acceptance Tests are meant to be used to verify the commonly used funct
 
 BATs describe BOSH behavior at the highest level. They often cover infrastructure-specific behavior that is not easily tested at lower levels. BATs verify integration between all BOSH components and infrastructures. They run against a deployed Director and use the CLI to perform tasks. They exercise different BOSH workflows (e.g. deploying for the first time, updating existing deployments, handling broken deployments). The assertions are made against CLI commands exit status, output and state of VMs after performing the command. Since BATs run on real infrastructures, they help verify that specific combinations of the Director and stemcell works.
 
-It requires a deployed BOSH director.
+## Prerequisites
+
+- deployed BOSH director
+- installed BOSH v2 cli 
 
 ## Configure BATS
 
@@ -13,29 +16,17 @@ It requires a deployed BOSH director.
 Before you can run BAT, you need to set the following environment variables:
 
 ```
-# DNS name or IP address of the bosh director used for testing (without the scheme)
-export BAT_DIRECTOR=
-
-# Username of bosh director used for testing (optional, only needed if you do not use the defaults)
-#export BAT_DIRECTOR_USER=
-
-# User's password of bosh director used for testing (optional, only needed if you do not use the defaults)
-#export BAT_DIRECTOR_PASSWORD=
-
 # path to the stemcell you want to use for testing
 export BAT_STEMCELL=
 
 # path to the bat yaml file which is used to generate the deployment manifest (see below `bat.yml`)
 export BAT_DEPLOYMENT_SPEC=
 
-# password used to ssh to the stemcells
-export BAT_VCAP_PASSWORD=
+# BOSH CLI executable path
+export BAT_BOSH_CLI=bosh2
 
 # DNS host or IP where BOSH-controlled PowerDNS server is running, which is required for the DNS tests. For example, if BAT is being run against a MicroBOSH then this value will be the same as BAT_DIRECTOR
 export BAT_DNS_HOST=
-
-# the full path to the private key for ssh into the bosh instances
-export BOSH_KEY_PATH=
 
 # the name of infrastructure that is used by bosh deployment. Examples: aws, vsphere, openstack, warden.
 export BAT_INFRASTRUCTURE=
@@ -43,19 +34,34 @@ export BAT_INFRASTRUCTURE=
 # the type of networking being used: `dynamic` or `manual`.
 export BAT_NETWORKING=
 
-# the path to ssh key, if set bosh ssh will use gateway host and user (optional; required when deployed to vpc)
-#export BAT_VCAP_PRIVATE_KEY=
+# the path to ssh key, used by OS specs to ssh into BOSH VMs
+export BAT_PRIVATE_KEY=
 
 # Run tests with --fail-fast and skip cleanup in case of failure (optional)
-#export BAT_DEBUG_MODE=
+export BAT_DEBUG_MODE=
 ```
 
-The 'dns' property MUST NOT be specified in the bat deployment spec properties. At all.
+To enable OS tests set:
+```
+export BOSH_OS_BATS=true
+```
+
+#### Environment variables for the BOSH v2 cli
+
+Provide all necessary variables for the BOSH cli to connect to the director, e.g.:
+
+```
+export BOSH_ENVIRONMENT=<director ip>
+export BOSH_CLIENT=<director username>
+export BOSH_CLIENT_SECRET=<director password>
+export BOSH_CA_CERT=<director ca cert content or path>
+```
 
 ## BATS manifest: bat.yml
 
 Create `bat.yml` that is used by BATs to generate manifest. Set `BAT_DEPLOYMENT_SPEC` to point to `bat.yml` file path.
 
+The 'dns' property MUST NOT be specified in the BAT deployment spec properties. At all.
 
 ### AWS
 
@@ -65,7 +71,6 @@ Create `bat.yml` that is used by BATs to generate manifest. Set `BAT_DEPLOYMENT_
 ---
 cpi: aws
 properties:
-  uuid: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx # BAT_DIRECTOR UUID
   stemcell:
     name: bosh-aws-xen-ubuntu-trusty-go_agent
     version: latest
@@ -93,7 +98,6 @@ properties:
 ---
 cpi: openstack
 properties:
-  uuid: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx # BAT_DIRECTOR UUID
   stemcell:
     name: bosh-openstack-kvm-ubuntu-trusty-go_agent
     version: latest
@@ -118,7 +122,6 @@ properties:
 ---
 cpi: openstack
 properties:
-  uuid: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx # BAT_DIRECTOR UUID
   stemcell:
     name: bosh-openstack-kvm-ubuntu-trusty-go_agent
     version: latest
@@ -159,7 +162,6 @@ properties:
 ---
 cpi: vsphere
 properties:
-  uuid: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx # BAT_DIRECTOR UUID
   stemcell:
     name: bosh-vsphere-esxi-ubuntu-trusty-go_agent
     version: latest
