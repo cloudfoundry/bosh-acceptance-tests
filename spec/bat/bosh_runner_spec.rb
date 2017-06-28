@@ -31,22 +31,6 @@ describe Bat::BoshRunner do
       expect(subject.bosh('FAKE_ARGS')).to eq(bosh_exec_result)
     end
 
-    context 'when a ca_cert is provided' do
-      let(:ca_cert) { 'CACERT' }
-
-      it 'passes the ca_cert to Bosh::Exec' do
-        expected_command = %W(
-        fake-bosh-exe
-        --non-interactive
-        --json
-        FAKE_ARGS 2>&1
-      ).join(' ')
-
-        expect(bosh_exec).to receive(:sh).with(expected_command, {}).and_return(bosh_exec_result)
-        subject.bosh('FAKE_ARGS')
-      end
-    end
-
     context 'when options are passed' do
       it 'passes the options to Bosh::Exec' do
         expect(bosh_exec).to receive(:sh).with(anything, {foo: :bar}).and_return(bosh_exec_result)
