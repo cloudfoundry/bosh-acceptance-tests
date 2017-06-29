@@ -55,7 +55,7 @@ describe 'with release and stemcell and subsequent deployments' do
     end
 
     def swaps
-      output = bosh_ssh('batlight', 0, 'swapon -s', deployment: deployment.name, result: true, column: 'stdout').output
+      output = bosh_ssh('batlight', 0, 'PATH=$PATH:/usr/sbin swapon -s', deployment: deployment.name, result: true, column: 'stdout').output
       output.lines.to_a[1..-1].map do |line|
         matches = /(?<point>.+)\s+(?<type>.+)\s+(?<size>.+)\s+(?<used>.+)\s+(?<priority>.+)/.match(line)
         next if matches.nil?
