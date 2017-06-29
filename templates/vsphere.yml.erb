@@ -26,12 +26,24 @@ networks:
   subnets:
   - range: <%= network.cidr %>
     reserved:
+      <% if network.reserved.instance_of?(Array) %>
+      <% network.reserved.each do |range| %>
+      - <%= range %>
+      <% end %>
+      <% else %>
       <% network.reserved.split(", ").each do |range| %>
       - <%= range %>
       <% end %>
+      <% end %>
     static:
+      <% if network.static.instance_of?(Array) %>
+      <% network.static.each do |range| %>
+      - <%= range %>
+      <% end %>
+      <% else %>
       <% network.static.split(", ").each do |range| %>
       - <%= range %>
+      <% end %>
       <% end %>
     gateway: <%= network.gateway %>
     dns: <%= p('dns').inspect %>
