@@ -17,12 +17,6 @@ describe 'back and restore deployment' do
   #   @requirements.cleanup(deployment)
   # end
 
-  fit 'jordan hahahah' do
-    with_tmpdir do
-      expect(true).to eq(true)
-    end
-  end
-
   xit 'should restore director DB' do
     with_tmpdir do
       expect(bosh_safe('backup one_deployment.tgz')).to succeed_with /Backup of BOSH director was put in.*one_deployment\.tgz/
