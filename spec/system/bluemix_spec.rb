@@ -1,6 +1,6 @@
 require 'system/spec_helper'
 
-describe 'check vcap password correct', type: 'os' do
+describe 'check vcap password correct 222' do
   before(:all) do
     @requirements.requirement(@requirements.stemcell)
     @requirements.requirement(@requirements.release)
