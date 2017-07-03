@@ -12,7 +12,7 @@ describe 'check vcap password correct 222' do
     @requirements.cleanup(deployment)
   end
 
-  it 'vcap should exist in shadow and user_data.json' do
+  fit 'vcap should exist in shadow and user_data.json' do
     passwd = '$6$3n/Y5RP0$Jr1nLxatojY9Wlqduzwh66w8KmYxjoj9vzI62n3Mmstd5mNVnm0SS1N0YizKOTlJCY5R/DFmeWgbkrqHIMGd51'
     output_shadow = bosh_ssh('batlight', 0, "cat /etc/shadow | grep #{passwd}").output
     running_services_shadow = output_shadow.split("\n").uniq

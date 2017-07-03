@@ -17,7 +17,7 @@ describe 'back and restore deployment' do
   #   @requirements.cleanup(deployment)
   # end
 
-  it 'jordan hahahah' do
+  fit 'jordan hahahah' do
     with_tmpdir do
       expect(true).to eq(true)
     end
