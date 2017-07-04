@@ -117,6 +117,20 @@ module Bat
       @spec['properties']['vip'] || static_ip
     end
 
+    def public_ip_v2
+      output = @bosh_runner.bosh('vms bat').output
+      table = output.lines.grep(/\|/)
+
+      table = table.map { |line| line.split('|').map(&:strip).reject(&:empty?) }
+      table.shift
+
+      output = []
+      table.each do |row|
+        output << row[4]
+      end
+      output[0]
+    end
+
     def use_static_ip
       @spec['properties']['use_static_ip'] = true
     end

@@ -19,18 +19,18 @@ describe 'network configuration' do
 
   describe 'resolving DNS entries', dns: true do
     let(:dns) { Resolv::DNS.new(nameserver: @env.dns_host) }
-
+    
     it 'forward looks up instance' do
       address = nil
       expect {
-        address = dns.getaddress("0.batlight.static.bat.#{bosh_tld}").to_s
+        address = dns.getaddress("0.batlight.default.bat.#{bosh_tld}").to_s
       }.not_to raise_error, 'this test tries to resolve to the public IP of director, so you need to have incoming UDP enabled for it'
-      expect(address).to eq(public_ip)
+      expect(address).to eq(public_ip_v2)
     end
 
     it 'reverse looks up instance' do
-      names = dns.getnames(public_ip)
-      expect(names.to_s).to include("0.batlight.static.bat.#{bosh_tld}.")
+      names = dns.getnames(public_ip_v2)
+      expect(names.to_s).to include("0.batlight.default.bat.#{bosh_tld}.")
     end
 
     it 'resolves instance names from deployed VM' do
@@ -40,8 +40,8 @@ describe 'network configuration' do
 
       bosh('logs batlight 0 --agent --dir /tmp')
 
-      cmd = 'dig +short 0.batlight.static.bat.bosh a 0.batlight.static.bat.microbosh a'
-      expect(bosh_ssh('batlight', 0, cmd).output).to include(public_ip)
+      cmd = 'dig +short 0.batlight.default.bat.bosh a 0.batlight.default.bat.microbosh a'
+      expect(bosh_ssh('batlight', 0, cmd).output).to include(public_ip_v2)
     end
   end
 
