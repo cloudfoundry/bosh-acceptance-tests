@@ -23,7 +23,7 @@ export BAT_STEMCELL=
 export BAT_DEPLOYMENT_SPEC=
 
 # BOSH CLI executable path
-export BAT_BOSH_CLI=bosh2
+export BAT_BOSH_CLI=bosh
 
 # DNS host or IP where BOSH-controlled PowerDNS server is running, which is required for the DNS tests. For example, if BAT is being run against a MicroBOSH then this value will be the same as BAT_DIRECTOR
 export BAT_DNS_HOST=
