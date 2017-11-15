@@ -28,7 +28,7 @@ export BAT_BOSH_CLI=bosh
 # DNS host or IP where BOSH-controlled PowerDNS server is running, which is required for the DNS tests. For example, if BAT is being run against a MicroBOSH then this value will be the same as BAT_DIRECTOR
 export BAT_DNS_HOST=
 
-# the name of infrastructure that is used by bosh deployment. Examples: aws, vsphere, openstack, warden.
+# the name of infrastructure that is used by bosh deployment. Examples: aws, vsphere, openstack, warden, oci.
 export BAT_INFRASTRUCTURE=
 
 # the type of networking being used: `dynamic` or `manual`.
@@ -51,7 +51,7 @@ export BOSH_OS_BATS=true
 Provide all necessary variables for the BOSH cli to connect to the director, e.g.:
 
 ```
-export BOSH_ENVIRONMENT=<director ip>
+export BOSH_ENVIRONMENT=<director ip or alias to bosh-env>
 export BOSH_CLIENT=<director username>
 export BOSH_CLIENT_SECRET=<director password>
 export BOSH_CA_CERT=<director ca cert content or path>
@@ -178,6 +178,47 @@ properties:
     gateway: 192.168.79.1
     vlan: Network_Name # vSphere network name
 ```
+
+### Oracle Cloud Infrastructure (OCI)
+#### Manual networking
+
+Example bat.yml pointed to by `BAT_DEPLOYMENT_SPEC` environment variable 
+
+```yaml
+
+---
+cpi: oci 
+properties:
+  stemcell:
+    name: light-oracle-ubuntu-stemcell 
+    version: latest
+  instances: 1
+  instance_shape: 'VM.Standard1.2' # Instance shape
+  availability_domain: WZYX:PHX-AD-3 
+
+  networks:
+  - name: default
+    type: manual
+    static_ip: 10.0.X.30 # Primary (private) IP assigned to the bat-release job vm (primary NIC), must be in the primary static range
+    cloud_properties:
+      vcn: cloudfoundry_vcn 
+      subnet: private_subnet_ad3 
+    cidr: 10.0.X.0/24 # CIDR bock of the subnet
+    reserved: ['10.0.X.2 - 10.0.X.9'] # 
+    static: ['10.0.X.10 - 10.0.X.30']
+    gateway: 10.0.X.1
+  - name: second # Secondary network for testing jobs with multiple manual networks
+    type: manual
+    static_ip: 10.0.Y.30 # Must be in the static range defined below
+    cloud_properties:
+      vcn: cloudfoundry_vcn 
+      subnet: private_subnet_ad3_for_bats 
+    cidr: 10.0.Y.0/24
+    reserved: ['10.0.Y.2 - 10.0.Y.9']
+    static: ['10.0.Y.10 - 10.0.Y.30']
+    gateway: 10.0.Y.1
+```
+
 
 ## Setup IaaS
 
