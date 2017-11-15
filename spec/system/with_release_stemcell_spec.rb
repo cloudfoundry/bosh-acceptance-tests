@@ -102,7 +102,7 @@ describe 'with release and stemcell and subsequent deployments' do
       unless warden?
         expect(persistent_disk('colocated', 0, deployment: deployment)).to_not eq(@size)
       end
-      expect(bosh_ssh('colocated', 0, "cat #{SAVE_FILE}", deployment: deployment.name).output).to match /foobar/
+      expect(bosh_ssh('colocated', 0, "sudo cat #{SAVE_FILE}", deployment: deployment.name).output).to match /foobar/
     end
   end
 
