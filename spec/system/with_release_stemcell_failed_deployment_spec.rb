@@ -23,7 +23,7 @@ describe 'with release, stemcell and failed deployment', core: true do
   end
 
   after do
-    bosh("-d #{deployment_manifest_good.name} delete-deployment")
+    bosh("-d #{deployment_manifest_good.name} delete-deployment --force")
 
     deployment_manifest_good.delete
     deployment_manifest_bad.delete
