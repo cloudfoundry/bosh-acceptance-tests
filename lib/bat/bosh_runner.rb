@@ -35,12 +35,12 @@ module Bat
       end
 
       @logger.info(result.output)
-      errored_task_id = /Task (?<id>\d+) error/
-                        .match(result.output)
-                        &.named_captures
-                        &.fetch('id')
+      errored_task_id_match = /Task (?<id>\d+) error/.match(result.output)
+      if errored_task_id_match && errored_task_id_match.named_captures
+        errored_task_id = errored_task_id_match.named_captures['id']
+        @logger.info(task_debug(errored_task_id).output)
+      end
 
-      @logger.info(task_debug(errored_task_id).output) if errored_task_id
       yield result if block_given?
 
       result
