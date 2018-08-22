@@ -35,6 +35,12 @@ module Bat
       end
 
       @logger.info(result.output)
+      errored_task_id = /Task (?<id>\d+) error/
+                        .match(result.output)
+                        &.named_captures
+                        &.fetch('id')
+
+      @logger.info(task_debug(errored_task_id).output) if errored_task_id
       yield result if block_given?
 
       result
@@ -67,6 +73,10 @@ module Bat
     end
 
     private
+
+    def task_debug(task_id)
+      bosh("task #{task_id} --debug")
+    end
 
     def build_command(arguments, options = {})
       command = []
