@@ -75,7 +75,7 @@ module Bat
     private
 
     def task_debug(task_id)
-      bosh("task #{task_id} --debug")
+      bosh_safe("task #{task_id} --debug")
     end
 
     def build_command(arguments, options = {})
