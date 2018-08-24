@@ -23,7 +23,7 @@ describe Bat::Deployment do
 
   describe '#initialize' do
     it 'generates a deployment manifest' do
-      expect(Bosh::Template::EvaluationContext).to receive(:new).with('FAKE_DEPLOYMENT_SPEC', nil)
+      expect(Bosh::Template::EvaluationContext).to receive(:new).with('FAKE_DEPLOYMENT_SPEC')
       Bat::Deployment.new('FAKE_DEPLOYMENT_SPEC')
       expect(File.read("#{tmp_dir}/deployment")).to eq("---\nname: FAKE_DEPLOYMENT_NAME")
     end
@@ -32,7 +32,7 @@ describe Bat::Deployment do
   describe '#generate_deployment_manifest' do
     it 'generates a deployment manifest' do
       deployment # force load
-      expect(Bosh::Template::EvaluationContext).to receive(:new).with('FAKE_DEPLOYMENT_SPEC', nil)
+      expect(Bosh::Template::EvaluationContext).to receive(:new).with('FAKE_DEPLOYMENT_SPEC')
       deployment.generate_deployment_manifest('FAKE_DEPLOYMENT_SPEC')
       expect(File.read("#{tmp_dir}/deployment")).to eq("---\nname: FAKE_DEPLOYMENT_NAME")
     end

@@ -35,12 +35,6 @@ module Bat
       end
 
       @logger.info(result.output)
-      errored_task_id_match = /Task (?<id>\d+) error/.match(result.output)
-      if errored_task_id_match
-        errored_task_id = errored_task_id_match['id']
-        @logger.info(task_debug(errored_task_id).output)
-      end
-
       yield result if block_given?
 
       result
@@ -73,10 +67,6 @@ module Bat
     end
 
     private
-
-    def task_debug(task_id)
-      bosh_safe("task #{task_id} --debug")
-    end
 
     def build_command(arguments, options = {})
       command = []
