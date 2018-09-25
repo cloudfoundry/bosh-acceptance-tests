@@ -151,6 +151,17 @@ module Bat
       @spec['properties']['persistent_disk'] = size
     end
 
+    def use_multiple_persistent_disks(*sizes)
+      disks = []
+      sizes.each do |size|
+        name = SecureRandom.hex(5)
+        disks << {:name => name, :disk_size => size}
+      end
+      @spec['properties']['disk_pools'] = disks
+      @spec['properties'].delete('persistent_disk')
+      @spec['properties']['persistent_disks'] = disks.map { |v| {name: SecureRandom.hex(5), type: v[:name]} }
+    end
+
     def use_canaries(count)
       @spec['properties']['canaries'] = count
     end
