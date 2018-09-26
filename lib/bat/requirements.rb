@@ -96,7 +96,12 @@ module Bat
       else
         @logger.info('deployment not already deployed, deploying...')
         what.generate_deployment_manifest(deployment_spec)
-        expect(@bosh_runner.bosh_safe("-d #{what.name} deploy #{what.to_path}")).to succeed
+        x = @bosh_runner.bosh_safe("-d #{what.name} deploy #{what.to_path}")
+        puts x
+        if x.exit_status != 0
+          puts @bosh_runner.bosh_safe("task 4 --debug")
+        end
+        expect(x).to succeed
       end
     rescue RSpec::Expectations::ExpectationNotMetError
       @spec_state.register_fail
