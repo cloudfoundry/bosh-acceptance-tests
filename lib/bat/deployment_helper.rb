@@ -148,6 +148,7 @@ module Bat
     end
 
     def use_persistent_disk(size)
+      @spec['properties'].delete('persistent_disks')
       @spec['properties']['persistent_disk'] = size
     end
 
@@ -155,11 +156,11 @@ module Bat
       disks = []
       sizes.each do |size|
         name = "abc#{SecureRandom.hex(3)}"
-        disks << {:name => name, :disk_size => size}
+        disks << {'name' => name, 'disk_size' => size}
       end
       @spec['properties']['disk_pools'] = disks
       @spec['properties'].delete('persistent_disk')
-      @spec['properties']['persistent_disks'] = disks.map { |v| {name: "xyz#{SecureRandom.hex(3)}", type: v[:name]} }
+      @spec['properties']['persistent_disks'] = disks.map { |v| {'name' => "xyz#{SecureRandom.hex(3)}", 'type' => v['name']} }
     end
 
     def use_canaries(count)
