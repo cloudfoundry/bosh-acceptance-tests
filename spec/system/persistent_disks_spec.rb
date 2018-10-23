@@ -1,6 +1,6 @@
 require 'system/spec_helper'
 
-describe 'with multiple persistent disks', core: true do
+xdescribe 'with multiple persistent disks', core: true do
   disk1_size_mb = 5 * 1024
   disk2_size_mb = 4 * 1024
 
