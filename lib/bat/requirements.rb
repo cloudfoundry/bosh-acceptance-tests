@@ -29,7 +29,7 @@ module Bat
           require_deployment(what, deployment_spec, options)
         when :no_tasks_processing
           if tasks_processing?
-            raise 'director is currently processing tasks'
+            raise TasksProcessing, 'director is currently processing tasks'
           end
         else
           raise "unknown requirement: #{what}"
