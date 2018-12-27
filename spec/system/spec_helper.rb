@@ -78,6 +78,7 @@ RSpec.configure do |config|
         raise e if i > 5
 
         sleep 1
+        i += 1
         retry
       end
     end
