@@ -12,8 +12,8 @@ describe 'with release and stemcell and subsequent deployments' do
       reload_deployment_spec
       use_static_ip
       use_vip
-      use_job('batlight')
-      use_templates(%w[batlight])
+      use_instance_group('batlight')
+      use_jobs(%w[batlight])
 
       use_flavor_with_no_ephemeral_disk
 
@@ -79,8 +79,8 @@ describe 'with release and stemcell and subsequent deployments' do
         /var/vcap/packages/batlight/bin/batlight
         /var/vcap/packages/batarang/bin/batarang
       ]
-      use_job('colocated')
-      use_templates(%w[batarang batlight])
+      use_instance_group('colocated')
+      use_jobs(%w[batarang batlight])
       use_persistent_disk(2048)
 
       @requirements.requirement(deployment, @spec)
@@ -117,8 +117,8 @@ describe 'with release and stemcell and subsequent deployments' do
         /var/vcap/packages/batlight/bin/batlight
         /var/vcap/packages/batarang/bin/batarang
       ]
-      use_job('colocated')
-      use_templates(%w[batarang batlight])
+      use_instance_group('colocated')
+      use_jobs(%w[batarang batlight])
 
       @requirements.requirement(deployment, @spec)
     end
