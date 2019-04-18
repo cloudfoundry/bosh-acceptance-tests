@@ -18,8 +18,8 @@ describe 'raw_instance_storage', raw_ephemeral_storage: true do
     @our_ssh_options = ssh_options.merge(password: 'foobar')
     use_static_ip
     use_vip
-    use_instance_group('batlight')
-    use_jobs(%w[batlight])
+    use_job('batlight')
+    use_templates(%w[batlight])
     use_raw_instance_storage
 
     @requirements.requirement(deployment, @spec)

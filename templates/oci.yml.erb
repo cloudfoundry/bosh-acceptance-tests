@@ -65,18 +65,12 @@ resource_pools:
       instance_shape: <%= properties.instance_shape || 'VM.Standard1.2' %>
       availability_domain: <%= properties.availability_domain %>
 
-stemcells:
-  - alias: default
-    name: <%= properties.stemcell.name %>
-    version: '<%= properties.stemcell.version %>'
-
-instance_groups:
-  - name: <%= properties.instance_group_name || "batlight" %>
-    jobs: <% (properties.jobs || ["batlight"]).each do |job| %>
-    - name: <%= job %>
+jobs:
+  - name: <%= properties.job || "batlight" %>
+    templates: <% (properties.templates || ["batlight"]).each do |template| %>
+    - name: <%= template %>
     <% end %>
     instances: <%= properties.instances %>
-    stemcell: default
     resource_pool: common
     <% if properties.persistent_disk %>
     persistent_disk: <%= properties.persistent_disk %>

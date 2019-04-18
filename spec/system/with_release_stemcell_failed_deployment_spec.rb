@@ -19,7 +19,7 @@ describe 'with release, stemcell and failed deployment', core: true do
     load_deployment_spec
     use_canaries(1)
     use_pool_size(2)
-    use_instance_count(2)
+    use_job_instances(2)
   end
 
   after do
