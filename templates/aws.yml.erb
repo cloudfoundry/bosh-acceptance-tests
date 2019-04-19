@@ -49,6 +49,11 @@ instance_groups:
           - <%= properties.vip %>
     <% end %>
     vm_type: default
+    <% if properties.password %>
+    env:
+      bosh:
+        password: <%= properties.password %>
+    <% end %>
 
 properties:
   batlight:

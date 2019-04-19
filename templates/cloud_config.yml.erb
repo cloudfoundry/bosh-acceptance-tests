@@ -62,14 +62,14 @@ compilation:
 vm_types:
 - name: default
   cloud_properties:
-    instance_type: <%= properties.instance_type || "m3.medium" %>
+    instance_type: <%= properties.instance_type || "m3.medium" %> # aws
     ephemeral_disk: {size: 3000, type: gp2}
     <% if properties.raw_instance_storage %>
     raw_instance_storage: <%= properties.raw_instance_storage %>
     <% end %>
-    ram: 512
-    disk: 2048
-    cpu: 1
+    ram: 512 # vsphere
+    disk: 2048 # vsphere
+    cpu: 1 # vsphere
 
   <% if properties.disk_types %>
 disk_types:

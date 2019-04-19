@@ -23,7 +23,6 @@ instance_groups:
     <% end %>
     instances: <%= properties.instances %>
     stemcell: default
-    resource_pool: common
     <% if properties.persistent_disk %>
     persistent_disk: <%= properties.persistent_disk %>
     <% end %>
@@ -45,6 +44,7 @@ instance_groups:
         - <%= network.static_ip %>
         <% end %>
       <% end %>
+    vm_type: default
     <% if properties.password %>
     env:
       bosh:
