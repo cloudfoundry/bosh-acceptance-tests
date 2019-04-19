@@ -13,6 +13,7 @@ require 'bat/spec_state'
 require 'bat/stemcell'
 require 'bat/release'
 require 'bat/deployment'
+require 'bat/cloud_config'
 require 'bat/bosh_helper'
 require 'bat/deployment_helper'
 

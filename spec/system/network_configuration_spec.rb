@@ -17,7 +17,7 @@ describe 'network configuration' do
     @requirements.cleanup(deployment)
   end
 
-  describe 'resolving DNS entries', dns: true do
+  xdescribe 'resolving DNS entries', dns: true do
     let(:dns) { Resolv::DNS.new(nameserver: @env.dns_host) }
 
     it 'forward looks up instance' do
@@ -45,7 +45,7 @@ describe 'network configuration' do
     end
   end
 
-  describe 'changing instance DNS', dns: true, network_reconfiguration: true do
+  xdescribe 'changing instance DNS', dns: true, network_reconfiguration: true do
     let(:manifest_with_different_dns) do
       # Need to include a valid DNS host so that other tests
       # can still use dns resolution on the deployed VM

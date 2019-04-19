@@ -28,7 +28,6 @@ module Bat
     # remove the generated deployment file
     # @return [Bat::Deployment]
     def with_deployment(spec = {}, &block)
-      deployed = false # move into Deployment ?
       deployment = Bat::Deployment.new(@spec.merge(spec))
 
       if !block_given?
@@ -57,16 +56,19 @@ module Bat
       FileUtils.rm_rf(dir) if dir
     end
 
-    def use_job(job)
-      @spec['properties']['job'] = job
-      @spec['properties']['templates'] = [job]
+    def upload_cloud_config
+
     end
 
-    def use_templates(templates)
-      @spec['properties']['templates'] = Array(templates)
+    def use_instance_group(instance_group_name)
+      @spec['properties']['instance_group_name'] = instance_group_name
     end
 
-    def use_job_instances(count)
+    def use_jobs(jobs)
+      @spec['properties']['jobs'] = Array(jobs)
+    end
+
+    def use_instance_count(count)
       @spec['properties']['instances'] = count
     end
 

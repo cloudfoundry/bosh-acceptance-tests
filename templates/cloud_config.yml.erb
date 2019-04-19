@@ -1,0 +1,63 @@
+---
+azs:
+- name: z1
+  cloud_properties:
+    availability_zone: <%= properties.availability_zone %>
+
+networks:
+- name: static
+  type: vip
+<% properties.networks.each do |network| %>
+- name: <%= network.name %>
+  <% if network.subnet %>
+  type: manual
+  subnets:
+  - range: <%= network.cidr %>
+    az: z1
+    reserved:
+      <% network.reserved.each do |range| %>
+      - <%= range %>
+      <% end %>
+    static:
+      <% network.static.each do |range| %>
+      - <%= range %>
+      <% end %>
+    gateway: <%= network.gateway %>
+    cloud_properties:
+      security_groups: <%= network.security_groups %>
+      subnet: <%= network.subnet %>
+  <% else %>
+  type: dynamic
+    <% if properties.security_groups %>
+  cloud_properties:
+    security_groups:
+      - <%= properties.security_groups %>
+    <% else %>
+  cloud_properties: {}
+    <% end %>
+  <% end %>
+<% end %>
+
+compilation:
+  workers: 2
+  network: default
+  reuse_compilation_vms: true
+  vm_type: default
+  az: z1
+
+vm_types:
+- name: default
+  cloud_properties:
+    instance_type: <%= properties.instance_type || "m3.medium" %>
+    ephemeral_disk: {size: 3000, type: gp2}
+
+<% if properties.disk_types %>
+disk_types:
+  <% properties.disk_types.each do |disk_type| %>
+- name: <%= disk_type.name %>
+  disk_size: <%= disk_type.disk_size %>
+  cloud_properties:
+    type: gp2
+  <% end %>
+<% end %>
+

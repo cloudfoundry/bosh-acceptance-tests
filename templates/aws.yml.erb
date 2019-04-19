@@ -5,85 +5,27 @@ releases:
   - name: bat
     version: <%= properties.release || "latest" %>
 
-compilation:
-  workers: 2
-  network: default
-  reuse_compilation_vms: true
-  cloud_properties:
-    instance_type: <%= properties.instance_type || "m3.medium" %>
-    availability_zone: <%= properties.availability_zone %>
-
 update:
   canaries: <%= properties.canaries || 1 %>
   canary_watch_time: 3000-90000
   update_watch_time: 3000-90000
   max_in_flight: <%= properties.max_in_flight || 1 %>
 
-networks:
-- name: static
-  type: vip
 
-<% properties.networks.each do |network| %>
-- name: <%= network.name %>
-  <% if network.subnet %>
-  type: manual
-  subnets:
-  - range: <%= network.cidr %>
-    reserved:
-      <% network.reserved.each do |range| %>
-      - <%= range %>
-      <% end %>
-    static:
-      <% network.static.each do |range| %>
-      - <%= range %>
-      <% end %>
-    gateway: <%= network.gateway %>
-    dns: <%= p('dns').inspect %>
-    cloud_properties:
-      security_groups: <%= network.security_groups %>
-      subnet: <%= network.subnet %>
-  <% else %>
-  type: dynamic
-  dns: <%= p('dns').inspect %>
-    <% if properties.security_groups %>
-  cloud_properties:
-    security_groups:
-      - <%= properties.security_groups %>
-    <% else %>
-  cloud_properties: {}
-    <% end %>
-  <% end %>
-<% end %>
 
-<% if properties.disk_pools %>
-disk_pools:
-<% properties.disk_pools.each do |disk_pool| %>
-- name: <%= disk_pool.name %>
-  disk_size: <%= disk_pool.disk_size %>
-<% end %>
-<% end %>
+stemcells:
+- alias: default
+  name: <%= properties.stemcell.name %>
+  version: '<%= properties.stemcell.version %>'
 
-resource_pools:
-  - name: common
-    network: default
-    size: <%= properties.pool_size %>
-    stemcell:
-      name: <%= properties.stemcell.name %>
-      version: '<%= properties.stemcell.version %>'
-    cloud_properties:
-      instance_type: <%= properties.instance_type || "m3.medium" %>
-      availability_zone: <%= properties.availability_zone %>
-      <% if properties.raw_instance_storage %>
-      raw_instance_storage: <%= properties.raw_instance_storage %>
-      <% end %>
-
-jobs:
-  - name: <%= properties.job || "batlight" %>
-    templates: <% (properties.templates || ["batlight"]).each do |template| %>
-    - name: <%= template %>
+instance_groups:
+  - name: <%= properties.instance_group_name || "batlight" %>
+    azs: [z1]
+    jobs: <% (properties.jobs || ["batlight"]).each do |job| %>
+    - name: <%= job %>
     <% end %>
     instances: <%= properties.instances %>
-    resource_pool: common
+    stemcell: default
     <% if properties.persistent_disk %>
     persistent_disk: <%= properties.persistent_disk %>
     <% end %>
@@ -108,6 +50,7 @@ jobs:
         static_ips:
           - <%= properties.vip %>
     <% end %>
+    vm_type: default
 
 properties:
   batlight:
