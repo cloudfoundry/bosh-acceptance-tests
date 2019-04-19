@@ -56,10 +56,6 @@ module Bat
       FileUtils.rm_rf(dir) if dir
     end
 
-    def upload_cloud_config
-
-    end
-
     def use_instance_group(instance_group_name)
       @spec['properties']['instance_group_name'] = instance_group_name
     end
