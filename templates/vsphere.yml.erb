@@ -5,81 +5,16 @@ releases:
   - name: bat
     version: <%= properties.release || "latest" %>
 
-compilation:
-  workers: 1
-  network: static
-  reuse_compilation_vms: true
-  cloud_properties:
-    ram: 1024
-    disk: 4096
-    cpu: 1
-
 update:
   canaries: <%= properties.canaries || 1 %>
   canary_watch_time: 3000-90000
   update_watch_time: 3000-90000
   max_in_flight: <%= properties.max_in_flight || 1 %>
 
-<% if properties.disk_pools %>
-disk_pools:
-<% properties.disk_pools.each do |disk_pool| %>
-- name: <%= disk_pool.name %>
-  disk_size: <%= disk_pool.disk_size %>
-<% end %>
-<% end %>
-
-networks:
-<% properties.networks.each do |network| %>
-- name: <%= network.name %>
-  subnets:
-  - range: <%= network.cidr %>
-    reserved:
-      <% if network.reserved.instance_of?(Array) %>
-      <% network.reserved.each do |range| %>
-      - <%= range %>
-      <% end %>
-      <% else %>
-      <% network.reserved.split(", ").each do |range| %>
-      - <%= range %>
-      <% end %>
-      <% end %>
-    static:
-      <% if network.static.instance_of?(Array) %>
-      <% network.static.each do |range| %>
-      - <%= range %>
-      <% end %>
-      <% else %>
-      <% network.static.split(", ").each do |range| %>
-      - <%= range %>
-      <% end %>
-      <% end %>
-    gateway: <%= network.gateway %>
-    dns: <%= p('dns').inspect %>
-    cloud_properties:
-      name: <%= network.vlan %>
-<% end %>
-
-resource_pools:
-  - name: common
-    network: static
-    size: <%= properties.pool_size %>
-    stemcell:
-      name: <%= properties.stemcell.name %>
-      version: '<%= properties.stemcell.version %>'
-    cloud_properties:
-      ram: 512
-      disk: 2048
-      cpu: 1
-    <% if properties.password %>
-    env:
-      bosh:
-        password: <%= properties.password %>
-    <% end %>
-
 stemcells:
-  - alias: default
-    name: <%= properties.stemcell.name %>
-    version: '<%= properties.stemcell.version %>'
+- alias: default
+  name: <%= properties.stemcell.name %>
+  version: '<%= properties.stemcell.version %>'
 
 instance_groups:
   - name: <%= properties.instance_group_name || "batlight" %>
@@ -110,6 +45,12 @@ instance_groups:
         - <%= network.static_ip %>
         <% end %>
       <% end %>
+    <% if properties.password %>
+    env:
+      bosh:
+        password: <%= properties.password %>
+    <% end %>
+
 
 properties:
   batlight:
