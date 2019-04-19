@@ -28,7 +28,7 @@ module Bat
     def generate_cloud_config(spec)
       puts "Generating cloud config with input:\n#{spec.to_yaml}"
       @context = Bosh::Template::EvaluationContext.new(spec, nil)
-      erb = ERB.new(load_template)
+      erb = ERB.new(load_template(@context.spec.cpi))
       result = erb.result(@context.get_binding)
       begin
         @yaml = YAML.load(result)
@@ -51,8 +51,8 @@ module Bat
       @path = cloud_config.path
     end
 
-    def load_template()
-      template = File.expand_path("../../../templates/cloud_config.yml.erb", __FILE__)
+    def load_template(cpi)
+      template = File.expand_path("../../../templates/cloud_config_#{cpi}.yml.erb", __FILE__)
       File.read(template)
     end
 

@@ -5,12 +5,9 @@ azs:
     availability_zone: <%= properties.availability_zone %>
 
 networks:
-- name: static
-  type: vip
 <% properties.networks.each do |network| %>
 - name: <%= network.name %>
   type: <%= network.type %>
-  <% if network.type == 'manual' %>
   subnets:
   - range: <%= network.cidr %>
     az: z1
@@ -36,24 +33,11 @@ networks:
     <% end %>
     gateway: <%= network.gateway %>
     cloud_properties:
-      security_groups: <%= network.security_groups %>
-      subnet: <%= network.subnet %>
-  <% else %>
-  type: dynamic
-  cloud_properties:
-    <% if properties.security_groups %> # aws
-    security_groups:
-      - <%= properties.security_groups %>
-    <% end %>
-    <% if network.vlan %> # vsphere
-    name: <%= network.vlan %>
-    <% end %>
-
-  <% end %>
+      name: <%= network.vlan %>
 <% end %>
 
 compilation:
-  workers: 2
+  workers: 1
   network: default
   reuse_compilation_vms: true
   vm_type: default
@@ -62,16 +46,12 @@ compilation:
 vm_types:
 - name: default
   cloud_properties:
-    instance_type: <%= properties.instance_type || "m3.medium" %> # aws
     ephemeral_disk: {size: 3000, type: gp2}
-    <% if properties.raw_instance_storage %>
-    raw_instance_storage: <%= properties.raw_instance_storage %>
-    <% end %>
-    ram: 512 # vsphere
-    disk: 2048 # vsphere
-    cpu: 1 # vsphere
+    ram: 512
+    disk: 2048
+    cpu: 1
 
-  <% if properties.disk_types %>
+<% if properties.disk_types %>
 disk_types:
   <% properties.disk_types.each do |disk_type| %>
 - name: <%= disk_type.name %>
