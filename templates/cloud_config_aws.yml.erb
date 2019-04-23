@@ -39,7 +39,7 @@ networks:
 
 compilation:
   workers: 2
-  network: default
+  network: <%= properties.networks.first.name %>
   reuse_compilation_vms: true
   vm_type: default
   az: z1
