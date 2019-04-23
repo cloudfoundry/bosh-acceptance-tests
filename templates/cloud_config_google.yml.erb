@@ -1,0 +1,48 @@
+---
+azs:
+- name: z1
+  cloud_properties:
+    availability_zone: <%= properties.availability_zone %>
+
+networks:
+- name: static
+  type: vip
+<% properties.networks.each do |network| %>
+- name: <%= network.name %>
+  type: <%= network.type %>
+  subnets:
+  <% network.subnets.each do |subnet| %>
+  - range: <%= subnet.range %>
+    azs: [z1]
+    static: [<%= subnet.static %>]
+    gateway: <%= subnet.gateway %>
+    cloud_properties:
+      network_name: <%= subnet.cloud_properties.network_name %>
+      subnetwork_name: <%= subnet.cloud_properties.subnetwork_name %>
+      ephemeral_external_ip: <%= subnet.cloud_properties.ephemeral_external_ip || false %>
+      tags: <%= subnet.cloud_properties.tags || [] %>
+  <% end %>
+<% end %>
+
+compilation:
+  workers: 2
+  network: <%= properties.networks.first.name %>
+  reuse_compilation_vms: true
+  vm_type: default
+  az: z1
+
+vm_types:
+- name: default
+  cloud_properties:
+    machine_type: <%= properties.machine_type || "n1-standard-2" %>
+    root_disk_size_gb: <%= properties.root_disk_size_gb || 20 %>
+    root_disk_type: <%= properties.root_disk_type || "pd-standard" %>
+    zone: <%= properties.zone %>
+
+<% if properties.disk_types %>
+disk_types:
+  <% properties.disk_types.each do |disk_type| %>
+- name: <%= disk_type.name %>
+  disk_size: <%= disk_type.disk_size %>
+  <% end %>
+<% end %>
