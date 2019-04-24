@@ -1,11 +1,6 @@
 ---
 azs:
 - name: z1
-  cloud_properties:
-    datacenters:
-    - name: private
-      clusters:
-      - { private: { resource_pool: <%= properties.networks.first.vlan %> } }
 
 networks:
 <% properties.networks.each do |network| %>
