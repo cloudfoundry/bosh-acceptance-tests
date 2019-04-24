@@ -1,0 +1,32 @@
+---
+azs:
+- name: z1
+
+networks:
+- name: default
+  type: manual
+  subnets:
+  - azs: [z1]
+    range: 10.244.0.0/24
+    gateway: 10.244.0.1
+    static: [10.244.0.34]
+    reserved: []
+
+compilation:
+  workers: 2
+  network: default
+  reuse_compilation_vms: true
+  az: z1
+
+vm_types:
+- name: default
+
+<% if properties.disk_types %>
+disk_types:
+  <% properties.disk_types.each do |disk_type| %>
+- name: <%= disk_type.name %>
+  disk_size: <%= disk_type.disk_size %>
+  cloud_properties:
+    type: gp2
+  <% end %>
+<% end %>

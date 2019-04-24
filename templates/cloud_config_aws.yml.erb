@@ -13,7 +13,7 @@ networks:
   <% if network.type == 'manual' %>
   subnets:
   - range: <%= network.cidr %>
-    az: z1
+    azs: [z1]
     reserved:
       <% network.reserved.each do |range| %>
     - <%= range %>

@@ -11,7 +11,7 @@ networks:
   <% if network.type == 'manual' %>
   subnets:
   - range: <%= network.cidr %>
-    az: z1
+    azs: [z1]
     reserved:
       <% network.reserved.each do |range| %>
     - <%= range %>
@@ -33,7 +33,7 @@ networks:
   <% elsif network.type == 'dynamic' %>
   subnets:
   - range: <%= network.cidr %>
-    az: z1
+    azs: [z1]
     cloud_properties:
       <% if network.cloud_properties.resource_group_name %>
       resource_group_name: <%= network.cloud_properties.resource_group_name %>
