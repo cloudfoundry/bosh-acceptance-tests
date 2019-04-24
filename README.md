@@ -74,7 +74,6 @@ properties:
   stemcell:
     name: bosh-aws-xen-ubuntu-trusty-go_agent
     version: latest
-  pool_size: 1
   instances: 1
   vip: 54.54.54.54 # elastic ip for bat deployed VM
   second_static_ip: 10.10.0.31 # Secondary (private) IP to use for reconfiguring networks, must be in the primary network & different from static_ip
@@ -101,7 +100,6 @@ properties:
   stemcell:
     name: bosh-openstack-kvm-ubuntu-trusty-go_agent
     version: latest
-  pool_size: 1
   instances: 1
   instance_type: some-ephemeral
   availability_zone: az1 # (optional)
@@ -125,7 +123,6 @@ properties:
   stemcell:
     name: bosh-openstack-kvm-ubuntu-trusty-go_agent
     version: latest
-  pool_size: 1
   instances: 1
   instance_type: some-ephemeral
   flavor_with_no_ephemeral_disk: no-ephemeral
@@ -152,7 +149,6 @@ properties:
     reserved: ['192.168.0.2 - 192.168.0.9']
     static: ['192.168.0.10 - 192.168.0.30']
     gateway: 192.168.0.1
-  key_name: bosh # (optional) SSH keypair name, overrides the director's default_key_name setting
   password: hash # (optional) vcap password hash
 ```
 
@@ -165,7 +161,6 @@ properties:
   stemcell:
     name: bosh-vsphere-esxi-ubuntu-trusty-go_agent
     version: latest
-  pool_size: 1
   instances: 1
   second_static_ip: 192.168.79.62 # Secondary (private) IP assigned to the bat-release job vm, used for testing network reconfiguration, must be in the primary network & different from static_ip
   networks:
