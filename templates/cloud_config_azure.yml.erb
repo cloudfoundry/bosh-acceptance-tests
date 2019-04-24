@@ -1,8 +1,10 @@
 ---
 azs:
 - name: z1
+  <% if properties.availability_zone %>
   cloud_properties:
     availability_zone: <%= properties.availability_zone %>
+  <% end %>
 
 networks:
 <% properties.networks.each do |network| %>
@@ -53,7 +55,7 @@ networks:
 
 compilation:
   workers: 2
-  network: <%= properties.networks.first.name %>
+  network: default
   reuse_compilation_vms: true
   vm_type: default
   az: z1
@@ -61,10 +63,7 @@ compilation:
 vm_types:
 - name: default
   cloud_properties:
-    instance_type: <%= properties.resource_pool_instance_type || "Standard_D3_v2" %>
-    <% if properties.key_name %>
-    key_name: <%= properties.key_name %>
-    <% end %>
+    instance_type: <%= properties.workers_instance_type || "Standard_D3_v2" %>
     <% if properties.availability_zone %>
     availability_zone: <%= properties.availability_zone %>
     <% end %>
@@ -74,7 +73,5 @@ disk_types:
   <% properties.disk_types.each do |disk_type| %>
 - name: <%= disk_type.name %>
   disk_size: <%= disk_type.disk_size %>
-  cloud_properties:
-    type: gp2
   <% end %>
 <% end %>
