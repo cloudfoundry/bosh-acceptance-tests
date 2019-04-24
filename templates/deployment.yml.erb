@@ -38,12 +38,12 @@ instance_groups:
     <% properties.job_networks.each_with_index do |network, i| %>
       - name: <%= network.name %>
         default: [dns, gateway]
-      <% if properties.use_static_ip %>
+      <% if properties.use_static_ip && network.static_ip %>
         static_ips:
         - <%= network.static_ip %>
       <% end %>
     <% end %>
-    <% if properties.use_vip %>
+    <% if properties.use_vip && properties.vip %>
       - name: static
         static_ips:
           - <%= properties.vip %>
