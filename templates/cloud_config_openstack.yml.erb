@@ -1,10 +1,10 @@
 ---
 azs:
 - name: z1
+  <% if properties.availability_zone %>
   cloud_properties:
-    <% if properties.availability_zone %>
     availability_zone: <%= properties.availability_zone %>
-    <% end %>
+  <% end %>
 
 networks:
 - name: static
@@ -12,10 +12,10 @@ networks:
 <% properties.networks.each do |network| %>
 - name: <%= network.name %>
   type: <%= network.type %>
-  <% if network.type == 'manual' %>
   subnets:
   - range: <%= network.cidr %>
     azs: [z1]
+    <% if network.type == 'manual' %>
     reserved:
       <% network.reserved.each do |range| %>
     - <%= range %>
@@ -25,23 +25,17 @@ networks:
     - <%= range %>
     <% end %>
     gateway: <%= network.gateway %>
+    <% end %>
     cloud_properties:
       security_groups: <%= network.cloud_properties.security_groups %>
       <% if network.cloud_properties.net_id %>
       net_id: <%= network.cloud_properties.net_id %>
-  <% end %>
-  <% else %>
-  cloud_properties:
-    security_groups: <%= network.cloud_properties.security_groups %>
-    <% if network.cloud_properties.net_id %>
-    net_id: <%= network.cloud_properties.net_id %>
-  <% end %>
-  <% end %>
-  <% end %>
+      <% end %>
+<% end %>
 
 compilation:
   workers: 2
-  network: default
+  network: <%= properties.networks.first.name %>
   reuse_compilation_vms: true
   vm_type: default
   az: z1
