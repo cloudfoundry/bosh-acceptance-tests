@@ -1,0 +1,8 @@
+cpi: warden
+properties:
+  instances: 1
+  networks:
+  - name: default
+  stemcell:
+    name: bosh-warden-boshlite-ubuntu-xenial-go_agent
+    version: REPLACE-ME
