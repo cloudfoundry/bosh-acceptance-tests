@@ -1,0 +1,65 @@
+---
+azs:
+- name: z1
+  cloud_properties:
+    availability_zone: <%= properties.availability_zone %>
+
+networks:
+- name: static
+  type: vip
+<% properties.networks.each do |network| %>
+- name: <%= network.name %>
+  type: <%= network.type %>
+  <% if network.type == 'manual' %>
+  subnets:
+  - range: <%= network.cidr %>
+    azs: [z1]
+    reserved:
+      <% network.reserved.each do |range| %>
+    - <%= range %>
+    <% end %>
+    static:
+      <% network.static.each do |range| %>
+    - <%= range %>
+    <% end %>
+    gateway: <%= network.gateway %>
+    cloud_properties:
+      security_group_ids:
+      - <%= network.security_groups %>
+      vswitch_id: <%= network.subnet %>
+  <% else %>
+  <% if properties.security_groups %>
+  cloud_properties:
+    security_group_ids:
+    - <%= properties.security_groups %>
+  <% else %>
+  cloud_properties: {}
+  <% end %>
+  <% end %>
+<% end %>
+
+compilation:
+  workers: 2
+  network: <%= properties.networks.first.name %>
+  reuse_compilation_vms: true
+  vm_type: default
+  az: z1
+
+vm_types:
+- name: default
+  cloud_properties:
+    instance_type: <%= properties.instance_type || "ecs.mn4.large" %>
+    ephemeral_disk: {size: 3000, type: cloud_ssd}
+    <% if properties.raw_instance_storage %>
+    raw_instance_storage: <%= properties.raw_instance_storage %>
+    <% end %>
+
+<% if properties.disk_types %>
+disk_types:
+  <% properties.disk_types.each do |disk_type| %>
+- name: <%= disk_type.name %>
+  disk_size: <%= disk_type.disk_size %>
+  cloud_properties:
+    type: cloud_ssd
+  <% end %>
+<% end %>
