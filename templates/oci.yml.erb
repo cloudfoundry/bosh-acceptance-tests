@@ -74,7 +74,7 @@ instance_groups:
   - name: <%= properties.instance_group_name || "batlight" %>
     jobs: <% (properties.jobs || ["batlight"]).each do |job| %>
     - name: <%= job %>
-    - release: bat
+      release: bat
     <% end %>
     instances: <%= properties.instances %>
     stemcell: default
