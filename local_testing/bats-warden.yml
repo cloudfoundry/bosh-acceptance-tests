@@ -5,4 +5,4 @@ properties:
   - name: default
   stemcell:
     name: bosh-warden-boshlite-ubuntu-xenial-go_agent
-    version: REPLACE-ME
+    version: latest

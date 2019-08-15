@@ -63,7 +63,7 @@ describe Bat::BoshHelper do
     end
   end
 
-  describe '#wait_for_instance_state' do
+  describe '#wait_for_process_state' do
     # rubocop:disable LineLength
     let(:bosh_instances_output_with_jesse_in_running_state) { <<-'OUTPUT' }
 {
@@ -251,7 +251,7 @@ OUTPUT
       end
 
       it 'returns the instance details' do
-        expect(bosh_helper.wait_for_instance_state('jessez', '0', 'running', 0)).to(eq(
+        expect(bosh_helper.wait_for_process_state('jessez', '0', 'running', 0)).to(eq(
           'instance' => 'jessez/29ae97ec-3106-450b-a848-98cb3b25d86f',
           'process_state' => 'running',
           'ips' => '10.20.30.1',
@@ -335,7 +335,7 @@ OUTPUT
 OUTPUT
 
         it 'returns the instance details' do
-          expect(bosh_helper.wait_for_instance_state('jessez', '0', 'running', 0)).to(eq(
+          expect(bosh_helper.wait_for_process_state('jessez', '0', 'running', 0)).to(eq(
             'instance' => 'jessez/0 (29ae97ec-3106-450b-a848-98cb3b25d86f)',
             'process_state' => 'running',
             'ips' => '10.20.30.1',
@@ -361,7 +361,7 @@ OUTPUT
       end
 
       it 'returns nil' do
-        expect{bosh_helper.wait_for_instance_state('jessez', '0', 'running', 0)}.to raise_error
+        expect{bosh_helper.wait_for_process_state('jessez', '0', 'running', 0)}.to raise_error
       end
     end
 
@@ -372,7 +372,7 @@ OUTPUT
       end
 
       it 'returns nil' do
-        expect{bosh_helper.wait_for_instance_state('jessez', '0', 'running', 0)}.to raise_error
+        expect{bosh_helper.wait_for_process_state('jessez', '0', 'running', 0)}.to raise_error
       end
     end
 
@@ -389,7 +389,7 @@ OUTPUT
       end
 
       it 'returns the instance details' do
-        expect(bosh_helper.wait_for_instance_state('jessez', '0', 'running', 0)).to(eq(
+        expect(bosh_helper.wait_for_process_state('jessez', '0', 'running', 0)).to(eq(
           'instance' => 'jessez/29ae97ec-3106-450b-a848-98cb3b25d86f',
           'process_state' => 'running',
           'ips' => '10.20.30.1',

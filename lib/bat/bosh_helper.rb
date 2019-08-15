@@ -92,12 +92,31 @@ module Bat
       list
     end
 
+    def wait_for_process_state(name, index, state, wait_time_in_seconds=300)
+      puts "Start waiting for instance #{name} to have process state #{state}"
+      instance_in_state = nil
+      10.times do
+        instance = get_instance(name, index)
+        if instance && instance['process_state'] =~ /#{state}/
+          instance_in_state = instance
+          break
+        end
+        sleep wait_time_in_seconds/10
+      end
+      if instance_in_state
+        @logger.info("Finished waiting for instance #{name} have process state=#{state} instance=#{instance_in_state.inspect}")
+        instance_in_state
+      else
+        raise Exception, "Instance is still not in expected process state: #{state}"
+      end
+    end
+
     def wait_for_instance_state(name, index, state, wait_time_in_seconds=300)
       puts "Start waiting for instance #{name} to have state #{state}"
       instance_in_state = nil
       10.times do
         instance = get_instance(name, index)
-        if instance && instance['process_state'] =~ /#{state}/
+        if instance && instance['state'] =~ /#{state}/
           instance_in_state = instance
           break
         end

@@ -258,6 +258,7 @@ BATs currently supports the following tags which are enabled by default (use `--
   - `root_partition`: BOSH agent repartitioning of unused storage on root volume
   - `multiple_manual_networks`: support for creating machines with multiple network interfaces
   - `raw_ephemeral_storage`: BOSH agent exposes all attached instance storage to deployed jobs
+  - `reboot`: reboot VM tests as part of cloud-check
   - `changing_static_ip`: `configure_networks` CPI method support [deprecated]
   - `network_reconfiguration`: `configure_networks` CPI method support [deprecated]
 

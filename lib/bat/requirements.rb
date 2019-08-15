@@ -55,7 +55,7 @@ module Bat
           end
         when Bat::Deployment
           if @bosh_runner.deployments.include?(what.name)
-            expect(@bosh_runner.bosh_safe("-d #{what.name} delete-deployment")).to succeed
+            expect(@bosh_runner.bosh_safe("-d #{what.name} delete-deployment --force")).to succeed
             what.delete
           end
         else
