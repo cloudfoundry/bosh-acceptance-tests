@@ -8,7 +8,7 @@ describe 'cck' do
     @requirements.requirement(deployment, @spec)
   end
 
-  before(:each)
+  before(:each) do
     bosh('update-resurrection off')
   end
 
