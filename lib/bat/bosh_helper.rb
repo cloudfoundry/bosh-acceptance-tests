@@ -38,9 +38,7 @@ module Bat
 
     def persistent_disk(job, index, options)
       get_disks(job, index, options).each do |_, disk|
-        if disk[:mountpoint] == '/var/vcap/store'
-          return disk[:blocks]
-        end
+        return disk[:blocks] if disk[:mountpoint] == '/var/vcap/store'
       end
       raise 'Could not find persistent disk size'
     end
@@ -54,9 +52,7 @@ module Bat
       options[:user_known_hosts_file] = %w[/dev/null]
       options[:keys] = [private_key] unless private_key.nil?
 
-      if options[:keys].nil?
-        raise 'Need to set ssh :keys, or :private_key'
-      end
+      raise 'Need to set ssh :keys, or :private_key' if options[:keys].nil?
 
       @logger.info("--> ssh options: #{options.inspect}")
       Net::SSH.start(host, user, options) do |ssh|
@@ -144,7 +140,7 @@ module Bat
       output = @bosh_runner.bosh('instances --details').output
       output_hash = JSON.parse(output)
 
-      output_hash["Tables"][0]["Rows"]
+      output_hash['Tables'][0]['Rows']
     end
 
     def get_disks(job, index, options)
@@ -163,11 +159,33 @@ module Bat
           used: fields[2],
           available: fields[3],
           percent: fields[4],
-          mountpoint: fields[5],
+          mountpoint: fields[5]
         }
       end
 
       disks
+    end
+
+    def get_disk_cids(name, index)
+      instance = get_instance(name, index)
+      instance['disk_cids']
+    end
+
+    def get_agent_id(name, index)
+      instance = get_instance(name, index)
+      instance['agent_id']
+    end
+
+    def get_vm_cid(name, index)
+      instance = get_instance(name, index)
+      instance['vm_cid']
+    end
+
+    def get_vms
+      output = @bosh_runner.bosh('vms').output
+      output_hash = JSON.parse(output)
+
+      output_hash['Tables'][0]['Rows']
     end
   end
 end

@@ -2,90 +2,82 @@ require 'system/spec_helper'
 
 describe 'cck' do
   before(:all) do
-    bosh('update-resurrection off')
-  end
-
-  before(:each) do
     @requirements.requirement(@requirements.stemcell)
     @requirements.requirement(@requirements.release)
     load_deployment_spec
     @requirements.requirement(deployment, @spec)
   end
 
-  after(:each) do
-    @requirements.cleanup(deployment)
+  before(:each)
+    bosh('update-resurrection off')
   end
 
-  after(:all) do
+  after(:each) do
     bosh('update-resurrection on')
   end
 
-  # TODO test orphaning with create-swap-delete strategy / enable_virtual_delete?
+  after(:all) do
+    @requirements.cleanup(deployment)
+  end
 
   context 'unresponsive agent' do
+    let(:instance_name) { 'batlight' }
+    let(:instance_id) { '0' }
+
     before do
-      bosh_ssh('batlight', 0, 'sudo sv stop agent', deployment: deployment.name)
+      bosh_ssh(instance_name, instance_id, 'sudo sv stop agent', deployment: deployment.name)
     end
 
     context 'recreate_vm' do
-      it 'should replace vm' do
+      it 'should replace vm and keep the persistent disks' do
+        initial_vm_cid = get_vm_cid(instance_name, instance_id)
+        initial_disk_cids = get_disk_cids(instance_name, instance_id)
         bosh('-d bat cck --resolution recreate_vm')
-        wait_for_process_state('batlight', '0', 'running')
-        # TODO assert cid change?
+        wait_for_process_state(instance_name, instance_id, 'running')
+        expect(get_vm_cid(instance_name, instance_id)).not_to eq(initial_vm_cid)
+        expect(get_disk_cids(instance_name, instance_id)).to eq(initial_disk_cids)
       end
     end
 
     context 'recreate_vm_without_wait' do
       it 'should replace vm' do
+        inital_cid = get_vm_cid(instance_name, instance_id)
         bosh('-d bat cck --resolution recreate_vm_without_wait')
-        wait_for_process_state('batlight', '0', 'running')
-        # TODO assert cid change?
-        # TODO assert processes still starting?
+        expect(get_instance(instance_name, instance_id)['process_state']).to eq('running')
+        wait_for_process_state(instance_name, instance_id, 'running')
+        expect(get_vm_cid(instance_name, instance_id)).not_to eq(inital_cid)
       end
     end
 
     context 'reboot_vm', reboot: true do # --tag ~reboot on warden
       it 'should reboot vm' do
+        inital_cid = get_vm_cid(instance_name, instance_id)
         bosh('-d bat cck --resolution reboot_vm')
-        wait_for_process_state('batlight', '0', 'running')
-        # TODO assert cid same?
+        wait_for_process_state(instance_name, instance_id, 'running')
+        expect(get_vm_cid(instance_name, instance_id)).to eq(inital_cid)
       end
     end
 
     context 'delete_vm' do
       it 'should delete vm' do
         bosh('-d bat cck --resolution delete_vm')
-        wait_for_instance_state('batlight', '0', 'detached')
-        # TODO
+        wait_for_process_state(instance_name, instance_id, '')
+        expect(get_agent_id(instance_name, instance_id)).to be_empty
       end
     end
 
     context 'delete_vm_reference' do
+      let!(:initial_cid) { get_vm_cid(instance_name, instance_id) }
+
       it 'should delete vm reference' do
         bosh('-d bat cck --resolution delete_vm_reference')
-        wait_for_instance_state('batlight', '0', 'detached')
-        # TODO
+        wait_for_process_state(instance_name, instance_id, '')
+        expect(get_vm_cid(instance_name, instance_id)).to be_empty
       end
 
       after do
-        bosh('clean-up --all') # delete orphaned VM
+        bosh("-d bat delete-vm #{initial_cid}")
       end
     end
-  end
-
-  context 'inactive disk' do
-
-  end
-
-  context 'missing disk' do
-
-  end
-
-  context 'missing vm' do
-
-  end
-
-  context 'mount info mismatch' do
-
   end
 end
