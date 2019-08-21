@@ -24,37 +24,37 @@ describe 'cck' do
     let(:instance_name) { 'batlight' }
     let(:instance_id) { '0' }
 
-    before do
-      bosh_ssh(instance_name, instance_id, 'sudo sv stop agent', deployment: deployment.name)
+    before do |example|
+      unless example.metadata[:skip_before]
+        bosh_ssh(instance_name, instance_id, 'sudo sv stop agent', deployment: deployment.name)
+        @initial_vm_cid = unresponsive_agent_vm_cid
+      end
     end
 
     context 'recreate_vm' do
       it 'should replace vm and keep the persistent disks' do
-        initial_vm_cid = get_vm_cid(instance_name, instance_id)
         initial_disk_cids = get_disk_cids(instance_name, instance_id)
         bosh('-d bat cck --resolution recreate_vm')
         wait_for_process_state(instance_name, instance_id, 'running')
-        expect(get_vm_cid(instance_name, instance_id)).not_to eq(initial_vm_cid)
+        expect(get_vm_cid(instance_name, instance_id)).not_to eq(@initial_vm_cid)
         expect(get_disk_cids(instance_name, instance_id)).to eq(initial_disk_cids)
       end
     end
 
     context 'recreate_vm_without_wait' do
       it 'should replace vm' do
-        inital_cid = get_vm_cid(instance_name, instance_id)
         bosh('-d bat cck --resolution recreate_vm_without_wait')
         expect(get_instance(instance_name, instance_id)['process_state']).to eq('running')
         wait_for_process_state(instance_name, instance_id, 'running')
-        expect(get_vm_cid(instance_name, instance_id)).not_to eq(inital_cid)
+        expect(get_vm_cid(instance_name, instance_id)).not_to eq(@initial_vm_cid)
       end
     end
 
-    context 'reboot_vm', reboot: true do # --tag ~reboot on warden
+    context 'reboot_vm', reboot: true do # --tag ~reboot on warden and AWS
       it 'should reboot vm' do
-        inital_cid = get_vm_cid(instance_name, instance_id)
         bosh('-d bat cck --resolution reboot_vm')
         wait_for_process_state(instance_name, instance_id, 'running')
-        expect(get_vm_cid(instance_name, instance_id)).to eq(inital_cid)
+        expect(get_vm_cid(instance_name, instance_id)).to eq(@initial_vm_cid)
       end
     end
 
@@ -62,21 +62,23 @@ describe 'cck' do
       it 'should delete vm' do
         bosh('-d bat cck --resolution delete_vm')
         wait_for_process_state(instance_name, instance_id, '')
-        expect(get_agent_id(instance_name, instance_id)).to be_empty
+        expect(vm_exists?(@initial_vm_cid)).not_to be_truthy
       end
     end
 
-    context 'delete_vm_reference' do
-      let!(:initial_cid) { get_vm_cid(instance_name, instance_id) }
-
+    context 'delete_vm_reference', skip_before: true do
       it 'should delete vm reference' do
+        instance_id = '1'
+        @initial_vm_cid = get_vm_cid(instance_name, instance_id)
+        bosh_ssh(instance_name, instance_id, 'sudo sv stop agent', deployment: deployment.name)
+
         bosh('-d bat cck --resolution delete_vm_reference')
         wait_for_process_state(instance_name, instance_id, '')
         expect(get_vm_cid(instance_name, instance_id)).to be_empty
       end
 
       after do
-        bosh("-d bat delete-vm #{initial_cid}")
+        bosh("-d bat delete-vm #{@initial_vm_cid}")
       end
     end
   end

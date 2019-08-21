@@ -181,11 +181,19 @@ module Bat
       instance['vm_cid']
     end
 
-    def get_vms
-      output = @bosh_runner.bosh('vms').output
-      output_hash = JSON.parse(output)
+    def unresponsive_agent_instance
+      get_instances.find { |i| i['process_state'] == 'unresponsive agent' }
+    end
 
-      output_hash['Tables'][0]['Rows']
+    def unresponsive_agent_vm_cid
+      unresponsive_agent_instance['vm_cid']
+    end
+
+    def vm_exists?(vm_cid)
+      instance = get_instances.find { |i| i['vm_cid'] == vm_cid }
+      return false if instance.nil?
+
+      true
     end
   end
 end
