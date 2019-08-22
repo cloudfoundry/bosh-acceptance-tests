@@ -24,11 +24,10 @@ describe 'cck' do
     let(:instance_name) { 'batlight' }
     let(:instance_id) { '0' }
 
-    before do |example|
-      unless example.metadata[:skip_before]
-        bosh_ssh(instance_name, instance_id, 'sudo sv stop agent', deployment: deployment.name)
-        @initial_vm_cid = unresponsive_agent_vm_cid
-      end
+    before do
+      @requirements.requirement(deployment, @spec, force: true, bosh_options: '--recreate')
+      bosh_ssh(instance_name, instance_id, 'sudo sv stop agent', deployment: deployment.name)
+      @initial_vm_cid = unresponsive_agent_vm_cid
     end
 
     context 'recreate_vm' do
@@ -66,13 +65,8 @@ describe 'cck' do
       end
     end
 
-    context 'delete_vm_reference', skip_before: true do
+    context 'delete_vm_reference' do
       it 'should delete vm reference' do
-        @requirements.requirement(deployment, @spec, force: true, bosh_options: '--recreate')
-
-        @initial_vm_cid = get_vm_cid(instance_name, instance_id)
-        bosh_ssh(instance_name, instance_id, 'sudo sv stop agent', deployment: deployment.name)
-
         bosh('-d bat cck --resolution delete_vm_reference')
         wait_for_process_state(instance_name, instance_id, '')
         expect(get_vm_cid(instance_name, instance_id)).to be_empty
