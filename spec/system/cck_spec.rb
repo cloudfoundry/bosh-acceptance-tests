@@ -68,7 +68,8 @@ describe 'cck' do
 
     context 'delete_vm_reference', skip_before: true do
       it 'should delete vm reference' do
-        instance_id = '1'
+        @requirements.requirement(deployment, @spec, force: true, bosh_options: '--recreate')
+
         @initial_vm_cid = get_vm_cid(instance_name, instance_id)
         bosh_ssh(instance_name, instance_id, 'sudo sv stop agent', deployment: deployment.name)
 

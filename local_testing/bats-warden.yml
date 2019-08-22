@@ -1,6 +1,6 @@
 cpi: warden
 properties:
-  instances: 2
+  instances: 1
   networks:
   - name: default
   stemcell:

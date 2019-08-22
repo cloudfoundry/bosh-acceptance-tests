@@ -109,7 +109,7 @@ module Bat
         update_cloud_config(deployment_spec)
         @logger.info('deployment not already deployed, deploying...')
         what.generate_deployment_manifest(deployment_spec)
-        x = @bosh_runner.bosh_safe("-d #{what.name} deploy #{what.to_path}")
+        x = @bosh_runner.bosh_safe("-d #{what.name} deploy #{what.to_path} #{options[:bosh_params]}")
         puts x
         if x.exit_status != 0
           puts @bosh_runner.bosh_safe("task 4 --debug")
