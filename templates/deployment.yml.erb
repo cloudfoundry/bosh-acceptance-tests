@@ -57,15 +57,13 @@ instance_groups:
       bosh:
         password: <%= properties.password %>
     <% end %>
-
-properties:
-  batlight:
-    <% if properties.batlight.fail %>
-    fail: <%= properties.batlight.fail %>
-    <% end %>
-    <% if properties.batlight.missing %>
-    missing: <%= properties.batlight.missing %>
-    <% end %>
-    <% if properties.batlight.drain_type %>
-    drain_type: <%= properties.batlight.drain_type %>
-    <% end %>
+    properties:
+      <% if properties.batlight.fail %>
+      fail: <%= properties.batlight.fail %>
+      <% end %>
+      <% if properties.batlight.missing %>
+      missing: <%= properties.batlight.missing %>
+      <% end %>
+      <% if properties.batlight.drain_type %>
+      drain_type: <%= properties.batlight.drain_type %>
+      <% end %>

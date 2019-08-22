@@ -1,10 +1,16 @@
 #!/bin/bash
 #
 # fake drain script
-
-DRAIN_TYPE=<%= p("batlight.drain_type") %>
-DYNAMIC_DRAIN_WAIT1=<%= p("batlight.dynamic_drain_wait1") %>
-DYNAMIC_DRAIN_WAIT2=<%= p("batlight.dynamic_drain_wait2") %>
+<%
+  batlight= p('instance_groups').select{ |ig| ig['name'] == 'batlight' }
+  batlight_props = batlight['properties']
+  drain_type = batlight_props['drain_type']
+  dynamic_drain_wait1 = batlight_props['dynamic_drain_wait1']
+  dynamic_drain_wait2 = batlight_props['dynamic_drain_wait2']
+%>
+DRAIN_TYPE=<%= drain_type %>
+DYNAMIC_DRAIN_WAIT1=<%= dynamic_drain_wait1 %>
+DYNAMIC_DRAIN_WAIT2=<%= dynamic_drain_wait2 %>
 FLAG=/tmp/drain
 
 case $DRAIN_TYPE in
