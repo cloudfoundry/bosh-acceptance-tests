@@ -24,15 +24,16 @@ instance_groups:
       release: bat
       <% if job == 'batlight' %>
       properties:
-      <% if properties.batlight.fail %>
-        fail: <%= properties.batlight.fail %>
-      <% end %>
-      <% if properties.batlight.missing %>
-        missing: <%= properties.batlight.missing %>
-      <% end %>
-      <% if properties.batlight.drain_type %>
-        drain_type: <%= properties.batlight.drain_type %>
-      <% end %>
+        batlight:
+        <% if properties.batlight.fail %>
+          fail: <%= properties.batlight.fail %>
+        <% end %>
+        <% if properties.batlight.missing %>
+          missing: <%= properties.batlight.missing %>
+        <% end %>
+        <% if properties.batlight.drain_type %>
+          drain_type: <%= properties.batlight.drain_type %>
+        <% end %>
       <% end %>
     <% end %>
     instances: <%= properties.instances %>
