@@ -43,7 +43,6 @@ describe 'cck' do
     context 'recreate_vm_without_wait' do
       it 'should replace vm' do
         bosh('-d bat cck --resolution recreate_vm_without_wait')
-        expect(get_instance(instance_name, instance_id)['process_state']).to eq('running')
         wait_for_process_state(instance_name, instance_id, 'running')
         expect(get_vm_cid(instance_name, instance_id)).not_to eq(@initial_vm_cid)
       end
