@@ -1,14 +1,6 @@
-<%
-  batlight= p('instance_groups').select{ |ig| ig['name'] == 'batlight' }
-  batlight_props = batlight['properties']
-  batlight_fail = batlight_props['fail']
-  batlight_required = batlight_props['required'] || 'required'
-  batlight_default = batlight_props['default']
-  batlight_missing= batlight_props['missing']
-%>
-<%= batlight_required %>
-<%= batlight_default %>
-<% if batlight_default && batlight_fail %>
+<%= p("batlight.required", "required") %>
+<%= p("batlight.default") %>
+<% if_p("batlight.default", "batlight.fail") do |d, f| %>
 both
 <% end %>
-<%= batlight_missing %>
+<%= p("batlight.missing") %>
