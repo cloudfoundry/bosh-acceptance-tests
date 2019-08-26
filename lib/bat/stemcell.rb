@@ -43,7 +43,7 @@ module Bat
     end
 
     def service_command
-      return 'systemctl' if name.include?('centos')
+      return '/etc/init.d/service' if name.include?('centos')
 
       'sv'
     end
