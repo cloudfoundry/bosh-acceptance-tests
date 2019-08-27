@@ -43,9 +43,9 @@ module Bat
     end
 
     def service_command
-      return '/sbin/service' if name.include?('centos')
+      return 'systemctl' if name.include?('centos')
 
-      'sv'
+      'sudo sv'
     end
   end
 end
