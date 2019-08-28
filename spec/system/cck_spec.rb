@@ -6,18 +6,12 @@ describe 'cck' do
     @requirements.requirement(@requirements.release)
     load_deployment_spec
     @requirements.requirement(deployment, @spec)
-  end
-
-  before(:each) do
     bosh('update-resurrection off')
-  end
-
-  after(:each) do
-    bosh('update-resurrection on')
   end
 
   after(:all) do
     @requirements.cleanup(deployment)
+    bosh('update-resurrection on')
   end
 
   context 'unresponsive agent' do
