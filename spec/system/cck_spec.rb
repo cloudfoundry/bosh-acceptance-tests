@@ -1,6 +1,6 @@
 require 'system/spec_helper'
 
-describe 'cck' do
+describe 'cck', skip_centos: true do
   before(:all) do
     @requirements.requirement(@requirements.stemcell)
     @requirements.requirement(@requirements.release)
@@ -15,12 +15,13 @@ describe 'cck' do
   end
 
   context 'unresponsive agent' do
+
     let(:instance_name) { 'batlight' }
     let(:instance_id) { '0' }
 
     before do
       @requirements.requirement(deployment, @spec, force: true, bosh_options: '--recreate')
-      bosh_ssh(instance_name, instance_id, "#{@requirements.stemcell.service_command} stop agent", deployment: deployment.name)
+      bosh_ssh(instance_name, instance_id, "sudo #{@requirements.stemcell.service_command} stop agent", deployment: deployment.name)
       @initial_vm_cid = unresponsive_agent_vm_cid
     end
 
