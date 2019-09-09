@@ -1,21 +1,26 @@
 require 'system/spec_helper'
 
-describe 'cck', skip_centos: true do
+describe 'cck' do
   before(:all) do
     @requirements.requirement(@requirements.stemcell)
     @requirements.requirement(@requirements.release)
     load_deployment_spec
     @requirements.requirement(deployment, @spec)
+  end
+
+  before(:each) do
     bosh('update-resurrection off')
+  end
+
+  after(:each) do
+    bosh('update-resurrection on')
   end
 
   after(:all) do
     @requirements.cleanup(deployment)
-    bosh('update-resurrection on')
   end
 
   context 'unresponsive agent' do
-
     let(:instance_name) { 'batlight' }
     let(:instance_id) { '0' }
 
