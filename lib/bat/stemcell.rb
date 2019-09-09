@@ -41,11 +41,5 @@ module Bat
     def ==(other)
       to_s == other.to_s
     end
-
-    def service_command
-      return 'systemctl' if name.include?('centos')
-
-      'sv'
-    end
   end
 end

@@ -21,7 +21,7 @@ describe 'cck', skip_centos: true do
 
     before do
       @requirements.requirement(deployment, @spec, force: true, bosh_options: '--recreate')
-      bosh_ssh(instance_name, instance_id, "sudo #{@requirements.stemcell.service_command} stop agent", deployment: deployment.name)
+      bosh_ssh(instance_name, instance_id, 'sudo sv stop agent', deployment: deployment.name)
       @initial_vm_cid = unresponsive_agent_vm_cid
     end
 
