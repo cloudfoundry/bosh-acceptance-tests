@@ -2,9 +2,6 @@
 
 set -e
 
-source /etc/profile.d/chruby.sh
-chruby 2.4.4
-
 export BAT_STEMCELL=$(realpath stemcell/*.tgz)
 export BAT_DEPLOYMENT_SPEC=$(realpath bats-config/bats-config.yml)
 export BAT_BOSH_CLI=$(realpath bosh-cli/*bosh-cli-*)
