@@ -3,4 +3,5 @@ final_name: bat
 blobstore:
   provider: s3
   options:
-    bucket_name: blob.cfblob.com
+    bucket_name: bat-release-blobs
+    region: us-west-1
