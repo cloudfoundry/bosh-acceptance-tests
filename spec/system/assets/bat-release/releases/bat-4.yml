@@ -1,0 +1,28 @@
+name: bat
+version: "4"
+commit_hash: 230ec47
+uncommitted_changes: false
+jobs:
+- name: batarang
+  version: d166b74a65d5060e10a151b6b68e666b59a2e3041c3d38bd2b4c79856b233eaa
+  fingerprint: d166b74a65d5060e10a151b6b68e666b59a2e3041c3d38bd2b4c79856b233eaa
+  sha1: sha256:c930a25c09538228d39197283c0bd749205b0d81fa4f0fb74a09f4cbed5675c9
+  packages:
+  - batarang
+- name: batlight
+  version: b4da3eb89343a859068d9430b2abd83c9fd2d50f997eeb61f92f4953a1b2fab9
+  fingerprint: b4da3eb89343a859068d9430b2abd83c9fd2d50f997eeb61f92f4953a1b2fab9
+  sha1: sha256:641c5a4ec9f051715ae864eb62377e6e0ee566af1a113d35521e155e1c29fa56
+  packages:
+  - batlight
+packages:
+- name: batarang
+  version: 3a858bf651441574d401d0b3e6fba67e1ef2f1102863d43b625acaaa5aabfb00
+  fingerprint: 3a858bf651441574d401d0b3e6fba67e1ef2f1102863d43b625acaaa5aabfb00
+  sha1: sha256:e6fec5ec60531f4f8e3ed936dec27788b1bf5b501c897172e3bece542dcf24c7
+  dependencies: []
+- name: batlight
+  version: a834a45464cd549a429f691b221cebf8ccd63b1eaf68ef7129e9bfcf7a5a97a6
+  fingerprint: a834a45464cd549a429f691b221cebf8ccd63b1eaf68ef7129e9bfcf7a5a97a6
+  sha1: sha256:9ab95e845f3e33c5d92670c9ab5230cc1dc9ebb6a74d44f35f725e143f799563
+  dependencies: []
