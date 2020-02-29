@@ -37,7 +37,7 @@ describe 'with release, stemcell and deployment', core: true do
   end
 
   describe 'ssh' do
-    it 'can bosh ssh into a vm' do
+    it 'can bosh ssh into a vm', ssh: true do
       expect(bosh_ssh('batlight', 0, "uname -a", deployment: deployment.name).output).to match /Linux/
     end
   end
