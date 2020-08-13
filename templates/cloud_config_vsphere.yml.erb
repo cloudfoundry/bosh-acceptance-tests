@@ -1,6 +1,10 @@
 ---
 azs:
 - name: z1
+<% if_p('datacenters') do |dcs| %>
+  cloud_properties:
+    datacenters: <%= dcs.to_yaml %>
+<% end %>
 
 networks:
 <% properties.networks.each do |network| %>

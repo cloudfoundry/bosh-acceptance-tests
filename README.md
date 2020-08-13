@@ -163,6 +163,11 @@ properties:
     version: latest
   instances: 1
   second_static_ip: 192.168.79.62 # Secondary (private) IP assigned to the bat-release job vm, used for testing network reconfiguration, must be in the primary network & different from static_ip
+  datacenters:  # This whole block is optional, and the format should match what the CPI expects in an AZ's datacenters configuration block
+  - name: myDC
+    clusters:
+    - myClusterName:
+        resource_pool: myRP
   networks:
   - name: static
     type: manual
