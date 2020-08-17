@@ -1,6 +1,7 @@
 require 'erb'
 require 'tempfile'
 require 'yaml'
+require 'json'
 
 module Bosh; end # Ugly hack
 require 'bosh/template/evaluation_context'
