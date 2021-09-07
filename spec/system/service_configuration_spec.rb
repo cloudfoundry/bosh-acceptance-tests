@@ -477,6 +477,20 @@ describe 'service configuration', :type => 'os'  do
           batlight_running_on_instance(public_ip)
         end
       end
+
+      context 'when monit is running' do
+        it 'can not be reached from the host' do
+          cmd = "#{sudo} netstat -ntpl | grep monit | awk '{print $4}' | xargs curl -m1"
+          expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to match("Connection timed out")
+        end
+
+        context 'when using the monit cli' do
+          it 'can reach the api and show a summary' do
+            cmd = "#{sudo} monit summary && echo 'SUCCESS'"
+            expect(ssh(public_ip, 'jumpbox', cmd, ssh_options)).to eq("SUCCESS\n")
+          end
+        end
+      end
     end
   end
 end
