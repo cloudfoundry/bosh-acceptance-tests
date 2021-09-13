@@ -98,9 +98,6 @@ describe 'with release and stemcell and subsequent deployments' do
     end
 
     it 'should migrate disk contents', ssh: true do
-      # Skip untill https://github.com/cloudfoundry/bosh-vsphere-cpi-release/pull/303 get merged
-      skip if vsphere?
-
       # Warden df don't work so skip the persistent disk size check
       unless warden?
         expect(persistent_disk('colocated', 0, deployment: deployment)).to_not eq(@size)
