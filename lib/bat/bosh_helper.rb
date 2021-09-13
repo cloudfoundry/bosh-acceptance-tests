@@ -36,6 +36,10 @@ module Bat
       @env.bat_infrastructure == 'warden'
     end
 
+    def vsphere?
+      @env.bat_infrastructure == 'vsphere'
+    end
+
     def persistent_disk(job, index, options)
       get_disks(job, index, options).each do |_, disk|
         return disk[:blocks] if disk[:mountpoint] == '/var/vcap/store'
