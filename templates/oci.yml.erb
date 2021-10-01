@@ -19,14 +19,6 @@ update:
   update_watch_time: 3000-90000
   max_in_flight: <%= properties.max_in_flight || 1 %>
 
-<% if properties.disk_pools %>
-disk_pools:
-<% properties.disk_pools.each do |disk_pool| %>
-- name: <%= disk_pool.name %>
-  disk_size: <%= disk_pool.disk_size %>
-<% end %>
-<% end %>
-
 networks:
 <% properties.networks.each do |network| %>
 - name: <%= network.name %>

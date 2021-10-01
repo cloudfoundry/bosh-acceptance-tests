@@ -156,7 +156,7 @@ module Bat
         name = "abc#{SecureRandom.hex(3)}"
         disks << {'name' => name, 'disk_size' => size}
       end
-      @spec['properties']['disk_pools'] = disks
+      @spec['properties']['disk_types'] = disks
       @spec['properties'].delete('persistent_disk')
       @spec['properties']['persistent_disks'] = disks.map { |v| {'name' => "xyz#{SecureRandom.hex(3)}", 'type' => v['name']} }
     end

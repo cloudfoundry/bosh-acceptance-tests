@@ -72,7 +72,6 @@ module Bat
 
     def update_cloud_config(deployment_spec)
       cloud_config = Bat::CloudConfig.new(deployment_spec)
-      cloud_config.generate_cloud_config(deployment_spec)
 
       update_cc_output = @bosh_runner.bosh_safe("update-cloud-config #{cloud_config.to_path}")
       puts update_cc_output

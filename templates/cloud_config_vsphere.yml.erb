@@ -48,7 +48,6 @@ compilation:
 vm_types:
 - name: default
   cloud_properties:
-    ephemeral_disk: {size: 3000, type: gp2}
     ram: 512
     disk: 2048
     cpu: 1
@@ -58,7 +57,5 @@ disk_types:
   <% properties.disk_types.each do |disk_type| %>
 - name: <%= disk_type.name %>
   disk_size: <%= disk_type.disk_size %>
-  cloud_properties:
-    type: gp2
   <% end %>
 <% end %>
