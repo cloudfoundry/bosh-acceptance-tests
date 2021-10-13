@@ -25,7 +25,7 @@ describe 'persistent disks', core: true do
       @requirements.requirement(deployment, @spec)
     end
 
-    it 'attaches multiple disks' do
+    it 'attaches multiple disks', ssh: true do
       disk1_bytes = disk1_size_mb * 1024 * 1024
       disk2_bytes = disk2_size_mb * 1024 * 1024
 
