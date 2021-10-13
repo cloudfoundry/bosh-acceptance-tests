@@ -55,7 +55,7 @@ describe 'persistent disks', core: true do
       instance = instance_hash['instance']
 
       expect(bosh("stop #{instance}", deployment: deployment.name)).to succeed
-      expect(bosh("attach-disk #{instance} #{@saved_disk_cid}", deployment: deployment.name)).to succeed
+      expect(bosh("attach-disk #{instance} \"#{@saved_disk_cid}\"", deployment: deployment.name)).to succeed
 
       result = bosh("instances --details")
       instance_hash = JSON.parse(result.output)['Tables'][0]['Rows'][0]
