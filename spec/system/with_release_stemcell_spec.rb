@@ -88,8 +88,8 @@ describe 'with release and stemcell and subsequent deployments' do
       bosh_ssh('colocated', 0, "sudo sh -c \"echo 'foobar' > #{SAVE_FILE}\"", deployment: deployment.name)
       unless warden?
         @size = persistent_disk('colocated', 0, deployment: deployment)
+        use_persistent_disk(4096)
       end
-      use_persistent_disk(4096)
       @requirements.requirement(deployment, @spec, force: true)
     end
 
@@ -157,10 +157,12 @@ describe 'with release and stemcell and subsequent deployments' do
     end
 
     it 'should have network access to the vm using the vip', vip_networking: true, ssh: true do
-      instance = wait_for_process_state('colocated', '0', 'running')
-      expect(instance).to_not be_nil
-      expect(vip).to_not be_nil
-      expect(bosh_ssh('colocated', 0, 'hostname', deployment: deployment.name).output).to match /#{instance[:agent_id]}/
+      unless warden? 
+        instance = wait_for_process_state('colocated', '0', 'running')
+        expect(instance).to_not be_nil
+        expect(vip).to_not be_nil
+        expect(bosh_ssh('colocated', 0, 'hostname', deployment: deployment.name).output).to match /#{instance[:agent_id]}/
+      end
     end
   end
 end
