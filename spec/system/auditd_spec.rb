@@ -14,11 +14,11 @@ describe 'auditd, sshd, cron, rsyslogd', type: 'os' do
 
   it 'should be running' do
     output = bosh_ssh('batlight', 0, 'ps ax -o ucmd', deployment: deployment.name).output
-    running_services = output.split("\n").uniq
+    running_services = output.split("\r\n").uniq
 
-    expect(running_services).to include(/^cron?$/)
-    expect(running_services).to include('kauditd')
-    expect(running_services).to include('auditd')
-    expect(running_services).to include('rsyslogd')
+    expect(running_services).to include(/ cron$/)
+    expect(running_services).to include(/ kauditd$/)
+    expect(running_services).to include(/ auditd$/)
+    expect(running_services).to include(/ rsyslogd$/)
   end
 end
