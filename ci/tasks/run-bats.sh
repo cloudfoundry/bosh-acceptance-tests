@@ -9,12 +9,6 @@ chmod +x $BAT_BOSH_CLI
 
 source bats-config/bats.env
 
-ssh_key_path=/tmp/bat_private_key
-echo "$BAT_PRIVATE_KEY" > $ssh_key_path
-chmod 600 $ssh_key_path
-
-export BOSH_GW_PRIVATE_KEY=$ssh_key_path
-
 pushd $(realpath bats)
   bundle install
   bundle exec rspec spec $BAT_RSPEC_FLAGS

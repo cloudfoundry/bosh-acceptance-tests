@@ -10,17 +10,11 @@ describe 'service configuration', :type => 'os'  do
     load_deployment_spec
     use_static_ip
     use_vip
-    # pw == 'foobar'
-    use_password('$6$tHAu4zCTso$pAQok0MTHP4newel7KMhTzMI4tQrAWwJ.X./fFAKjbWkCb5sAaavygXAspIGWn8qVD8FeT.Z/XN4dvqKzLHhl0')
     @requirements.requirement(deployment, @spec) # 2.5 min on local vsphere
   end
 
   after(:all) do
     @requirements.cleanup(deployment)
-  end
-
-  let(:sudo) do
-    "echo foobar | sudo -S "
   end
 
   def instance_reboot(ip)
@@ -29,8 +23,8 @@ describe 'service configuration', :type => 'os'  do
 
     # shutdown instance
     begin
-      ssh(ip, 'vcap', "#{sudo} reboot", ssh_options.merge({ :password => 'foobar'}))
-    rescue IOError
+      bosh_ssh('batlight', 0, "sudo reboot", deployment: deployment.name).output
+    rescue Bosh::Exec::Error
       @logger.debug('Rebooting instance closed the ssh connection')
     end
 
@@ -40,7 +34,7 @@ describe 'service configuration', :type => 'os'  do
     loop do
       sleep 10
       begin
-        result = ssh(ip, 'vcap', "echo 'UP'", ssh_options.merge({ :password => 'foobar'}))
+        result = ssh(ip, 'vcap', "echo 'UP'", ssh_options(@spec))
       rescue Exception => e
         @logger.info("Failed to run ssh command. Retrying. Message: #{e.message}")
       end
@@ -56,7 +50,7 @@ describe 'service configuration', :type => 'os'  do
   def dump_log(ip, log_path)
     @logger.info("Dumping log file '#{log_path}'")
     @logger.info("================================================================================")
-    ssh(ip, 'vcap', "([ -f '#{log_path}' ] && cat #{log_path})", ssh_options.merge({ :password => 'foobar'}))
+    ssh(ip, 'vcap', "([ -f '#{log_path}' ] && cat #{log_path})", ssh_options(@spec))
   end
 
   def process_running_on_instance(ip, process_name)
@@ -65,8 +59,10 @@ describe 'service configuration', :type => 'os'  do
     pid = ''
     loop do
       sleep 1
-      pid = ssh(ip, 'vcap', "pgrep #{process_name}", ssh_options.merge({ :password => 'foobar'}))
-      break unless (tries += 1) < 30 && (pid =~ /^\d+\n$/).nil?
+      pid = ssh(ip, 'vcap', "pgrep #{process_name}", ssh_options(@spec))
+    rescue Net::SSH::ConnectionTimeout
+    ensure
+      break if (tries += 1) >= 30 || (pid =~ /^\d+\n$/)
     end
 
     matched = pid.match(/^\d+\n$/)
@@ -123,7 +119,7 @@ describe 'service configuration', :type => 'os'  do
         local proc_name="${1}"
 
         local pid="$(waitForProcess ${proc_name})"
-        #{sudo} kill -9 ${pid}
+        sudo kill -9 ${pid}
         waitForProcess ${proc_name} ${pid}
       }
 
@@ -167,9 +163,10 @@ describe 'service configuration', :type => 'os'  do
             echo "SUCCESS"
           else
             echo "FAILURE: expected /etc/service/monit to be younger than uptime, got a difference of ${diff} seconds"
+            exit 1
           fi
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+        expect(ssh(public_ip, 'vcap', cmd, ssh_options(@spec))).to include("SUCCESS\n")
       end
 
       context 'when monit dies' do
@@ -177,13 +174,17 @@ describe 'service configuration', :type => 'os'  do
           # compare monit pids pre- and post kill
           cmd = <<-EOF
             #{bash_functions}
-            old_pid="$(waitForProcess monit '')"
-            #{sudo} kill ${old_pid}
-            new_pid="$(waitForProcess monit $old_pid)"
-            if [[ "${new_pid}" = "${old_pid}" || -z "${new_pid}" ]]; then echo 'FAILURE'; fi
+            old_pid="$(waitForProcess monit-actual "")"
+            sudo kill ${old_pid}
+            new_pid="$(waitForProcess monit-actual $old_pid)"
+            if [[ "${new_pid}" = "${old_pid}" || -z "${new_pid}" ]]; then
+              echo "FAILURE"
+              exit 1
+            fi
             echo "SUCCESS"
           EOF
-          expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+          output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+          expect(output).to include("SUCCESS")
         end
       end
 
@@ -192,13 +193,17 @@ describe 'service configuration', :type => 'os'  do
           # compare agent pids pre- and post kill
           cmd = <<-EOF
             #{bash_functions}
-            old_pid="$(waitForProcess bosh-agent '')"
-            #{sudo} kill ${old_pid}
+            old_pid="$(waitForProcess bosh-agent "")"
+            sudo kill ${old_pid}
             new_pid="$(waitForProcess bosh-agent $old_pid)"
-            if [[ "${new_pid}" = "${old_pid}" || -z "${new_pid}" ]]; then echo 'FAILURE'; fi
+            if [[ "${new_pid}" = "${old_pid}" || -z "${new_pid}" ]]; then
+              echo "FAILURE"
+              exit 1
+            fi
             echo "SUCCESS"
           EOF
-          expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+          output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+          expect(output).to include("SUCCESS")
         end
       end
     end
@@ -214,26 +219,30 @@ describe 'service configuration', :type => 'os'  do
         cmd = <<-EOF
           #{bash_functions}
           agent_pid="$(waitForProcess bosh-agent)"
-          monit_pid="$(waitForProcess monit)"
+          monit_pid="$(waitForProcess monit-actual)"
 
           _=$(waitForSymlink /etc/service/monit)
           link_time="$(stat --printf="%Y" /etc/service/monit)"
 
           _=$(killAndAwaitProcess runsvdir)
           new_agent_pid="$(pgrep ^bosh-agent$)"
-          new_monit_pid="$(pgrep ^monit$)"
+          new_monit_pid="$(pgrep ^monit-actual$)"
           if [ "${new_agent_pid}" != "${agent_pid}" ] || [ -z "${new_agent_pid}" ]; then
             echo "FAILURE: Agent pid changed from ${agent_pid} to ${new_agent_pid}"
+            exit 1
           fi
           if [ "${new_monit_pid}" != "${monit_pid}" ] || [ -z "${new_monit_pid}" ]; then
             echo "FAILURE: Monit pid changed from ${monit_pid} to ${new_monit_pid}"
+            exit 1
           fi
           if [ "$(stat --printf="%Y" /etc/service/monit)" != "${link_time}" ] || [ -z "${link_time}" ]; then
-            echo 'FAILURE: /etc/service/monit symlink changed'
+            echo "FAILURE: /etc/service/monit symlink changed"
+            exit 1
           fi
           echo "SUCCESS"
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+        output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+        expect(output).to include("SUCCESS")
       end
 
       context 'when monit dies' do
@@ -245,10 +254,11 @@ describe 'service configuration', :type => 'os'  do
           cmd = <<-EOF
             #{bash_functions}
             _=$(killAndAwaitProcess runsvdir)
-            _=$(killAndAwaitProcess monit)
+            _=$(killAndAwaitProcess monit-actual)
             echo "SUCCESS"
           EOF
-          expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+          output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+          expect(output).to include("SUCCESS")
         end
       end
 
@@ -264,7 +274,8 @@ describe 'service configuration', :type => 'os'  do
             _=$(killAndAwaitProcess bosh-agent)
             echo "SUCCESS"
           EOF
-          expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+          output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+          expect(output).to include("SUCCESS")
         end
       end
     end
@@ -284,7 +295,7 @@ describe 'service configuration', :type => 'os'  do
       it 'mounts tmpfs to /var/vcap/data/sys/run' do
         # verify mount point for sys/run
         cmd = "if [ x`mount | grep -c /var/vcap/data/sys/run` = x1 ] ; then echo 'SUCCESS' ; fi"
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+        expect(ssh(public_ip, 'vcap', cmd, ssh_options(@spec))).to include("SUCCESS\n")
       end
 
       it 'creates a symlink from /etc/sv/monit to /etc/service/monit' do
@@ -292,17 +303,22 @@ describe 'service configuration', :type => 'os'  do
         # make sure agent recreates /etc/service/monit upon restart
         cmd = <<-EOF
           #{bash_functions}
-          #{sudo} PATH=$PATH:/sbin sv down agent
-          #{sudo} rm -rf /etc/service/monit
-          if [ -f /etc/service/monit ]; then echo 'FAILURE'; fi
-          #{sudo} PATH=$PATH:/sbin sv up agent
+          sudo PATH=$PATH:/sbin sv down agent
+          sudo rm -rf /etc/service/monit
+          if [ -f /etc/service/monit ]; then
+            echo "FAILURE"
+            exit 1
+          fi
+          sudo PATH=$PATH:/sbin sv up agent
           link_target=$(waitForSymlink /etc/service/monit)
           if [ "${link_target}" != "/etc/sv/monit" ]; then
             echo "FAILURE: wrong symlink for /etc/service/monit: expected /etc/sv/monit, got ${link_target}"
+            exit 1
           fi
           echo 'SUCCESS'
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+        output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+        expect(output).to include("SUCCESS")
       end
 
       it 'does not keep pre-existing pid files in sys/run after instance reboot' do
@@ -318,19 +334,22 @@ describe 'service configuration', :type => 'os'  do
           pid=$(cat /var/vcap/data/sys/run/batlight/batlight.pid)
           if [ "${pid}" != "${pgrep}" ]; then
             echo "FAILURE: actual batlight pid (${pgrep}) different from pid in batlight.pid (${pid})"
+            exit 1
           fi
           for i in `seq 1 30`; do
-            monit=$(#{sudo} PATH=$PATH:/var/vcap/bosh/bin monit status | grep '^\s*pid' | awk '{ print \$2 }')
+            monit=$(sudo monit status | grep "^\s*pid" | awk "{ print \\$2 }")
             if [ -n "${monit}" ] && [ "x${monit}" != "x0" ]; then break; fi
             sleep 1
           done
           if [ "${monit}" != "${pgrep}" ]; then
             echo "FAILURE: actual batlight pid (${pgrep}) different from pid monitored by monit (${monit})"
+            exit 1
           fi
           touch /var/vcap/data/sys/run/foo.pid
-          echo 'SUCCESS'
+          echo "SUCCESS"
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+        output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+        expect(output).to include("SUCCESS")
 
         # reboot instance
         instance_reboot(public_ip)
@@ -347,21 +366,25 @@ describe 'service configuration', :type => 'os'  do
           pid=$(cat /var/vcap/data/sys/run/batlight/batlight.pid)
           if [ "${pid}" != "${pgrep}" ]; then
             echo "FAILURE: actual batlight pid (${pgrep}) different from pid in batlight.pid (${pid})"
+            exit 1
           fi
           for i in `seq 1 30`; do
-            monit=$(#{sudo} PATH=$PATH:/var/vcap/bosh/bin monit status | grep '^\s*pid' | awk '{ print \$2 }')
+            monit=$(sudo PATH=$PATH:/var/vcap/bosh/bin monit status | grep "^\s*pid" | awk "{ print \\$2 }")
             if [ -n "${monit}" ] && [ "x${monit}" != "x0" ]; then break; fi
             sleep 1
           done
           if [ "${monit}" != "${pgrep}" ]; then
             echo "FAILURE: actual batlight pid (${pgrep}) different from pid monitored by monit (${monit})"
+            exit 1
           fi
           if [ -f /var/vcap/data/sys/run/foo.pid ]; then
             echo "FAILURE: foo.pid still existing"
+            exit 1
           fi
-          echo 'SUCCESS'
+          echo "SUCCESS"
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+        output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+        expect(output).to include("SUCCESS")
       end
     end
 
@@ -372,15 +395,17 @@ describe 'service configuration', :type => 'os'  do
         # make sure file still exists
         cmd = <<-EOF
           touch /var/vcap/data/sys/run/foo
-          #{sudo} PATH=$PATH:/sbin sv down agent
-          #{sudo} PATH=$PATH:/sbin sv up agent
+          sudo PATH=$PATH:/sbin sv down agent
+          sudo PATH=$PATH:/sbin sv up agent
           if [ -f /var/vcap/data/sys/run/foo ]; then
-            echo 'SUCCESS';
+            echo "SUCCESS";
           else
             echo "FAILURE: foo not existing anymore"
+            exit 1
           fi
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+        output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+        expect(output).to include("SUCCESS")
       end
 
       it 'does not remove existing pid files' do
@@ -390,32 +415,36 @@ describe 'service configuration', :type => 'os'  do
         # compare pids pre and post agent restart
         cmd = <<-EOF
           old_pid=$(cat /var/vcap/data/sys/run/batlight/batlight.pid)
-          #{sudo} PATH=$PATH:/sbin sv down agent
-          #{sudo} PATH=$PATH:/sbin sv up agent
+          sudo PATH=$PATH:/sbin sv down agent
+          sudo PATH=$PATH:/sbin sv up agent
           new_pid=$(cat /var/vcap/data/sys/run/batlight/batlight.pid)
           if [ "${old_pid}" = "${new_pid}" ]; then
-            echo 'SUCCESS'
+            echo "SUCCESS"
           else
-            echo 'FAILURE: batlight.pid changed'
+            echo "FAILURE: batlight.pid changed"
+            exit 1
           fi
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+        output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+        expect(output).to include("SUCCESS")
       end
 
       it 'does not recreates a symlink from /etc/sv/monit to /etc/service/monit' do
         # compare modification times for /etc/service/monit pre and post agent restart
         cmd = <<-EOF
-          old_time=$(stat  --print '%Y' /etc/service/monit)
-          #{sudo} PATH=$PATH:/sbin sv down agent
-          #{sudo} PATH=$PATH:/sbin sv up agent
-          new_time=$(stat  --print '%Y' /etc/service/monit)
+          old_time=$(stat  --print "%Y" /etc/service/monit)
+          sudo PATH=$PATH:/sbin sv down agent
+          sudo PATH=$PATH:/sbin sv up agent
+          new_time=$(stat  --print "%Y" /etc/service/monit)
           if [ "${old_time}" = "${new_time}" ]; then
-            echo 'SUCCESS'
+            echo "SUCCESS"
           else
-            echo 'FAILURE: /etc/service/monit modified'
+            echo "FAILURE: /etc/service/monit modified"
+            exit 1
           fi
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+        output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+        expect(output).to include("SUCCESS")
       end
 
       it 'does not restart monit' do
@@ -424,17 +453,19 @@ describe 'service configuration', :type => 'os'  do
 
         # compare monit pid and process time pre and post agent restart
         cmd = <<-EOF
-          old_pid=$(pgrep ^monit$)
-          #{sudo} PATH=$PATH:/sbin sv down agent
-          #{sudo} PATH=$PATH:/sbin sv up agent
-          new_pid=$(pgrep ^monit$)
+          old_pid=$(pgrep ^monit-actual$)
+          sudo sv down agent
+          sudo sv up agent
+          new_pid=$(pgrep ^monit-actual$)
           if [ "${old_pid}" = "${new_pid}" ]; then
-            echo 'SUCCESS'
+            echo "SUCCESS"
           else
-            echo 'FAILURE: monit restarted'
+            echo "FAILURE: monit restarted"
+            exit 1
           fi
         EOF
-        expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+        output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+        expect(output).to include("SUCCESS")
       end
     end
   end
@@ -452,8 +483,9 @@ describe 'service configuration', :type => 'os'  do
           batlight_running_on_instance(public_ip)
 
           # kill batlight
-          cmd = "#{sudo} pkill batlight && echo 'SUCCESS'"
-          expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+          cmd = "sudo pkill batlight && echo 'SUCCESS'"
+          output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+          expect(output).to include("SUCCESS")
 
           # wait for batlight to come up again
           batlight_running_on_instance(public_ip)
@@ -465,15 +497,17 @@ describe 'service configuration', :type => 'os'  do
       context 'when a monitored process dies' do
         it 'restarts it' do
           # kill monit
-          cmd = "#{sudo} pkill monit && echo 'SUCCESS'"
-          expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+          cmd = "sudo pkill monit && echo 'SUCCESS'"
+          output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+          expect(output).to include("SUCCESS")
 
           # wait for monit to come up again
           monit_running_on_instance(public_ip)
 
           # kill batlight
-          cmd = "#{sudo} pkill batlight && echo 'SUCCESS'"
-          expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+          cmd = "sudo pkill batlight && echo 'SUCCESS'"
+          output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+          expect(output).to include("SUCCESS")
 
           # wait for batlight to come up again
           batlight_running_on_instance(public_ip)
@@ -482,14 +516,16 @@ describe 'service configuration', :type => 'os'  do
 
       context 'when monit is running' do
         it 'can not be reached from the host' do
-          cmd = "#{sudo} -- netstat -ntpl | grep monit | awk '{print $4}' | xargs curl -m1"
-          expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("Connection timed out")
+          cmd = 'sudo -- netstat -ntpl | grep monit | awk "{print $4}" | xargs curl -m1'
+          output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name, on_error: :return).output
+          expect(output).to include("Connection timed out")
         end
 
         context 'when using the monit cli' do
           it 'can reach the api and show a summary' do
-            cmd = "#{sudo} monit summary && echo 'SUCCESS'"
-            expect(ssh(public_ip, 'vcap', cmd, ssh_options.merge({ :password => 'foobar'}))).to include("SUCCESS\n")
+            cmd = "sudo monit summary && echo 'SUCCESS'"
+            output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+            expect(output).to include("SUCCESS")
           end
         end
       end

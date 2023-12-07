@@ -4,12 +4,8 @@ module Bat
       stemcell_path:        'BAT_STEMCELL',
       bosh_cli_path:        'BAT_BOSH_CLI',
       deployment_spec_path: 'BAT_DEPLOYMENT_SPEC',
-      dns_host:             'BAT_DNS_HOST',
 
       bat_infrastructure:   'BAT_INFRASTRUCTURE',
-      bat_networking:       'BAT_NETWORKING',
-
-      private_key:          'BAT_PRIVATE_KEY',
     }.freeze
 
     OPTIONAL_VARS = {

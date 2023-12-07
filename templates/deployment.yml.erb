@@ -65,8 +65,7 @@ instance_groups:
           - <%= properties.vip %>
     <% end %>
     vm_type: default
-    <% if properties.password %>
     env:
       bosh:
-        password: <%= properties.password %>
-    <% end %>
+        authorized_keys:
+        - <%= properties.ssh_key_pair.public_key %>

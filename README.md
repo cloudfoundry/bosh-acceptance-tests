@@ -25,25 +25,11 @@ export BAT_DEPLOYMENT_SPEC=
 # BOSH CLI executable path
 export BAT_BOSH_CLI=bosh
 
-# DNS host or IP where BOSH-controlled PowerDNS server is running, which is required for the DNS tests. For example, if BAT is being run against a MicroBOSH then this value will be the same as BAT_DIRECTOR
-export BAT_DNS_HOST=
-
 # the name of infrastructure that is used by bosh deployment. Examples: aws, vsphere, openstack, warden, oci.
 export BAT_INFRASTRUCTURE=
 
-# the type of networking being used: `dynamic` or `manual`.
-export BAT_NETWORKING=
-
-# the path to ssh key, used by OS specs to ssh into BOSH VMs
-export BAT_PRIVATE_KEY=
-
 # Run tests with --fail-fast and skip cleanup in case of failure (optional)
 export BAT_DEBUG_MODE=
-```
-
-To enable OS tests set:
-```
-export BOSH_OS_BATS=true
 ```
 
 #### Environment variables for the BOSH v2 cli
@@ -55,6 +41,7 @@ export BOSH_ENVIRONMENT=<director ip or alias to bosh-env>
 export BOSH_CLIENT=<director username>
 export BOSH_CLIENT_SECRET=<director password>
 export BOSH_CA_CERT=<director ca cert content or path>
+export BOSH_ALL_PROXY=<socks5 proxy url needed to connect to bosh or deployed vms>
 ```
 
 ## BATS manifest: bat.yml
@@ -75,6 +62,12 @@ properties:
     name: bosh-aws-xen-ubuntu-trusty-go_agent
     version: latest
   instances: 1
+  ssh_gateway:
+    host: "jumpbox_host" # optional host used to provide tunnel when the tests need to ssh to VMs
+    username: "jumpbox_username" # optional username used to provide tunnel when the tests need to ssh to VMs
+  ssh_key_pair:
+    public_key: "public_key_string" # used when deploying VMs to allow direct ssh access
+    private_key: "private_key_string" # used to ssh into bosh deployed VMs and the gateway host
   vip: 54.54.54.54 # elastic ip for bat deployed VM
   second_static_ip: 10.10.0.31 # Secondary (private) IP to use for reconfiguring networks, must be in the primary network & different from static_ip
   networks:
@@ -265,7 +258,6 @@ BATs currently supports the following tags which are enabled by default (use `--
   - `raw_ephemeral_storage`: BOSH agent exposes all attached instance storage to deployed jobs
   - `reboot`: reboot VM tests as part of cloud-check
   - `changing_static_ip`: `configure_networks` CPI method support [deprecated]
-  - `network_reconfiguration`: `configure_networks` CPI method support [deprecated]
 
 Here is an example of running BATs on vSphere, skipping tests that are not applicable.
 Execute the following inside the bosh-acceptance-tests directory:

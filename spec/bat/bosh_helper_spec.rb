@@ -15,14 +15,35 @@ describe Bat::BoshHelper do
   end
 
   describe '#ssh_options' do
-    let(:env) { instance_double('Bat::Env') }
-    before do
-      bosh_helper.instance_variable_set('@env', env)
-      allow(env).to receive(:private_key).and_return('fake_private_key')
+    let(:spec) do
+      {
+        'properties' => {
+          'ssh_key_pair' => {
+            'private_key' => 'private',
+          }
+        }
+      }
     end
 
-    it 'returns the private key from the env' do
-      expect(bosh_helper.ssh_options).to eq(private_key: 'fake_private_key')
+    it 'returns the private key from the spec' do
+      expect(bosh_helper.ssh_options(spec)).to eq(private_key: 'private')
+    end
+
+    context 'when ssh gateway is present' do
+      before do
+        spec['properties']['ssh_gateway'] = {
+          'host' => 'host',
+          'username' => 'user'
+        }
+      end
+
+      it 'returns the gateway values' do
+        expect(bosh_helper.ssh_options(spec)).to eq({
+          gateway_host: 'host',
+          gateway_username: 'user',
+          private_key: 'private'
+        })
+      end
     end
   end
 

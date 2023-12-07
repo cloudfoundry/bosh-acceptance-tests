@@ -14,7 +14,7 @@ networks:
   <% network.subnets.each do |subnet| %>
   - range: <%= subnet.range %>
     azs: [z1]
-    static: [<%= subnet.static %>]
+    static: <%= subnet.static %>
     gateway: <%= subnet.gateway %>
     cloud_properties:
       network_name: <%= subnet.cloud_properties.network_name %>

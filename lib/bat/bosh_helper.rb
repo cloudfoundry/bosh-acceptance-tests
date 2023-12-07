@@ -1,6 +1,7 @@
 require 'httpclient'
 require 'json'
 require 'net/ssh'
+require 'net/ssh/gateway'
 require 'zlib'
 require 'archive/tar/minitar'
 require 'tempfile'
@@ -18,10 +19,15 @@ module Bat
       @bosh_runner.bosh_safe(*args, &blk)
     end
 
-    def ssh_options
-      {
-        private_key: @env.private_key
+    def ssh_options(spec)
+      options = {
+        private_key: spec['properties']['ssh_key_pair']['private_key']
       }
+      if spec['properties']['ssh_gateway']
+        options[:gateway_host] = spec['properties']['ssh_gateway']['host']
+        options[:gateway_username] = spec['properties']['ssh_gateway']['username']
+      end
+      options
     end
 
     def aws?
@@ -48,19 +54,34 @@ module Bat
     end
 
     def ssh(host, user, command, options = {})
-      options = options.dup
+      ssh_options = {}
       output = nil
       @logger.info("--> ssh: #{user}@#{host} #{command.inspect}")
 
-      private_key = options.delete(:private_key)
-      options[:user_known_hosts_file] = %w[/dev/null]
-      options[:keys] = [private_key] unless private_key.nil?
+      ssh_options[:user_known_hosts_file] = %w[/dev/null]
 
-      raise 'Need to set ssh :keys, or :private_key' if options[:keys].nil?
+      raise 'Need to set ssh :private_key' if options[:private_key].nil?
+      ssh_options[:key_data] = [options[:private_key]]
 
-      @logger.info("--> ssh options: #{options.inspect}")
-      Net::SSH.start(host, user, options) do |ssh|
+      @logger.info("--> ssh options: #{ssh_options.inspect}")
+
+      if options[:gateway_host] && options[:gateway_username]
+        gateway = Net::SSH::Gateway.new(
+          options[:gateway_host],
+          options[:gateway_username],
+          ssh_options
+        )
+        local_port_for_gateway = gateway.open(host, 22)
+        ssh_options[:port] = local_port_for_gateway
+        host = '127.0.0.1'
+      end
+
+      Net::SSH.start(host, user, ssh_options) do |ssh|
         output = ssh.exec!(command).to_s
+      end
+
+      if gateway
+        gateway.close(local_port_for_gateway)
       end
 
       @logger.info("--> ssh output: #{output.inspect}")
