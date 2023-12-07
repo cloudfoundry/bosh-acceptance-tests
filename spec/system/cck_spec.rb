@@ -1,6 +1,6 @@
 require 'system/spec_helper'
 
-xdescribe 'cck', skip_centos: true do
+describe 'cck', skip_centos: true do
   before(:all) do
     @requirements.requirement(@requirements.stemcell)
     @requirements.requirement(@requirements.release)

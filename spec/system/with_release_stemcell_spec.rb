@@ -109,8 +109,6 @@ describe 'with release and stemcell and subsequent deployments' do
   describe 'general stemcell configuration' do
     before(:all) do
       reload_deployment_spec
-      # using password 'foobar'
-      use_password('$6$tHAu4zCTso$pAQok0MTHP4newel7KMhTzMI4tQrAWwJ.X./fFAKjbWkCb5sAaavygXAspIGWn8qVD8FeT.Z/XN4dvqKzLHhl0')
       use_static_ip
       use_vip
       @jobs = %w[

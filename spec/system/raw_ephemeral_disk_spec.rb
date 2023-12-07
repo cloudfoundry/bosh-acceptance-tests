@@ -13,9 +13,6 @@ describe 'raw_instance_storage', raw_ephemeral_storage: true do
 
   before do
     reload_deployment_spec
-    # using password 'foobar'
-    use_password('$6$tHAu4zCTso$pAQok0MTHP4newel7KMhTzMI4tQrAWwJ.X./fFAKjbWkCb5sAaavygXAspIGWn8qVD8FeT.Z/XN4dvqKzLHhl0')
-    @our_ssh_options = ssh_options.merge(password: 'foobar')
     use_static_ip
     use_vip
     use_instance_group('batlight')

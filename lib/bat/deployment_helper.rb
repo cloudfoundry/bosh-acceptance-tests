@@ -19,7 +19,6 @@ module Bat
       # It is used for negative testing.
       @spec['properties']['batlight'] ||= {}
       @spec['properties']['batlight']['missing'] = 'nope'
-      @spec['properties']['dns'] = [@env.dns_host]
       # dup the job_network so test-local mutations don't affect other tests
       @spec['properties']['job_networks'] = [@spec['properties']['networks'].first.dup]
     end
@@ -167,10 +166,6 @@ module Bat
 
     def use_pool_size(size)
       @spec['properties']['pool_size'] = size
-    end
-
-    def use_password(passwd)
-      @spec['properties']['password'] = passwd
     end
 
     def use_failing_job
