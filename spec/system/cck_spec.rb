@@ -67,7 +67,7 @@ describe 'cck', skip_centos: true do
       end
 
       after do
-        bosh("-d bat delete-vm #{@initial_vm_cid}")
+        bosh("-d bat delete-vm '#{@initial_vm_cid}'")
       end
     end
   end
