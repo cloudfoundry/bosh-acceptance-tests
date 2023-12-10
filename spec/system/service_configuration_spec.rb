@@ -17,13 +17,13 @@ describe 'service configuration', :type => 'os'  do
     @requirements.cleanup(deployment)
   end
 
-  def instance_reboot(ip)
+  def instance_reboot
     # turn off vm resurrection
     bosh('update-resurrection off')
 
     # shutdown instance
     begin
-      bosh_ssh('batlight', 0, "sudo reboot", deployment: deployment.name).output
+      bosh_ssh('batlight', 0, "sudo reboot", deployment: deployment.name)
     rescue Bosh::Exec::Error
       @logger.debug('Rebooting instance closed the ssh connection')
     end
@@ -34,14 +34,14 @@ describe 'service configuration', :type => 'os'  do
     loop do
       sleep 10
       begin
-        result = ssh(ip, 'vcap', "echo 'UP'", ssh_options(@spec))
-      rescue Exception => e
-        @logger.info("Failed to run ssh command. Retrying. Message: #{e.message}")
+        result = bosh_ssh('batlight', 0, "echo 'UP'", deployment: deployment.name).output
+      rescue Bosh::Exec::Error
+        @logger.info("Failed to run ssh command. Retrying.")
       end
-      break unless (Time.now.to_i - start) < 180 && result != "UP\n"
+      break if (Time.now.to_i - start) > 180 || result.include?("UP")
     end
 
-    expect(result).to eq("UP\n")
+    expect(result).to include("UP")
 
     # turn on vm resurrection
     bosh('update-resurrection on')
@@ -146,7 +146,7 @@ describe 'service configuration', :type => 'os'  do
     end
 
     after(:each) do
-      instance_reboot(public_ip)
+      instance_reboot
     end
 
     context 'when initially started after instance boot (before agent has been started)' do
@@ -352,7 +352,7 @@ describe 'service configuration', :type => 'os'  do
         expect(output).to include("SUCCESS")
 
         # reboot instance
-        instance_reboot(public_ip)
+        instance_reboot
 
         # wait for monit
         monit_running_on_instance(public_ip)
