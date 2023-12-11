@@ -28,6 +28,13 @@ describe 'service configuration', :type => 'os'  do
       @logger.debug('Rebooting instance closed the ssh connection')
     end
 
+    wait_for_agent
+
+    # turn on vm resurrection
+    bosh('update-resurrection on')
+  end
+
+  def wait_for_agent
     # wait for it to come back up (max 2 minutes)
     start = Time.now.to_i
     result = ''
@@ -42,9 +49,6 @@ describe 'service configuration', :type => 'os'  do
     end
 
     expect(result).to include("UP")
-
-    # turn on vm resurrection
-    bosh('update-resurrection on')
   end
 
   def dump_log(ip, log_path)
@@ -284,6 +288,10 @@ describe 'service configuration', :type => 'os'  do
   describe 'agent' do
     before(:each) do
       agent_running_on_instance(public_ip)
+    end
+
+    after(:each) do
+      wait_for_agent
     end
 
     context 'when initially started after instance boot' do
