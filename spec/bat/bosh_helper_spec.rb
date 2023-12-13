@@ -40,8 +40,9 @@ describe Bat::BoshHelper do
       it 'returns the gateway values' do
         expect(bosh_helper.ssh_options(spec)).to eq({
           gateway_host: 'host',
+          gateway_private_key: nil,
           gateway_username: 'user',
-          private_key: 'private'
+          private_key: 'private',
         })
       end
     end
