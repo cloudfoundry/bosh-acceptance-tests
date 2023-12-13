@@ -26,6 +26,7 @@ module Bat
       if spec['properties']['ssh_gateway']
         options[:gateway_host] = spec['properties']['ssh_gateway']['host']
         options[:gateway_username] = spec['properties']['ssh_gateway']['username']
+        options[:gateway_private_key] = spec['properties']['ssh_gateway']['private_key']
       end
       options
     end
@@ -66,10 +67,15 @@ module Bat
       @logger.info("--> ssh options: #{ssh_options.inspect}")
 
       if options[:gateway_host] && options[:gateway_username]
+        gateway_ssh_options = ssh_options.dup
+        if options[:gateway_private_key]
+          gateway_ssh_options[:key_data] = [options[:gateway_private_key]]
+        end
+
         gateway = Net::SSH::Gateway.new(
           options[:gateway_host],
           options[:gateway_username],
-          ssh_options
+          gateway_ssh_options
         )
         local_port_for_gateway = gateway.open(host, 22)
         ssh_options[:port] = local_port_for_gateway
