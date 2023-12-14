@@ -1,6 +1,6 @@
 require 'system/spec_helper'
 
-describe 'service configuration', :type => 'os'  do
+describe 'service configuration', os: true  do
   before(:all) do
     @requirements.requirement(@requirements.stemcell)
     @requirements.requirement(@requirements.release)
