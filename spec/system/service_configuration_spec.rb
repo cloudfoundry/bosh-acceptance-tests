@@ -23,7 +23,7 @@ describe 'service configuration', os: true  do
 
     # shutdown instance
     begin
-      bosh_ssh('batlight', 0, "sudo reboot", deployment: deployment.name)
+      bosh_ssh('batlight', instance_id, "sudo reboot", deployment: deployment.name)
     rescue Bosh::Exec::Error
       @logger.debug('Rebooting instance closed the ssh connection')
     end
@@ -41,7 +41,7 @@ describe 'service configuration', os: true  do
     loop do
       sleep 10
       begin
-        result = bosh_ssh('batlight', 0, "echo 'UP'", deployment: deployment.name).output
+        result = bosh_ssh('batlight', instance_id, "echo 'UP'", deployment: deployment.name).output
       rescue Bosh::Exec::Error
         @logger.info("Failed to run ssh command. Retrying.")
       end
@@ -144,7 +144,20 @@ describe 'service configuration', os: true  do
     EOF
   end
 
+  let(:instance_name) { 'batlight' }
+  let(:instance_id) { '0' }
+
+  def srv_cmd
+    return service_command("batlight", "0", deployment: deployment.name)
+  end
+
   describe 'runit' do
+    before(:all) do
+      if srv_cmd == "systemctl"
+        skip 'Not applicable for agent/monit running on systemd'
+      end
+    end
+
     before(:each) do
       runit_running_on_instance(public_ip)
     end
@@ -187,7 +200,7 @@ describe 'service configuration', os: true  do
             fi
             echo "SUCCESS"
           EOF
-          output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+          output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
           expect(output).to include("SUCCESS")
         end
       end
@@ -206,7 +219,7 @@ describe 'service configuration', os: true  do
             fi
             echo "SUCCESS"
           EOF
-          output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+          output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
           expect(output).to include("SUCCESS")
         end
       end
@@ -245,7 +258,7 @@ describe 'service configuration', os: true  do
           fi
           echo "SUCCESS"
         EOF
-        output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+        output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
         expect(output).to include("SUCCESS")
       end
 
@@ -261,7 +274,7 @@ describe 'service configuration', os: true  do
             _=$(killAndAwaitProcess monit-actual)
             echo "SUCCESS"
           EOF
-          output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+          output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
           expect(output).to include("SUCCESS")
         end
       end
@@ -278,7 +291,148 @@ describe 'service configuration', os: true  do
             _=$(killAndAwaitProcess bosh-agent)
             echo "SUCCESS"
           EOF
-          output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+          output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
+          expect(output).to include("SUCCESS")
+        end
+      end
+    end
+  end
+
+  describe 'systemd' do
+    before(:all) do
+      if srv_cmd == "sv"
+        skip 'Not applicable for agent/monit running on runit'
+      end
+    end
+
+    after(:each) do
+      instance_reboot
+    end
+
+    context 'when initially started after instance boot (before agent has been started)' do
+      # it 'deletes /etc/service/monit' do
+      #   # expect /etc/service/monit to be younger that the system's uptime
+      #   cmd = <<-EOF
+      #     #{bash_functions}
+      #     _=$(waitForSymlink /etc/service/monit)
+      #     now="$(date +"%s")"
+      #     mod_time="$(stat --printf="%Y" /etc/service/monit)"
+      #     up_time="$(cut -f1 -d. /proc/uptime)"
+      #     diff=$((${up_time}-${now}+${mod_time}))
+      #     if [ $diff -ge 0 ]; then
+      #       echo "SUCCESS"
+      #     else
+      #       echo "FAILURE: expected /etc/service/monit to be younger than uptime, got a difference of ${diff} seconds"
+      #       exit 1
+      #     fi
+      #   EOF
+      #   expect(ssh(public_ip, 'vcap', cmd, ssh_options(@spec))).to include("SUCCESS\n")
+      # end
+
+      context 'when monit dies' do
+        it 'restarts it' do
+          # compare monit pids pre- and post kill
+          cmd = <<-EOF
+            #{bash_functions}
+            old_pid="$(waitForProcess monit "")"
+            sudo kill ${old_pid}
+            new_pid="$(waitForProcess monit $old_pid)"
+            if [[ "${new_pid}" = "${old_pid}" || -z "${new_pid}" ]]; then
+              echo "FAILURE"
+              exit 1
+            fi
+            echo "SUCCESS"
+          EOF
+          output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
+          expect(output).to include("SUCCESS")
+        end
+      end
+
+      context 'when the agent dies' do
+        it 'restarts it' do
+          # compare agent pids pre- and post kill
+          cmd = <<-EOF
+            #{bash_functions}
+            old_pid="$(waitForProcess bosh-agent "")"
+            sudo kill ${old_pid}
+            new_pid="$(waitForProcess bosh-agent $old_pid)"
+            if [[ "${new_pid}" = "${old_pid}" || -z "${new_pid}" ]]; then
+              echo "FAILURE"
+              exit 1
+            fi
+            echo "SUCCESS"
+          EOF
+          output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
+          expect(output).to include("SUCCESS")
+        end
+      end
+    end
+
+    context 'when restarted after agent has been started' do
+      # it 'does not delete /etc/service/monit' do
+      #   # wait for agent and monit to come up
+      #   agent_running_on_instance(public_ip)
+      #   monit_running_on_instance(public_ip)
+
+      #   # compare pids pre- and post runsvdir kill
+      #   # make sure runsvdir does not delete /etc/service/monit
+      #   cmd = <<-EOF
+      #     #{bash_functions}
+      #     agent_pid="$(waitForProcess bosh-agent)"
+      #     monit_pid="$(waitForProcess monit-actual)"
+
+      #     _=$(waitForSymlink /etc/service/monit)
+      #     link_time="$(stat --printf="%Y" /etc/service/monit)"
+
+      #     _=$(killAndAwaitProcess runsvdir)
+      #     new_agent_pid="$(pgrep ^bosh-agent$)"
+      #     new_monit_pid="$(pgrep ^monit-actual$)"
+      #     if [ "${new_agent_pid}" != "${agent_pid}" ] || [ -z "${new_agent_pid}" ]; then
+      #       echo "FAILURE: Agent pid changed from ${agent_pid} to ${new_agent_pid}"
+      #       exit 1
+      #     fi
+      #     if [ "${new_monit_pid}" != "${monit_pid}" ] || [ -z "${new_monit_pid}" ]; then
+      #       echo "FAILURE: Monit pid changed from ${monit_pid} to ${new_monit_pid}"
+      #       exit 1
+      #     fi
+      #     if [ "$(stat --printf="%Y" /etc/service/monit)" != "${link_time}" ] || [ -z "${link_time}" ]; then
+      #       echo "FAILURE: /etc/service/monit symlink changed"
+      #       exit 1
+      #     fi
+      #     echo "SUCCESS"
+      #   EOF
+      #   output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
+      #   expect(output).to include("SUCCESS")
+      # end
+
+      context 'when monit dies' do
+        it 'restarts it' do
+          # wait for monit to come up
+          monit_running_on_instance(public_ip)
+
+          # compare monit pids pre- and post kill
+          cmd = <<-EOF
+            #{bash_functions}
+            _=$(killAndAwaitProcess monit)
+            echo "SUCCESS"
+          EOF
+          output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
+          expect(output).to include("SUCCESS")
+        end
+      end
+
+      context 'when the agent dies' do
+        it 'restarts it' do
+          # wait for agent to come up
+          agent_running_on_instance(public_ip)
+
+          # compare agent pids pre- and post kill
+          cmd = <<-EOF
+            #{bash_functions}
+            _=$(killAndAwaitProcess bosh-agent)
+            echo "SUCCESS"
+          EOF
+          output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
           expect(output).to include("SUCCESS")
         end
       end
@@ -307,6 +461,10 @@ describe 'service configuration', os: true  do
       end
 
       it 'creates a symlink from /etc/sv/monit to /etc/service/monit' do
+        if srv_cmd == "systemctl"
+          skip 'Not applicable for agent/monit running on systemd'
+        end
+
         # shutdown agent and remove /etc/service/monit
         # make sure agent recreates /etc/service/monit upon restart
         cmd = <<-EOF
@@ -325,7 +483,7 @@ describe 'service configuration', os: true  do
           fi
           echo 'SUCCESS'
         EOF
-        output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+        output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
         expect(output).to include("SUCCESS")
       end
 
@@ -356,7 +514,7 @@ describe 'service configuration', os: true  do
           touch /var/vcap/data/sys/run/foo.pid
           echo "SUCCESS"
         EOF
-        output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+        output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
         expect(output).to include("SUCCESS")
 
         # reboot instance
@@ -391,12 +549,18 @@ describe 'service configuration', os: true  do
           fi
           echo "SUCCESS"
         EOF
-        output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+        output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
         expect(output).to include("SUCCESS")
       end
     end
 
     context 'when restarted by runit' do
+      before(:all) do
+        if srv_cmd == "systemctl"
+          skip 'Not applicable for agent/monit running on systemd'
+        end
+      end
+
       it 'does not remount /var/vcap/data/sys/run' do
         # put file into /var/vcap/data/sys/run
         # restart agent
@@ -412,7 +576,7 @@ describe 'service configuration', os: true  do
             exit 1
           fi
         EOF
-        output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+        output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
         expect(output).to include("SUCCESS")
       end
 
@@ -433,7 +597,7 @@ describe 'service configuration', os: true  do
             exit 1
           fi
         EOF
-        output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+        output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
         expect(output).to include("SUCCESS")
       end
 
@@ -451,7 +615,7 @@ describe 'service configuration', os: true  do
             exit 1
           fi
         EOF
-        output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+        output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
         expect(output).to include("SUCCESS")
       end
 
@@ -472,7 +636,76 @@ describe 'service configuration', os: true  do
             exit 1
           fi
         EOF
-        output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+        output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
+        expect(output).to include("SUCCESS")
+      end
+    end
+
+    context 'when restarted by systemd' do
+      before(:all) do
+        if srv_cmd == "sv"
+          skip 'Not applicable for agent/monit running on runit'
+        end
+      end
+
+      it 'does not remount /var/vcap/data/sys/run' do
+        # put file into /var/vcap/data/sys/run
+        # restart agent
+        # make sure file still exists
+        cmd = <<-EOF
+          touch /var/vcap/data/sys/run/foo
+          sudo PATH=$PATH:/sbin systemctl stop bosh-agent
+          sudo PATH=$PATH:/sbin systemctl start bosh-agent
+          if [ -f /var/vcap/data/sys/run/foo ]; then
+            echo "SUCCESS";
+          else
+            echo "FAILURE: foo not existing anymore"
+            exit 1
+          fi
+        EOF
+        output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
+        expect(output).to include("SUCCESS")
+      end
+
+      it 'does not remove existing pid files' do
+        # wait for batlight
+        batlight_running_on_instance(public_ip)
+
+        # compare pids pre and post agent restart
+        cmd = <<-EOF
+          old_pid=$(cat /var/vcap/data/sys/run/batlight/batlight.pid)
+          sudo PATH=$PATH:/sbin systemctl stop bosh-agent
+          sudo PATH=$PATH:/sbin systemctl start bosh-agent
+          new_pid=$(cat /var/vcap/data/sys/run/batlight/batlight.pid)
+          if [ "${old_pid}" = "${new_pid}" ]; then
+            echo "SUCCESS"
+          else
+            echo "FAILURE: batlight.pid changed"
+            exit 1
+          fi
+        EOF
+        output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
+        expect(output).to include("SUCCESS")
+      end
+
+      it 'does not restart monit' do
+        # wait for monit
+        monit_running_on_instance(public_ip)
+
+        # compare monit pid and process time pre and post agent restart
+        cmd = <<-EOF
+          old_pid=$(pgrep ^monit$)
+          sudo systemctl stop bosh-agent
+          sudo systemctl start bosh-agent
+          new_pid=$(pgrep ^monit$)
+          if [ "${old_pid}" = "${new_pid}" ]; then
+            echo "SUCCESS"
+          else
+            echo "FAILURE: monit restarted"
+            exit 1
+          fi
+        EOF
+        output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
         expect(output).to include("SUCCESS")
       end
     end
@@ -492,7 +725,7 @@ describe 'service configuration', os: true  do
 
           # kill batlight
           cmd = "sudo pkill batlight && echo 'SUCCESS'"
-          output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+          output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
           expect(output).to include("SUCCESS")
 
           # wait for batlight to come up again
@@ -501,12 +734,12 @@ describe 'service configuration', os: true  do
       end
     end
 
-    context 'when restarted by runit' do
+    context 'when restarted by runit/systemd' do
       context 'when a monitored process dies' do
         it 'restarts it' do
           # kill monit
           cmd = "sudo pkill monit && echo 'SUCCESS'"
-          output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+          output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
           expect(output).to include("SUCCESS")
 
           # wait for monit to come up again
@@ -514,7 +747,7 @@ describe 'service configuration', os: true  do
 
           # kill batlight
           cmd = "sudo pkill batlight && echo 'SUCCESS'"
-          output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+          output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
           expect(output).to include("SUCCESS")
 
           # wait for batlight to come up again
@@ -525,14 +758,14 @@ describe 'service configuration', os: true  do
       context 'when monit is running' do
         it 'can not be reached from the host' do
           cmd = 'sudo -- netstat -ntpl | grep monit | awk "{print $4}" | xargs curl -m1'
-          output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name, on_error: :return).output
+          output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name, on_error: :return).output
           expect(output).to include("Connection timed out")
         end
 
         context 'when using the monit cli' do
           it 'can reach the api and show a summary' do
             cmd = "sudo monit summary && echo 'SUCCESS'"
-            output = bosh_ssh('batlight', 0, cmd, deployment: deployment.name).output
+            output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
             expect(output).to include("SUCCESS")
           end
         end

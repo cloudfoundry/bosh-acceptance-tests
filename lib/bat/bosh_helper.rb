@@ -102,6 +102,25 @@ module Bat
       bosh_ssh_options << '--results' if options.delete(:result)
       bosh_ssh_options << " --column=#{column}" if column
       bosh("ssh #{job}/#{index} -c '#{command}' #{bosh_ssh_options}", options)
+      # TODO: we should consider using -r to get propper output
+      # this means fixing al the other tests that rely on the current output
+    end
+
+    def service_command(job, index, options = {})
+      result = bosh_ssh(job, index, 'sudo cat /var/vcap/bosh/agent.json', options)
+      agent_json = result.output.lines.select { |line| line.include?('stdout') }.map { |line| line.split('|').last.strip }.join
+      agent_settings = JSON.load(agent_json)
+      service_manager = agent_settings.dig('Platform', 'Linux', 'ServiceManager')
+
+      if service_manager.nil?
+        command = "sv"
+      elsif service_manager == 'systemd'
+        command = "systemctl"
+      else
+        command = "sv"
+      end
+
+      return command
     end
 
     def tarfile
