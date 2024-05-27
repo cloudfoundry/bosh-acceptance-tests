@@ -112,13 +112,7 @@ module Bat
       agent_settings = JSON.load(agent_json)
       service_manager = agent_settings.dig('Platform', 'Linux', 'ServiceManager')
 
-      if service_manager.nil?
-        command = "sv"
-      elsif service_manager == 'systemd'
-        command = "systemctl"
-      else
-        command = "sv"
-      end
+      command =  service_manager == 'systemd' ? "systemctl" : "sv"
 
       return command
     end
