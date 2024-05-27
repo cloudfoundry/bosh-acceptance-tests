@@ -310,25 +310,6 @@ describe 'service configuration', os: true  do
     end
 
     context 'when initially started after instance boot (before agent has been started)' do
-      # it 'deletes /etc/service/monit' do
-      #   # expect /etc/service/monit to be younger that the system's uptime
-      #   cmd = <<-EOF
-      #     #{bash_functions}
-      #     _=$(waitForSymlink /etc/service/monit)
-      #     now="$(date +"%s")"
-      #     mod_time="$(stat --printf="%Y" /etc/service/monit)"
-      #     up_time="$(cut -f1 -d. /proc/uptime)"
-      #     diff=$((${up_time}-${now}+${mod_time}))
-      #     if [ $diff -ge 0 ]; then
-      #       echo "SUCCESS"
-      #     else
-      #       echo "FAILURE: expected /etc/service/monit to be younger than uptime, got a difference of ${diff} seconds"
-      #       exit 1
-      #     fi
-      #   EOF
-      #   expect(ssh(public_ip, 'vcap', cmd, ssh_options(@spec))).to include("SUCCESS\n")
-      # end
-
       context 'when monit dies' do
         it 'restarts it' do
           # compare monit pids pre- and post kill
@@ -369,42 +350,6 @@ describe 'service configuration', os: true  do
     end
 
     context 'when restarted after agent has been started' do
-      # it 'does not delete /etc/service/monit' do
-      #   # wait for agent and monit to come up
-      #   agent_running_on_instance(public_ip)
-      #   monit_running_on_instance(public_ip)
-
-      #   # compare pids pre- and post runsvdir kill
-      #   # make sure runsvdir does not delete /etc/service/monit
-      #   cmd = <<-EOF
-      #     #{bash_functions}
-      #     agent_pid="$(waitForProcess bosh-agent)"
-      #     monit_pid="$(waitForProcess monit-actual)"
-
-      #     _=$(waitForSymlink /etc/service/monit)
-      #     link_time="$(stat --printf="%Y" /etc/service/monit)"
-
-      #     _=$(killAndAwaitProcess runsvdir)
-      #     new_agent_pid="$(pgrep ^bosh-agent$)"
-      #     new_monit_pid="$(pgrep ^monit-actual$)"
-      #     if [ "${new_agent_pid}" != "${agent_pid}" ] || [ -z "${new_agent_pid}" ]; then
-      #       echo "FAILURE: Agent pid changed from ${agent_pid} to ${new_agent_pid}"
-      #       exit 1
-      #     fi
-      #     if [ "${new_monit_pid}" != "${monit_pid}" ] || [ -z "${new_monit_pid}" ]; then
-      #       echo "FAILURE: Monit pid changed from ${monit_pid} to ${new_monit_pid}"
-      #       exit 1
-      #     fi
-      #     if [ "$(stat --printf="%Y" /etc/service/monit)" != "${link_time}" ] || [ -z "${link_time}" ]; then
-      #       echo "FAILURE: /etc/service/monit symlink changed"
-      #       exit 1
-      #     fi
-      #     echo "SUCCESS"
-      #   EOF
-      #   output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
-      #   expect(output).to include("SUCCESS")
-      # end
-
       context 'when monit dies' do
         it 'restarts it' do
           # wait for monit to come up
