@@ -18,10 +18,12 @@ describe 'cck' do
 
     let(:instance_name) { 'batlight' }
     let(:instance_id) { '0' }
+    let(:srv_cmd) { service_command(instance_name, instance_id, deployment: deployment.name)}
 
     before do
       @requirements.requirement(deployment, @spec, force: true, bosh_options: '--recreate')
-      bosh_ssh(instance_name, instance_id, 'sudo sv stop agent', deployment: deployment.name)
+      # stop agent would be bosh-agent. unless we change this in systemd
+      bosh_ssh(instance_name, instance_id, "sudo #{srv_cmd} stop agent", deployment: deployment.name)
       @initial_vm_cid = unresponsive_agent_vm_cid
     end
 
