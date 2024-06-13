@@ -106,15 +106,26 @@ module Bat
       # this means fixing al the other tests that rely on the current output
     end
 
-    def service_command(job, index, options = {})
-      result = bosh_ssh(job, index, 'sudo cat /var/vcap/bosh/agent.json', options)
-      agent_json = result.output.lines.select { |line| line.include?('stdout') }.map { |line| line.split('|').last.strip }.join
-      agent_settings = JSON.load(agent_json)
+    def service_command(job, index, deployment)
+      agent_settings = agent_config(job, index, deployment)
       service_manager = agent_settings.dig('Platform', 'Linux', 'ServiceManager')
 
-      command =  service_manager == 'systemd' ? "systemctl" : "sv"
+      service_manager == 'systemd' ? 'systemctl' : 'sv'
+    end
 
-      return command
+    def agent_config(job, index, deployment)
+      ssh_result = bosh_ssh(
+        job,
+        index,
+        'sudo cat /var/vcap/bosh/agent.json',
+        options: {
+          column: 'stdout',
+          deployment: deployment.name,
+          result: true,
+        }
+      )
+
+      JSON.parse(ssh_result.output)
     end
 
     def tarfile

@@ -26,7 +26,7 @@ describe 'with release and stemcell and subsequent deployments' do
     end
 
     it 'creates ephemeral and swap partitions on the root device if no ephemeral disk', ssh: true, core: true do
-      setting_value = agent_config().
+      setting_value = agent_config('batlight', '0', deployment).
         fetch('Platform', {}).
         fetch('Linux', {}).
         fetch('CreatePartitionIfNoEphemeralDisk', false)
@@ -38,11 +38,6 @@ describe 'with release and stemcell and subsequent deployments' do
 
       # expect swap to be a mounted partition on the root disk
       expect(swaps()).to include(hash_including('type' => 'partition'))
-    end
-
-    def agent_config
-      output = bosh_ssh('batlight', 0, 'sudo cat /var/vcap/bosh/agent.json', deployment: deployment.name, result: true, column: 'stdout').output
-      JSON.parse(output)
     end
 
     def mounts

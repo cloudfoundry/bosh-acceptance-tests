@@ -148,7 +148,7 @@ describe 'service configuration', os: true  do
   let(:instance_id) { '0' }
 
   def srv_cmd
-    return service_command("batlight", "0", deployment: deployment.name)
+    return service_command('batlight', '0', deployment)
   end
 
   describe 'runit' do
