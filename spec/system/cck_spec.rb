@@ -18,7 +18,7 @@ describe 'cck' do
 
     let(:instance_name) { 'batlight' }
     let(:instance_id) { '0' }
-    let(:srv_cmd) { service_command(instance_name, instance_id, deployment)}
+    let(:srv_cmd) { service_command(instance_name, instance_id, deployment.name)}
 
     before do
       @requirements.requirement(deployment, @spec, force: true, bosh_options: '--recreate')

@@ -118,11 +118,9 @@ module Bat
         job,
         index,
         'sudo cat /var/vcap/bosh/agent.json',
-        options: {
-          column: 'stdout',
-          deployment: deployment.name,
-          result: true,
-        }
+        column: 'stdout',
+        deployment: deployment,
+        result: true,
       )
 
       JSON.parse(ssh_result.output)
