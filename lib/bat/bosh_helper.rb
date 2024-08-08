@@ -3,13 +3,12 @@ require 'json'
 require 'net/ssh'
 require 'net/ssh/gateway'
 require 'zlib'
-require 'archive/tar/minitar'
+require 'minitar'
 require 'tempfile'
 require 'common/exec'
 
 module Bat
   module BoshHelper
-    include Archive::Tar
 
     def bosh(*args, &blk)
       @bosh_runner.bosh(*args, &blk)
