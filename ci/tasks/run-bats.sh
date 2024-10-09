@@ -4,8 +4,7 @@ set -e
 
 export BAT_STEMCELL=$(realpath stemcell/*.tgz)
 export BAT_DEPLOYMENT_SPEC=$(realpath bats-config/bats-config.yml)
-export BAT_BOSH_CLI=$(realpath bosh-cli/*bosh-cli-*)
-chmod +x $BAT_BOSH_CLI
+export BAT_BOSH_CLI=$(realpath "$(which bosh)")
 
 source bats-config/bats.env
 
