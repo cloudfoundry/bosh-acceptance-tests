@@ -13,7 +13,9 @@ networks:
   subnets:
   - range: <%= network.cidr %>
     azs: [z1]
-    dns: <%= p('dns') %>
+<% if_p('dns') do |dns_server| %>
+    dns: <%= dns_server %>
+<% end %>
     reserved:
       <% if network.reserved.instance_of?(Array) %>
       <% network.reserved.each do |range| %>
