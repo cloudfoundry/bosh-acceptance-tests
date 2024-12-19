@@ -78,7 +78,7 @@ RSpec.configure do |config|
       rescue TasksProcessing => e
         raise e if i > 5
 
-        sleep 1
+        sleep 10
         i += 1
         retry
       end
