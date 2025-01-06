@@ -29,7 +29,11 @@ module Bat
           require_deployment(what, deployment_spec, options)
         when :no_tasks_processing
           if tasks_processing?
-            raise TasksProcessing, 'director is currently processing tasks'
+            if !only_scan_and_fix_processing?
+              raise TasksProcessing, 'director is currently processing tasks'
+            else
+              raise OnlyScanAndFixProcessing, 'director is currently processing only scan and fix task(s)'
+            end
           end
         else
           raise "unknown requirement: #{what}"
@@ -68,6 +72,12 @@ module Bat
       tasks = JSON.parse(@bosh_runner.bosh('tasks').output)["Tables"][0]["Rows"]
       tasks_without_ssh_cleanup = tasks.reject { |task| task['description'].match(/^ssh: cleanup/) }
       !tasks_without_ssh_cleanup.empty?
+    end
+
+    def only_scan_and_fix_processing?
+      tasks = JSON.parse(@bosh_runner.bosh('tasks').output)["Tables"][0]["Rows"]
+      tasks_without_scan_and_fix_cleanup = tasks.reject { |task| task['description'].match(/^scan and fix$/) }
+      tasks_without_scan_and_fix_cleanup.empty?
     end
 
     def update_cloud_config(deployment_spec)

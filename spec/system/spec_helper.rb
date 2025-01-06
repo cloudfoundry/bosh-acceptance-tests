@@ -20,6 +20,7 @@ require 'bat/deployment_helper'
 require File.expand_path('../support/succeed_matchers', __FILE__)
 
 class TasksProcessing < StandardError;end
+class OnlyScanAndFixProcessing < StandardError;end
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
@@ -75,6 +76,9 @@ RSpec.configure do |config|
       i = 0
       begin
         requirements.requirement(:no_tasks_processing) # 5 sec on local vsphere
+      rescue OnlyScanAndFixProccesing => e
+        sleep 10
+        retry
       rescue TasksProcessing => e
         raise e if i > 5
 
