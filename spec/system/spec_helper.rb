@@ -76,7 +76,7 @@ RSpec.configure do |config|
       i = 0
       begin
         requirements.requirement(:no_tasks_processing) # 5 sec on local vsphere
-      rescue OnlyScanAndFixProccesing => e
+      rescue OnlyScanAndFixProcessing => e
         sleep 10
         retry
       rescue TasksProcessing => e
