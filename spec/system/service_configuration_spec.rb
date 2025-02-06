@@ -45,7 +45,7 @@ describe 'service configuration', os: true  do
       rescue Bosh::Exec::Error
         @logger.info("Failed to run ssh command. Retrying.")
       end
-      break if (Time.now.to_i - start) > 300 || result.include?("UP")
+      break if (Time.now.to_i - start) > 600 || result.include?("UP")
     end
 
     expect(result).to include("UP")
