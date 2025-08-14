@@ -247,5 +247,11 @@ module Bat
 
       true
     end
+
+    # TODO: Temporary solution until -r is implemented
+    # in the bosh_ssh function
+    def extract_ssh_stdout_between_dashes(output)
+      output[/----(.*?)----/m, 1]&.strip
+    end
   end
 end
