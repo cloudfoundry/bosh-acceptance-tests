@@ -103,6 +103,7 @@ properties:
   second_static_ip: 10.10.0.31 # Secondary (private) IP to use for reconfiguring networks, must be in the primary network & different from static_ip
   networks:
   - name: default
+    type: manual
     static_ip: 10.10.0.30
     cidr: 10.10.0.0/24
     reserved: ['10.10.0.2 - 10.10.0.9']
