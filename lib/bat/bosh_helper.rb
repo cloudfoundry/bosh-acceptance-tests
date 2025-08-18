@@ -248,6 +248,16 @@ module Bat
       true
     end
 
+    def fetch_ipv6_prefix_from_aws_metadata(job, index, deployment)
+      cli_cmd = 'for iface in $(ls /sys/class/net/ | grep -v lo); do mac=$(cat /sys/class/net/$iface/address); output_data=$(curl -s "http://169.254.169.254/latest/meta-data/network/interfaces/macs/$mac/ipv6-prefix"); if [ -n "$output_data" ] && ! echo "$output_data" | grep -q "404 - Not Found"; then echo "----$iface:$output_data----"; fi; done'
+      prefix_output = bosh_ssh(job, index, cli_cmd, deployment: deployment).output
+      prefix_line = prefix_output.lines.find { |l| l.include?("----") }
+      return nil unless prefix_line
+      match = prefix_line.match(/----([^:]+):([\da-fA-F:.]+)\/(\d+)----/)
+      return nil unless match
+      [match[1], match[2], match[3]]
+    end
+
     # TODO: Temporary solution until -r is implemented
     # in the bosh_ssh function
     def extract_ssh_stdout_between_dashes(output)

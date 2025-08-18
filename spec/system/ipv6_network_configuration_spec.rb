@@ -44,18 +44,14 @@ describe 'IPv6 network configuration', ipv6: true do
       expect(bosh("-d #{deployment.name} deploy #{deployment.to_path}")).to succeed
     end
 
-    it 'returns the expected IPv6 prefix from AWS metadata', ssh: true do
-      cli_cmd = 'mac=$(cat /sys/class/net/eth0/address);output_data=$(curl -s "http://169.254.169.254/latest/meta-data/network/interfaces/macs/$mac/ipv6-prefix");echo "----$output_data----"'
-      prefix_output = bosh_ssh('batlight', 0, cli_cmd, deployment: deployment.name).output
-      _, prefix = extract_ssh_stdout_between_dashes(prefix_output).split('/')
 
+    it 'returns the expected IPv6 prefix from AWS metadata', ssh: true do
+      _, _, prefix = fetch_ipv6_prefix_from_aws_metadata('batlight', 0, deployment.name)
       expect(prefix).to eq('80')
     end
 
     it 'verifies the IPv6 prefix in spec.json', ssh: true do
-      cli_cmd = 'mac=$(cat /sys/class/net/eth0/address);output_data=$(curl -s "http://169.254.169.254/latest/meta-data/network/interfaces/macs/$mac/ipv6-prefix");echo "----$output_data----"'
-      prefix_output = bosh_ssh('batlight', 0, cli_cmd, deployment: deployment.name).output
-      ip, prefix = extract_ssh_stdout_between_dashes(prefix_output).split('/')
+      _, ip, prefix = fetch_ipv6_prefix_from_aws_metadata('batlight', 0, deployment.name)
 
       cli_cmd = 'output_data=$(sudo cat /var/vcap/bosh/spec.json); echo "----$output_data----"'
       spec_output = bosh_ssh('batlight', 0, cli_cmd, deployment: deployment.name).output
