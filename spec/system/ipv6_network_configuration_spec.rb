@@ -23,7 +23,7 @@ describe 'IPv6 network configuration', ipv6: true do
       @requirements.requirement(@deployment, @spec)
     end
 
-    it 'supports manual network dual stack on AWS', ipv6_dual_stack: true, ssh: true do
+    it 'supports manual network dual stack', ipv6_dual_stack: true, ssh: true do
       output = bosh_ssh('batlight', 0, 'PATH=/sbin:/usr/sbin:$PATH; ifconfig', deployment: @deployment.name).output
       expect(output).to include(static_ips[0])
       expect(output).to include(static_ips[1])
