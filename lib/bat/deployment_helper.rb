@@ -180,6 +180,15 @@ module Bat
       @spec['properties'].fetch('network', {}).fetch('type', nil)
     end
 
+    def nic_groups
+       @spec['properties']['job_networks'].inject([]) do |memo, network|
+        if network['nic_group']
+          memo << network['nic_group']
+        end
+        memo
+      end
+    end
+
     def get_most_recent_task_id
       output = @bosh_runner.bosh("tasks --recent=1").output
       JSON.parse(output)["Tables"].first["Rows"].first["id"]
