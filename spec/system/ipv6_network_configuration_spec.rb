@@ -9,7 +9,7 @@ describe 'IPv6 network configuration', ipv6: true do
     load_deployment_spec
     use_static_ip
     use_vip
-    
+
     @deployment = use_multiple_manual_networks
     @deployment = with_deployment
   end
@@ -32,6 +32,7 @@ describe 'IPv6 network configuration', ipv6: true do
 
   context 'when allocating IPv6 prefix', ipv6_prefix_allocation: true do
     before(:all) do
+      skip 'IPv6 prefix allocation is only supported on AWS' unless aws?
       @requirements.requirement(@deployment, @spec)
     end
 
