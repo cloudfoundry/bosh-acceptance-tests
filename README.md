@@ -130,7 +130,7 @@ properties:
     subnet: subnet-xxxxxxxx # VPC subnet
     nic_group: 2
     security_groups: 'bat' # VPC security groups
-  - name: default2
+  - name: default3
     type: manual
     static_ip: 10.10.2.30
     cidr: 10.10.2.0/24
