@@ -35,7 +35,7 @@ describe 'IPv6 network configuration', ipv6: true do
       @requirements.requirement(@deployment, @spec)
     end
 
-    it 'returns the expected IPv6 prefix from AWS metadata', ssh: true do
+    it 'returns the expected IPv6 prefix from metadata', ssh: true do
       _, prefix = fetch_ipv6_and_prefix_from_metadata('batlight', 0, @deployment.name)
       expect(prefix).to eq('80')
     end
