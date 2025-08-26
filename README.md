@@ -111,7 +111,7 @@ properties:
     gateway: 10.10.0.1
     subnet: subnet-xxxxxxxx # VPC subnet
     security_groups: 'bat' # VPC security groups
-  - name: second_ipv6
+  - name: second
     type: manual
     cidr: 2001:db8:abcd:1234::/56
     reserved: ['2001:db8:abcd:1234::2 - 2001:db8:abcd:1234::f']
