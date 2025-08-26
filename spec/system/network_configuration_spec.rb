@@ -1,4 +1,5 @@
 require 'system/spec_helper'
+require 'set'
 
 describe 'network configuration' do
   before(:all) do
@@ -40,9 +41,6 @@ describe 'network configuration' do
   end
 
   context 'when using nic_groups', nic_groups: true do
-    before(:all) do
-      skip 'nic_groups are not supported on AWS CPI' if aws?
-    end
     it 'assigns networks with the same nic_group to the same interface', ssh: true do
       use_multiple_manual_networks
 
@@ -59,29 +57,30 @@ describe 'network configuration' do
       raw_interfaces_json = JSON.parse(extract_ssh_stdout_between_dashes(output))
 
       interfaces = raw_interfaces_json.reject { |iface| iface['ifname'] == 'lo' }
-                                 .map do |iface|
-        { 'ifname' => iface['ifname'], 'ips' => iface['addr_info'].map do |addr|
-          addr['local']
-        end }
+                                      .map do |iface|
+        {
+          'ifname' => iface['ifname'],
+          'ips' => (iface['addr_info'] || []).map { |addr| addr['local'] }
+        }
       end
 
-      ip_to_interface = {}
+      ip_to_interface_map = {}
       interfaces.each do |iface|
-        iface['ips'].each { |ip| ip_to_interface[ip] = iface['ifname'] }
+        iface['ips'].each { |ip| ip_to_interface_map[ip] = iface['ifname'] }
       end
 
-      nic_group_to_interfaces = Hash.new { |h, k| h[k] = Set.new }
+      nic_group_to_interface_set = Hash.new { |h, k| h[k] = Set.new }
       networks_with_nic_groups.each do |network|
         static_ip = network['static_ip']
         nic_group = network['nic_group']
-        interface = ip_to_interface[static_ip]
+        interface_name = ip_to_interface_map[static_ip]
 
-        expect(interface).not_to be_nil,
+        expect(interface_name).not_to be_nil,
                                  "Static IP #{static_ip} from network '#{network['name']}' not found on any interface"
-        nic_group_to_interfaces[nic_group] << interface
+        nic_group_to_interface_set[nic_group] << interface_name
       end
 
-      nic_group_to_interfaces.each do |nic_group, interface_set|
+      nic_group_to_interface_set.each do |nic_group, interface_set|
         expect(interface_set.size).to eq(1),
                                       "Networks with nic_group #{nic_group} should be on the same interface, but found on: #{interface_set.to_a.join(', ')}"
       end
