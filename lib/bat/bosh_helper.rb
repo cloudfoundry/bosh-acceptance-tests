@@ -248,17 +248,35 @@ module Bat
       true
     end
 
-    def fetch_ipv6_prefix_from_aws_metadata(job, index, deployment)
-      cli_cmd = 'for iface in $(ls /sys/class/net/ | grep -v lo); do mac=$(cat /sys/class/net/$iface/address); output_data=$(curl -s "http://169.254.169.254/latest/meta-data/network/interfaces/macs/$mac/ipv6-prefix"); if [ -n "$output_data" ] && ! echo "$output_data" | grep -q "404 - Not Found"; then echo "----$iface:$output_data----"; break; fi; done'
+    def fetch_ipv6_and_prefix_from_metadata(job, index, deployment)
+      # TODO: Enable for other IaaS when feature is supported in their respective CPI
+      metadata_endpoints = {
+        'aws' => 'http://169.254.169.254/latest/meta-data/network/interfaces/macs/$mac/ipv6-prefix',
+        # 'alicloud' => 'http://100.100.100.200/latest/meta-data/network/interfaces/macs/$mac/ipv6-prefixes',
+      }
+
+      iaas = @env.bat_infrastructure
+
+      endpoint = metadata_endpoints[iaas]
+      return nil unless endpoint
+
+      # TODO: Enable for other IaaS when feature is supported in their respective CPI
+      if iaas == 'aws'
+        cli_cmd = 'for iface in $(ls /sys/class/net/ | grep -v lo); do mac=$(cat /sys/class/net/$iface/address); output_data=$(curl -s "' + endpoint + '"); if [ -n "$output_data" ] && ! echo "$output_data" | grep -q "404 - Not Found"; then echo "----$output_data----"; break; fi; done'
+      # elsif iaas == 'alicloud'
+      #   cli_cmd = 'for iface in $(ls /sys/class/net/ | grep -v lo); do mac=$(cat /sys/class/net/$iface/address); output_data=$(curl -s "' + endpoint + '"); if [ -n "$output_data" ] && ! echo "$output_data" | grep -q "404 - Not Found"; then echo "----$output_data----"; break; fi; done'
+      else
+        return nil
+      end
+
       prefix_output = bosh_ssh(job, index, cli_cmd, deployment: deployment).output
-      
       extracted_data = extract_ssh_stdout_between_dashes(prefix_output)
       return nil unless extracted_data
-      
-      match = extracted_data.match(/^([^:]+):([\da-fA-F:.]+)\/(\d+)$/)
-      return nil unless match
-      
-      [match[1], match[2], match[3]]
+
+      match = extracted_data.match(/([\da-fA-F:.]+)(?:\/(\d+))?$/)
+        return nil unless match
+
+      [match[1], match[2]]
     end
 
     # TODO: Temporary solution until -r is implemented

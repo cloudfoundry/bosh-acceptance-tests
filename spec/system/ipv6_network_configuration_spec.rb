@@ -32,17 +32,16 @@ describe 'IPv6 network configuration', ipv6: true do
 
   context 'when allocating IPv6 prefix', ipv6_prefix_allocation: true do
     before(:all) do
-      skip 'IPv6 prefix allocation is only supported on AWS' unless aws?
       @requirements.requirement(@deployment, @spec)
     end
 
     it 'returns the expected IPv6 prefix from AWS metadata', ssh: true do
-      _, _, prefix = fetch_ipv6_prefix_from_aws_metadata('batlight', 0, @deployment.name)
+      _, prefix = fetch_ipv6_and_prefix_from_metadata('batlight', 0, @deployment.name)
       expect(prefix).to eq('80')
     end
 
     it 'verifies the IPv6 prefix in spec.json', ssh: true do
-      _, ip, prefix = fetch_ipv6_prefix_from_aws_metadata('batlight', 0, @deployment.name)
+      ip, prefix = fetch_ipv6_and_prefix_from_metadata('batlight', 0, @deployment.name)
 
       cli_cmd = 'output_data=$(sudo cat /var/vcap/bosh/spec.json); echo "----$output_data----"'
       spec_output = bosh_ssh('batlight', 0, cli_cmd, deployment: @deployment.name).output
