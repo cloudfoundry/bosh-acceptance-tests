@@ -105,41 +105,41 @@ properties:
     type: manual
     static_ip: 10.10.0.30
     cidr: 10.10.0.0/24
-    reserved: ['10.10.0.2 - 10.10.0.9']
-    static: ['10.10.0.10 - 10.10.0.31']
+    reserved: ["10.10.0.2 - 10.10.0.9"]
+    static: ["10.10.0.10 - 10.10.0.31"]
     gateway: 10.10.0.1
     subnet: subnet-xxxxxxxx # VPC subnet
     nic_group: 1
-    security_groups: 'bat' # VPC security groups
-  - name: second_ipv6
+    security_groups: "bat" # VPC security groups
+  - name: second
     type: manual
     cidr: 2001:db8:abcd:1234::/56
-    reserved: ['2001:db8:abcd:1234::2 - 2001:db8:abcd:1234::f']
+    reserved: ["2001:db8:abcd:1234::2 - 2001:db8:abcd:1234::f"]
     static_ip: 2001:db8:abcd:1234::10
     gateway: 2001:db8:abcd:1234::1
     subnet: subnet-xxxxxxxx
-    security_groups: 'bat'
+    security_groups: "bat"
     nic_group: 1
-  - name: default2
+  - name: third
     type: manual
     static_ip: 10.10.1.30
     cidr: 10.10.1.0/24
-    reserved: ['10.10.1.2 - 10.10.1.9']
-    static: ['10.10.1.10 - 10.10.1.31']
+    reserved: ["10.10.1.2 - 10.10.1.9"]
+    static: ["10.10.1.10 - 10.10.1.31"]
     gateway: 10.10.1.1
     subnet: subnet-xxxxxxxx # VPC subnet
     nic_group: 2
-    security_groups: 'bat' # VPC security groups
-  - name: default3
+    security_groups: "bat" # VPC security groups
+  - name: fourth
     type: manual
-    static_ip: 10.10.2.30
-    cidr: 10.10.2.0/24
-    reserved: ['10.10.2.2 - 10.10.2.9']
-    static: ['10.10.2.10 - 10.10.2.31']
-    gateway: 10.10.2.1
+    static_ip: 2001:db8:cafe:5678::10
+    cidr: 2001:db8:cafe:5678::/56
+    reserved: ["2001:db8:cafe:5678::2 - 2001:db8:cafe:5678::f"]
+    static: ["2001:db8:cafe:5678::10 - 2001:db8:cafe:5678::1f"]
+    gateway: 2001:db8:cafe:5678::1
     subnet: subnet-xxxxxxxx # VPC subnet
     nic_group: 2
-    security_groups: 'bat' # VPC security groups
+    security_groups: "bat" # VPC security groups
   key_name: bosh # (optional) SSH keypair name, overrides the director's default_key_name setting
 ```
 
