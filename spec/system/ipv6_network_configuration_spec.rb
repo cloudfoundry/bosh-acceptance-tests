@@ -37,11 +37,14 @@ describe 'IPv6 network configuration', ipv6: true do
 
     it 'returns the expected IPv6 prefix from metadata', ssh: true do
       _, prefix = fetch_ipv6_and_prefix_from_metadata('batlight', 0, @deployment.name)
+      expect(prefix).not_to be_nil, "Could not fetch IPv6 prefix from metadata"
       expect(prefix).to eq('80')
     end
 
     it 'verifies the IPv6 prefix in spec.json', ssh: true do
       ip, prefix = fetch_ipv6_and_prefix_from_metadata('batlight', 0, @deployment.name)
+      expect(ip).not_to be_nil, "Could not fetch IPv6 address from metadata"
+      expect(prefix).not_to be_nil, "Could not fetch IPv6 prefix from metadata"
 
       cli_cmd = 'output_data=$(sudo cat /var/vcap/bosh/spec.json); echo "----$output_data----"'
       spec_output = bosh_ssh('batlight', 0, cli_cmd, deployment: @deployment.name).output
@@ -51,7 +54,7 @@ describe 'IPv6 network configuration', ipv6: true do
       found = spec['networks'].values.any? do |net|
         IPAddr.new(net['ip']) == IPAddr.new(ip) && net['prefix'].to_s == prefix.to_s
       end
-      expect(found).to be true
+      expect(found).to be true, "IPv6 address #{ip}/#{prefix} not found in spec.json networks"
     end
   end
 end
