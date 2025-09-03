@@ -22,7 +22,7 @@ networks:
     prefix: <%= network.prefix %>
     <% end %>
     static:
-    <% if network.static_ip %>
+    <% if network.static %>
       <% network.static.each do |range| %>
     - <%= range %>
       <% end %>
