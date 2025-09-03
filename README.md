@@ -113,6 +113,15 @@ properties:
     security_groups: 'bat' # VPC security groups
   - name: second
     type: manual
+    static_ip: 2001:db8:abcd:1234::30
+    cidr: 2001:db8:abcd:1234::/56
+    reserved: ['2001:db8:abcd:1234::2 - 2001:db8:abcd:1234::f']
+    static: [2001:db8:abcd:1234::10 - 2001:db8:abcd:1234::31]
+    gateway: 2001:db8:abcd:1234::1
+    subnet: subnet-xxxxxxxx
+    security_groups: 'bat'
+  - name: third
+    type: manual
     cidr: 2001:db8:abcd:1234::/56
     reserved: ['2001:db8:abcd:1234::2 - 2001:db8:abcd:1234::f']
     gateway: 2001:db8:abcd:1234::1
