@@ -63,6 +63,7 @@ describe 'network configuration' do
         end
       end
 
+      # {<nic_group>=>#<Set: {"NICX"}>, <nic_group>=>#<Set: {"NICX"}>}
       nic_group_to_interface_set = Hash.new { |h, k| h[k] = Set.new }
       networks_with_nic_groups.each do |network|
         static_ip = network['static_ip']
