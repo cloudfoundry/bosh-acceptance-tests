@@ -41,13 +41,13 @@ describe 'network configuration' do
   end
 
   context 'when using nic_groups', nic_groups: true do
-    it 'assigns networks with the same nic_group to the same interface', ssh: true do
+    before(:all) do
       use_multiple_manual_networks
-
+      skip "Skipping nic_groups tests because a nic_group is not defined" if nic_groups.empty?
+    end
+    it 'assigns networks with the same nic_group to the same interface', ssh: true do
       job_networks = @spec['properties']['job_networks']
       networks_with_nic_groups = job_networks.select { |n| n['static_ip'] && n['nic_group'] }
-      expect(networks_with_nic_groups.size).to be > 0,
-                                               'No networks with nic_group found to test. At least one network should have a nic_group property.'
 
       deployment = with_deployment
       expect(bosh("-d #{deployment.name} deploy #{deployment.to_path}")).to succeed
@@ -56,17 +56,11 @@ describe 'network configuration' do
       output = bosh_ssh('batlight', 0, cli_cmd, deployment: deployment.name).output
       raw_interfaces_json = JSON.parse(extract_ssh_stdout_between_dashes(output))
 
-      interfaces = raw_interfaces_json.reject { |iface| iface['ifname'] == 'lo' }
-                                      .map do |iface|
-        {
-          'ifname' => iface['ifname'],
-          'ips' => (iface['addr_info'] || []).map { |addr| addr['local'] }
-        }
-      end
-
       ip_to_interface_map = {}
-      interfaces.each do |iface|
-        iface['ips'].each { |ip| ip_to_interface_map[ip] = iface['ifname'] }
+      raw_interfaces_json.reject { |iface| iface['ifname'] == 'lo' }.each do |iface|
+        (iface['addr_info'] || []).each do |addr|
+          ip_to_interface_map[addr['local']] = iface['ifname']
+        end
       end
 
       nic_group_to_interface_set = Hash.new { |h, k| h[k] = Set.new }
