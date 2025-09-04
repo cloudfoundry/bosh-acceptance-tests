@@ -82,6 +82,67 @@ properties:
   key_name: bosh # (optional) SSH keypair name, overrides the director's default_key_name setting
 ```
 
+#### manual networking with multiple networks and nic groups
+
+```yaml
+---
+cpi: aws
+properties:
+  stemcell:
+    name: bosh-aws-xen-ubuntu-trusty-go_agent
+    version: latest
+  instances: 1
+  ssh_gateway:
+    host: "jumpbox_host" # optional host used to provide tunnel when the tests need to ssh to VMs
+    username: "jumpbox_username" # optional username used to provide tunnel when the tests need to ssh to VMs
+  ssh_key_pair:
+    public_key: "public_key_string" # used when deploying VMs to allow direct ssh access
+    private_key: "private_key_string" # used to ssh into bosh deployed VMs and the gateway host
+  vip: 54.54.54.54 # elastic ip for bat deployed VM
+  second_static_ip: 10.10.0.31 # Secondary (private) IP to use for reconfiguring networks, must be in the primary network & different from static_ip
+  networks:
+  - name: default
+    type: manual
+    static_ip: 10.10.0.30
+    cidr: 10.10.0.0/24
+    reserved: ["10.10.0.2 - 10.10.0.9"]
+    static: ["10.10.0.10 - 10.10.0.31"]
+    gateway: 10.10.0.1
+    subnet: subnet-xxxxxxxx # VPC subnet
+    nic_group: 1
+    security_groups: "bat" # VPC security groups
+  - name: second
+    type: manual
+    cidr: 2001:db8:abcd:1234::/56
+    reserved: ["2001:db8:abcd:1234::2 - 2001:db8:abcd:1234::f"]
+    static_ip: 2001:db8:abcd:1234::10
+    gateway: 2001:db8:abcd:1234::1
+    subnet: subnet-xxxxxxxx
+    security_groups: "bat"
+    nic_group: 1
+  - name: third
+    type: manual
+    static_ip: 10.10.1.30
+    cidr: 10.10.1.0/24
+    reserved: ["10.10.1.2 - 10.10.1.9"]
+    static: ["10.10.1.10 - 10.10.1.31"]
+    gateway: 10.10.1.1
+    subnet: subnet-xxxxxxxx # VPC subnet
+    nic_group: 2
+    security_groups: "bat" # VPC security groups
+  - name: fourth
+    type: manual
+    static_ip: 2001:db8:cafe:5678::10
+    cidr: 2001:db8:cafe:5678::/56
+    reserved: ["2001:db8:cafe:5678::2 - 2001:db8:cafe:5678::f"]
+    static: ["2001:db8:cafe:5678::10 - 2001:db8:cafe:5678::1f"]
+    gateway: 2001:db8:cafe:5678::1
+    subnet: subnet-xxxxxxxx # VPC subnet
+    nic_group: 2
+    security_groups: "bat" # VPC security groups
+  key_name: bosh # (optional) SSH keypair name, overrides the director's default_key_name setting
+```
+
 ### OpenStack
 
 #### dynamic networking

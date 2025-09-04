@@ -54,10 +54,13 @@ instance_groups:
         <% if i == 0 %>
         default: [dns, gateway]
         <% end %>
-      <% if properties.use_static_ip && network.static_ip %>
+        <% if properties.use_static_ip && network.static_ip %>
         static_ips:
-        - <%= network.static_ip %>
-      <% end %>
+          - <%= network.static_ip %>
+        <% end %>
+        <% if network.nic_group %>
+        nic_group: <%= network.nic_group %>
+        <% end %>
     <% end %>
     <% if properties.use_vip && properties.vip %>
       - name: static
