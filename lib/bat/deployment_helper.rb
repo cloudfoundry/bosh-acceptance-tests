@@ -131,9 +131,11 @@ module Bat
     end
 
     def network_prefixes
-      @spec['properties']['job_prefixes'] = []
-      @spec['properties']['networks'].each do |network|
-        @spec['properties']['job_prefixes'] << network['prefix']
+      @spec['properties']['job_networks'].inject([]) do |memo, network|
+        if network['prefix']
+          memo << network['prefix']
+        end
+        memo
       end
     end
 

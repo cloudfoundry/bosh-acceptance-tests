@@ -12,6 +12,8 @@ describe 'IPv6 network configuration', ipv6: true do
 
     @deployment = use_multiple_manual_networks
     @deployment = with_deployment
+
+    expect(bosh("-d #{@deployment.name} deploy #{@deployment.to_path}")).to succeed
   end
 
   after(:all) do
@@ -32,8 +34,7 @@ describe 'IPv6 network configuration', ipv6: true do
 
   context 'when allocating IPv6 prefix', ipv6_prefix_allocation: true do
     before(:all) do
-      network_prefixes
-      skip 'Skipping IPv6 prefix allocation tests because a prefix is not configured under a network' unless @spec['properties']['job_prefixes'].to_a.any?
+      skip 'Skipping IPv6 prefix allocation tests because a prefix is not defined under a network' if network_prefixes.empty? 
       @requirements.requirement(@deployment, @spec)
     end
 
