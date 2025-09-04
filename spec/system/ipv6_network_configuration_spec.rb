@@ -32,6 +32,8 @@ describe 'IPv6 network configuration', ipv6: true do
 
   context 'when allocating IPv6 prefix', ipv6_prefix_allocation: true do
     before(:all) do
+      network_prefixes
+      skip 'Skipping IPv6 prefix allocation tests because a prefix is not configured under a network' unless @spec['properties']['job_prefixes'].to_a.any?
       @requirements.requirement(@deployment, @spec)
     end
 
