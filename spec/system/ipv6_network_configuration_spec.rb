@@ -10,7 +10,7 @@ describe 'IPv6 network configuration', ipv6: true do
     use_static_ip
     use_vip
 
-    @deployment = use_multiple_manual_networks
+    use_multiple_manual_networks
     @deployment = with_deployment
 
     expect(bosh("-d #{@deployment.name} deploy #{@deployment.to_path}")).to succeed
