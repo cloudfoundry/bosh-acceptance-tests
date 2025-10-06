@@ -233,6 +233,32 @@ module Bat
       instance['vm_cid']
     end
 
+    def get_instance_ips
+      output = @bosh_runner.bosh('instances --json').output
+      rows = JSON.parse(output)['Tables'][0]['Rows']
+
+      instance_ips = {}
+      rows.each do |r|
+        inst = r['instance'].to_s
+        ips_array = r['ips'].to_s.split("\n").map(&:strip).reject(&:empty?)
+        instance_ips[inst] = ips_array
+      end
+
+      instance_ips
+    end
+
+    def get_ipv6_prefix_addresses
+      instance_ips = get_instance_ips
+      result = {}
+      instance_ips.each do |inst, ips|
+        # look for an IPv6 address that includes a prefix (e.g. "2600:...::/80")
+        ip_with_prefix = ips.find { |ip| ip.include?('/') }
+        result[inst] = ip_with_prefix if ip_with_prefix
+      end
+
+      result.empty? ? nil : result
+    end
+
     def unresponsive_agent_instance
       get_instances.find { |i| i['process_state'] == 'unresponsive agent' }
     end
@@ -246,37 +272,6 @@ module Bat
       return false if instance.nil?
 
       true
-    end
-
-    def fetch_ipv6_and_prefix_from_metadata(job, index, deployment)
-      # TODO: Enable for other IaaS when feature is supported in their respective CPI
-      metadata_endpoints = {
-        'aws' => 'http://169.254.169.254/latest/meta-data/network/interfaces/macs/$mac/ipv6-prefix',
-        # 'alicloud' => 'http://100.100.100.200/latest/meta-data/network/interfaces/macs/$mac/ipv6-prefixes',
-      }
-
-      iaas = @env.bat_infrastructure
-
-      endpoint = metadata_endpoints[iaas]
-      return nil unless endpoint
-
-      # TODO: Enable for other IaaS when feature is supported in their respective CPI
-      if iaas == 'aws'
-        cli_cmd = 'for iface in $(ls /sys/class/net/ | grep -v lo); do mac=$(cat /sys/class/net/$iface/address); output_data=$(curl -s "' + endpoint + '"); if [ -n "$output_data" ] && ! echo "$output_data" | grep -q "404 - Not Found"; then echo "----$output_data----"; break; fi; done'
-      # elsif iaas == 'alicloud'
-      #   cli_cmd = 'for iface in $(ls /sys/class/net/ | grep -v lo); do mac=$(cat /sys/class/net/$iface/address); output_data=$(curl -s "' + endpoint + '"); if [ -n "$output_data" ] && ! echo "$output_data" | grep -q "404 - Not Found"; then echo "----$output_data----"; break; fi; done'
-      else
-        return nil
-      end
-
-      prefix_output = bosh_ssh(job, index, cli_cmd, deployment: deployment).output
-      extracted_data = extract_ssh_stdout_between_dashes(prefix_output)
-      return nil unless extracted_data
-
-      match = extracted_data.match(/([\da-fA-F:.]+)(?:\/(\d+))?$/)
-        return nil unless match
-
-      [match[1], match[2]]
     end
 
     # TODO: Temporary solution until -r is implemented
