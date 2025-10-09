@@ -130,6 +130,15 @@ module Bat
       @spec['properties']['second_static_ip']
     end
 
+    def network_prefixes
+      @spec['properties']['job_networks'].inject([]) do |memo, network|
+        if network['prefix']
+          memo << network['prefix']
+        end
+        memo
+      end
+    end
+
     def use_multiple_manual_networks
       @spec['properties']['job_networks'] = []
       @spec['properties']['networks'].each do |network|

@@ -233,6 +233,32 @@ module Bat
       instance['vm_cid']
     end
 
+    def get_instance_ips
+      output = @bosh_runner.bosh('instances --json').output
+      rows = JSON.parse(output)['Tables'][0]['Rows']
+
+      instance_ips = {}
+      rows.each do |r|
+        inst = r['instance'].to_s
+        ips_array = r['ips'].to_s.split("\n").map(&:strip).reject(&:empty?)
+        instance_ips[inst] = ips_array
+      end
+
+      instance_ips
+    end
+
+    def get_ipv6_prefix_addresses
+      instance_ips = get_instance_ips
+      result = {}
+      instance_ips.each do |inst, ips|
+        # look for an IPv6 address that includes a prefix (e.g. "2600:...::/80")
+        ip_with_prefix = ips.find { |ip| ip.include?('/') }
+        result[inst] = ip_with_prefix if ip_with_prefix
+      end
+
+      result.empty? ? nil : result
+    end
+
     def unresponsive_agent_instance
       get_instances.find { |i| i['process_state'] == 'unresponsive agent' }
     end
@@ -246,6 +272,12 @@ module Bat
       return false if instance.nil?
 
       true
+    end
+
+    # TODO: Temporary solution until -r is implemented
+    # in the bosh_ssh function
+    def extract_ssh_stdout_between_dashes(output)
+      output[/----(.*?)----/m, 1]&.strip
     end
   end
 end

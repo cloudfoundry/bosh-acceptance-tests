@@ -18,9 +18,14 @@ networks:
       <% network.reserved.each do |range| %>
     - <%= range %>
     <% end %>
+    <% if network.prefix %>
+    prefix: <%= network.prefix %>
+    <% end %>
     static:
+    <% if network.static %>
       <% network.static.each do |range| %>
     - <%= range %>
+      <% end %>
     <% end %>
     gateway: <%= network.gateway %>
     cloud_properties:
