@@ -2,14 +2,14 @@ require 'system/spec_helper'
 require 'json'
 require 'ipaddr'
 
-describe 'IPv6 network configuration', ipv6: true do
+describe 'IPv6 network configuration', multiple_manual_networks: true, ipv6: true do
   before(:all) do
     @requirements.requirement(@requirements.stemcell)
     @requirements.requirement(@requirements.release)
     load_deployment_spec
   end
 
-  context 'when using manual networking and ipv6', multiple_manual_networks: true, ipv6_manual_networking: true do
+  context 'when using manual networking and ipv6', ipv6_manual_networking: true do
     before(:all) do
       use_static_ip
       use_multiple_manual_networks
@@ -30,7 +30,7 @@ describe 'IPv6 network configuration', ipv6: true do
     end
   end
 
-  context 'when allocating IPv6 prefix', multiple_manual_networks: true, ipv6_prefix_allocation: true do
+  context 'when allocating IPv6 prefix', ipv6_prefix_allocation: true do
     before(:all) do
       load_deployment_spec
       use_multiple_manual_networks
