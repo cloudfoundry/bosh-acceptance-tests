@@ -314,3 +314,9 @@ Execute the following inside the bosh-acceptance-tests directory:
 ```
 bundle exec rspec spec --tag ~vip_networking --tag ~dynamic_networking --tag ~root_partition --tag ~raw_ephemeral_storage
 ```
+
+It is also possible to only execute specific tests like this:
+
+```
+bundle exec rspec spec --tag manual_networking --tag dynamic_networking
+```
