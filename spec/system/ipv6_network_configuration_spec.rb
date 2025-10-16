@@ -2,7 +2,7 @@ require 'system/spec_helper'
 require 'json'
 require 'ipaddr'
 
-describe 'IPv6 network configuration', ipv6: true do
+describe 'IPv6 network configuration', multiple_manual_networks: true, ipv6: true do
   before(:all) do
     @requirements.requirement(@requirements.stemcell)
     @requirements.requirement(@requirements.release)
