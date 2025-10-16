@@ -101,8 +101,8 @@ module Bat
       bosh_ssh_options << '--results' if options.delete(:result)
       bosh_ssh_options << " --column=#{column}" if column
       bosh("ssh #{job}/#{index} -c '#{command}' #{bosh_ssh_options}", options)
-      # TODO: we should consider using -r to get propper output
-      # this means fixing al the other tests that rely on the current output
+      # TODO: we should consider using --result (-r) by default to get a proper output
+      # this means fixing all the other tests that rely on the current output
     end
 
     def service_command(job, index, deployment)
@@ -246,12 +246,6 @@ module Bat
       return false if instance.nil?
 
       true
-    end
-
-    # TODO: Temporary solution until -r is implemented
-    # in the bosh_ssh function
-    def extract_ssh_stdout_between_dashes(output)
-      output[/----(.*?)----/m, 1]&.strip
     end
   end
 end

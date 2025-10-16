@@ -52,9 +52,9 @@ describe 'network configuration' do
       deployment = with_deployment
       expect(bosh("-d #{deployment.name} deploy #{deployment.to_path}")).to succeed
 
-      cli_cmd = 'output_data=$(ip -j addr); echo "----$output_data----"'
-      output = bosh_ssh('batlight', 0, cli_cmd, deployment: deployment.name).output
-      raw_interfaces_json = JSON.parse(extract_ssh_stdout_between_dashes(output))
+      cli_cmd = 'ip -j addr'
+      output = bosh_ssh('batlight', 0, cli_cmd, deployment: deployment.name, result: true, column: 'stdout').output
+      raw_interfaces_json = JSON.parse(output)
 
       ip_to_interface_map = {}
       raw_interfaces_json.reject { |iface| iface['ifname'] == 'lo' }.each do |iface|
