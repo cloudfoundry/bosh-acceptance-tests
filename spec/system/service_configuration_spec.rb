@@ -96,6 +96,14 @@ describe 'service configuration', os: true  do
 
   let(:bash_functions) do
     <<-EOF
+      monitProcessName() {
+        if pgrep ^monit-actual$ > /dev/null 2>&1; then
+          echo "monit-actual"
+        else
+          echo "monit"
+        fi
+      }
+
       waitForProcess() {
         local proc_name="${1}"
         local old_pid="${2}"
@@ -191,9 +199,10 @@ describe 'service configuration', os: true  do
           # compare monit pids pre- and post kill
           cmd = <<-EOF
             #{bash_functions}
-            old_pid="$(waitForProcess monit-actual "")"
+            monit_proc=$(monitProcessName)
+            old_pid="$(waitForProcess $monit_proc "")"
             sudo kill ${old_pid}
-            new_pid="$(waitForProcess monit-actual $old_pid)"
+            new_pid="$(waitForProcess $monit_proc $old_pid)"
             if [[ "${new_pid}" = "${old_pid}" || -z "${new_pid}" ]]; then
               echo "FAILURE"
               exit 1
@@ -235,15 +244,16 @@ describe 'service configuration', os: true  do
         # make sure runsvdir does not delete /etc/service/monit
         cmd = <<-EOF
           #{bash_functions}
+          monit_proc=$(monitProcessName)
           agent_pid="$(waitForProcess bosh-agent)"
-          monit_pid="$(waitForProcess monit-actual)"
+          monit_pid="$(waitForProcess $monit_proc)"
 
           _=$(waitForSymlink /etc/service/monit)
           link_time="$(stat --printf="%Y" /etc/service/monit)"
 
           _=$(killAndAwaitProcess runsvdir)
           new_agent_pid="$(pgrep ^bosh-agent$)"
-          new_monit_pid="$(pgrep ^monit-actual$)"
+          new_monit_pid="$(pgrep ^${monit_proc}$)"
           if [ "${new_agent_pid}" != "${agent_pid}" ] || [ -z "${new_agent_pid}" ]; then
             echo "FAILURE: Agent pid changed from ${agent_pid} to ${new_agent_pid}"
             exit 1
@@ -270,8 +280,9 @@ describe 'service configuration', os: true  do
           # compare monit pids pre- and post kill
           cmd = <<-EOF
             #{bash_functions}
+            monit_proc=$(monitProcessName)
             _=$(killAndAwaitProcess runsvdir)
-            _=$(killAndAwaitProcess monit-actual)
+            _=$(killAndAwaitProcess $monit_proc)
             echo "SUCCESS"
           EOF
           output = bosh_ssh(instance_name, instance_id, cmd, deployment: deployment.name).output
@@ -570,10 +581,12 @@ describe 'service configuration', os: true  do
 
         # compare monit pid and process time pre and post agent restart
         cmd = <<-EOF
-          old_pid=$(pgrep ^monit-actual$)
+          #{bash_functions}
+          monit_proc=$(monitProcessName)
+          old_pid=$(pgrep ^${monit_proc}$)
           sudo sv down agent
           sudo sv up agent
-          new_pid=$(pgrep ^monit-actual$)
+          new_pid=$(pgrep ^${monit_proc}$)
           if [ "${old_pid}" = "${new_pid}" ]; then
             echo "SUCCESS"
           else
