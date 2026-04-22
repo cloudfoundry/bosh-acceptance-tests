@@ -150,6 +150,7 @@ properties:
   instances: 1
   instance_type: some-ephemeral
   flavor_with_no_ephemeral_disk: no-ephemeral
+  volume_type: premium # (optional) Volume type for persistent disks, defaults to 'gp2' if not specified
   vip: 0.0.0.43 # Virtual (public/floating) IP assigned to the bat-release job vm ('static' network), for ssh testing
   second_static_ip: 10.253.3.29 # Secondary (private) IP to use for reconfiguring networks, must be in the primary network & different from static_ip
   networks:
