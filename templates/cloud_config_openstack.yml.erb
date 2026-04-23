@@ -54,6 +54,6 @@ disk_types:
 - name: <%= disk_type.name %>
   disk_size: <%= disk_type.disk_size %>
   cloud_properties:
-    type: gp2
+    type: <%= properties.volume_type || 'gp2' %>
   <% end %>
 <% end %>
