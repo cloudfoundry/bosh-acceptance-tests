@@ -31,7 +31,7 @@ case $1 in
 
     echo $$ > $PIDFILE
 
-    exec chpst -u $RUNAS:$RUNAS \
+    exec setpriv --reuid=$RUNAS --regid=$RUNAS --clear-groups -- \
       $BIN_DIR/batlight <%= spec.index %> \
       1>>$LOG_DIR/$JOB.stdout.log \
       2>>$LOG_DIR/$JOB.stderr.log
