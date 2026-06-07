@@ -56,6 +56,7 @@ module Bat
         when Bat::Release
           if @bosh_runner.releases.include?(what)
             expect(@bosh_runner.bosh_safe("delete-release #{what.name}")).to succeed
+            @uploaded_releases&.delete(what.path)
           end
         when Bat::Deployment
           if @bosh_runner.deployments.include?(what.name)
@@ -103,11 +104,15 @@ module Bat
     end
 
     def require_release(what)
-      if @bosh_runner.releases.include?(what)
+      @uploaded_releases ||= {}
+      if @uploaded_releases[what.path]
         @logger.info('release already uploaded')
       else
-        @logger.info('release not uploaded')
-        expect(@bosh_runner.bosh_safe("upload-release --dir #{what.path} #{what.to_path}")).to succeed
+        @logger.info('creating bat release')
+        expect(@bosh_runner.bosh_safe("create-release --dir #{what.path} --force")).to succeed
+        @logger.info('uploading bat release')
+        expect(@bosh_runner.bosh_safe("upload-release --dir #{what.path}")).to succeed
+        @uploaded_releases[what.path] = true
       end
     end
 
@@ -118,7 +123,7 @@ module Bat
         update_cloud_config(deployment_spec)
         @logger.info('deployment not already deployed, deploying...')
         what.generate_deployment_manifest(deployment_spec)
-        x = @bosh_runner.bosh_safe("-d #{what.name} deploy #{what.to_path} #{options[:bosh_params]}")
+        x = @bosh_runner.bosh_safe("-d #{what.name} deploy #{what.to_path} #{options[:bosh_options]}")
         puts x
         if x.exit_status != 0
           puts @bosh_runner.bosh_safe("task 4 --debug")

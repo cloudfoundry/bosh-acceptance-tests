@@ -52,7 +52,8 @@ module Bat
     def releases
       result = []
       JSON.parse(bosh('releases').output)["Tables"][0]["Rows"].each do |r|
-        result << Bat::Release.new(r['name'], [])
+        version = r['version']&.sub(/\*$/, '')
+        result << Bat::Release.new(r['name'], version ? [version] : [])
       end
       result
     end
@@ -60,7 +61,7 @@ module Bat
     def stemcells
       result = []
       JSON.parse(bosh('stemcells').output)["Tables"][0]["Rows"].each do |s|
-        result << Bat::Stemcell.new(s['name'], s['version'])
+        result << Bat::Stemcell.new(s['name'], s['version']&.sub(/\*$/, ''))
       end
       result
     end
