@@ -1,64 +1,23 @@
 require 'spec_helper'
 require 'bat/release'
-require 'fileutils'
 
 describe Bat::Release do
-  subject(:release) { Bat::Release.new(release_name, release_versions) }
+  subject(:release) { Bat::Release.new(release_name, []) }
   let(:release_name) { 'FAKE_NAME' }
-  let(:release_versions) { %w(FAKE_VERSION_1 FAKE_VERSION_2) }
 
   describe '.from_path' do
     let(:bat_path) { '/tmp/fake/bat/path' }
 
-    context 'when there files in the path' do
-      before do
-        bat_releases_dir = File.join(bat_path, 'releases')
-        FileUtils.mkdir_p(bat_releases_dir)
-
-        deployment_file = File.join(bat_releases_dir, 'bat-0.yml')
-        File.open(deployment_file, 'w') { |f| f.write("CONTENT: #{deployment_file}") }
-
-        deployment_file = File.join(bat_releases_dir, 'bat-1.yml')
-        File.open(deployment_file, 'w') { |f| f.write("CONTENT: #{deployment_file}") }
-
-        deployment_file = File.join(bat_releases_dir, 'bat-12.yml')
-        File.open(deployment_file, 'w') { |f| f.write("CONTENT: #{deployment_file}") }
-      end
-
-      before do
-        bat_dev_releases_dir = File.join(bat_path, 'dev_releases')
-        FileUtils.mkdir_p(bat_dev_releases_dir)
-
-        deployment_file = File.join(bat_dev_releases_dir, 'bat-1.1+dev.yml')
-        File.open(deployment_file, 'w') { |f| f.write("CONTENT: #{deployment_file}") }
-      end
-
-      it 'creates a Release named "bat" with versions found in the path specified' do
-        release = Bat::Release.from_path(bat_path)
-        expect(release.name).to eq('bat')
-        expect(release.sorted_versions).to eq(%w(0 1 1.1+dev 12))
-        expect(release.path).to eq(bat_path)
-      end
-    end
-
-    context 'when there are no files in the path' do
-      before { FileUtils.rm_r(bat_path, force: true) }
-
-      it 'raises an error' do
-        expect {
-          Bat::Release.from_path(bat_path)
-        }.to raise_error(RuntimeError, /no final or dev releases.*#{bat_path}/)
-      end
+    it 'creates a Release named "bat" with the given path' do
+      result = Bat::Release.from_path(bat_path)
+      expect(result.name).to eq('bat')
+      expect(result.path).to eq(bat_path)
     end
   end
 
   describe '#initialize' do
     it 'sets name' do
       expect(Bat::Release.new('NAME', nil).name).to eq('NAME')
-    end
-
-    it 'sets versions' do
-      expect(Bat::Release.new(nil, %w(0 1)).sorted_versions).to eq(%w(0 1))
     end
 
     it 'sets path to nil' do
@@ -73,45 +32,22 @@ describe Bat::Release do
   end
 
   describe '#to_s' do
-    it 'returns "name-version"' do
-      expect(release.to_s).to eq('FAKE_NAME-FAKE_VERSION_2')
-    end
-  end
-
-  describe '#to_path' do
-    it 'raises an exception (even though it should not)' do
-      expect { release.to_path }.to raise_error
-    end
-
-    context 'when path is specified' do
-      subject(:release) { Bat::Release.new('FAKE_NAME', release_versions, '/tmp/fake/path') }
-
-      it 'returns its #path, and #to_s values joined as a YAML file path' do
-        expect(release.to_path).to eq('/tmp/fake/path/releases/FAKE_NAME-FAKE_VERSION_2.yml')
-      end
-    end
-  end
-
-  describe '#version' do
-    let(:release_versions) { %w(FAKE_VERSION_11 FAKE_VERSION_33 FAKE_VERSION_66 FAKE_VERSION_99).shuffle }
-
-    it 'retuns the last element in the versions array' do
-      expect(release.version).to eq(release_versions.last)
-    end
-  end
-
-  describe '#latest' do
-    let(:release_versions) { %w(FAKE_VERSION_11 FAKE_VERSION_33 FAKE_VERSION_66 FAKE_VERSION_99).shuffle }
-
-    it 'retuns the last element in the versions array' do
-      expect(release.latest).to eq(release_versions.last)
+    it 'returns the name' do
+      expect(release.to_s).to eq('FAKE_NAME')
     end
   end
 
   describe '#==' do
-    it 'returns true if the other object is a Release with the same #name and any common #versions' do
-      equal_release = Bat::Release.new(release_name, release_versions.sample(1))
-      expect(release == equal_release).to be(true)
+    it 'returns true if the other object is a Release with the same name' do
+      expect(release == Bat::Release.new(release_name, [])).to be(true)
+    end
+
+    it 'returns false if the other object is a Release with a different name' do
+      expect(release == Bat::Release.new('OTHER', [])).to be(false)
+    end
+
+    it 'returns false for non-Release objects' do
+      expect(release == 'not a release').to be(false)
     end
   end
 end
