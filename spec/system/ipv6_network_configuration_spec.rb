@@ -127,7 +127,7 @@ describe 'IPv6 network configuration', multiple_manual_networks: true, ipv6: tru
         instances_usable_ips.each do |target_instance, data|
           next if source_instance == target_instance # Skip pinging self
 
-          ping_result = bosh_ssh(source_name, source_id, "ping6 -c 5 #{data[:usable_ip]}",
+          ping_result = bosh_ssh(source_name, source_id, "sudo ping6 -c 5 #{data[:usable_ip]}",
                                  deployment: @deployment.name, result: true, column: 'stdout').output
           success = ping_result.match(/0% packet loss/) || ping_result.match(/\d+ packets transmitted, \d+ received/)
           expect(success).to be_truthy,
