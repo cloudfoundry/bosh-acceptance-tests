@@ -16,6 +16,7 @@ describe 'IPv6 network configuration', multiple_manual_networks: true, ipv6: tru
       use_static_ip
       use_multiple_manual_networks
       @deployment = with_deployment
+      @requirements.update_cloud_config(@spec)
       expect(bosh("-d #{@deployment.name} deploy #{@deployment.to_path}")).to succeed
     end
 
@@ -47,6 +48,7 @@ describe 'IPv6 network configuration', multiple_manual_networks: true, ipv6: tru
       use_instance_count(2)
 
       @deployment = with_deployment
+      @requirements.update_cloud_config(@spec)
       expect(bosh("-d #{@deployment.name} deploy #{@deployment.to_path}")).to succeed
     end
 
