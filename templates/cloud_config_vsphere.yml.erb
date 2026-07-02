@@ -1,6 +1,9 @@
 ---
 azs:
 - name: z1
+<% if_p('cpi_id') do |cpi| %>
+  cpi: <%= cpi %>
+<% end %>
 <% if_p('datacenters') do |dcs| %>
   cloud_properties:
     datacenters: <%= dcs.to_json %>

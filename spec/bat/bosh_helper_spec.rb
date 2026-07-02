@@ -12,6 +12,7 @@ describe Bat::BoshHelper do
     bosh_helper.instance_variable_set('@bosh_runner', bosh_runner)
     stub_const('ENV', {})
     bosh_helper.instance_variable_set('@logger', Logger.new('/dev/null'))
+    allow(bosh_helper).to receive(:puts) # silence output in specs
   end
 
   describe '#ssh_options' do
@@ -382,8 +383,8 @@ OUTPUT
         allow(bosh_runner).to receive(:bosh).with('instances --details').and_return(fake_result)
       end
 
-      it 'returns nil' do
-        expect{bosh_helper.wait_for_process_state('jessez', '0', 'running', 0)}.to raise_error
+      it 'raises an error' do
+        expect{bosh_helper.wait_for_process_state('jessez', '0', 'running', 0)}.to raise_error("Instance is still not in expected process state: running")
       end
     end
 
@@ -393,8 +394,8 @@ OUTPUT
         allow(bosh_runner).to receive(:bosh).with('instances --details').and_return(fake_result)
       end
 
-      it 'returns nil' do
-        expect{bosh_helper.wait_for_process_state('jessez', '0', 'running', 0)}.to raise_error
+      it 'raises an error' do
+        expect{bosh_helper.wait_for_process_state('jessez', '0', 'running', 0)}.to raise_error("Instance is still not in expected process state: running")
       end
     end
 
