@@ -12,6 +12,5 @@ gem 'net-ssh'
 gem 'net-ssh-gateway'
 
 gem 'rspec'
-gem 'base64'
 gem 'logger' # Ruby 4.x
 gem 'ostruct' # Ruby 4.x - used by `bosh-template`
