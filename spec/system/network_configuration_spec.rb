@@ -51,6 +51,7 @@ describe 'network configuration' do
       use_multiple_manual_networks
 
       @deployment = with_deployment
+      @requirements.update_cloud_config(@spec)
       expect(bosh("-d #{@deployment.name} deploy #{@deployment.to_path}")).to succeed
     end
 
