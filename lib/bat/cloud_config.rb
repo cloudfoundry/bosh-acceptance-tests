@@ -8,7 +8,10 @@ require 'bosh/template/evaluation_context'
 
 module Bat
   class CloudConfig
-    def initialize(spec)
+    DEFAULT_TEMPLATES_DIR = File.expand_path("../../../templates/", __FILE__)
+
+    def initialize(env, spec)
+      @env = env
       @spec = spec
       generate_cloud_config(spec)
     end
@@ -53,7 +56,8 @@ module Bat
     end
 
     def load_template(cpi)
-      template = File.expand_path("../../../templates/cloud_config_#{cpi}.yml.erb", __FILE__)
+      template = File.join(cc_templates_dir, "cloud_config_#{cpi}.yml.erb")
+
       File.read(template)
     end
 
@@ -63,6 +67,16 @@ module Bat
 
     def to_s
       "#{name}"
+    end
+
+    def cc_templates_dir
+      if @env.cc_templates_dir &&
+         @env.cc_templates_dir != "" &&
+         Dir.exist?(@env.cc_templates_dir)
+        @env.cc_templates_dir
+      else
+        DEFAULT_TEMPLATES_DIR
+      end
     end
   end
 end
