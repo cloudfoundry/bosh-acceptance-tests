@@ -63,6 +63,16 @@ module Bat
       raise 'Need to set ssh :private_key' if options[:private_key].nil?
       ssh_options[:key_data] = [options[:private_key]]
 
+      # Offer the deployment's key and nothing else. Net::SSH otherwise adds
+      # every IdentityFile from ~/.ssh/config, which it tries before :key_data,
+      # plus every identity loaded in the ssh-agent. Enough extra identities
+      # exhaust the target sshd's MaxAuthTries and it disconnects the example
+      # with "Too many authentication failures". :keys_only alone is not
+      # enough: it filters agent identities but not the config file's.
+      ssh_options[:keys] = []
+      ssh_options[:keys_only] = true
+      ssh_options[:use_agent] = false
+
       @logger.info("--> ssh options: #{ssh_options.inspect}")
 
       if options[:gateway_host] && options[:gateway_username]
