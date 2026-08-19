@@ -55,7 +55,7 @@ vm_types:
     memory: <%= properties.vm_memory || 2048 %>
     disk: <%= properties.vm_disk || 8192 %>
 
-<% if properties.disk_types %>
+<% if properties.disk_types && !properties.disk_types.empty? %>
 disk_types:
   <% properties.disk_types.each do |disk_type| %>
 - name: <%= disk_type.name %>
