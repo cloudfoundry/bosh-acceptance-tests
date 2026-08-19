@@ -49,6 +49,20 @@ describe Bat::BoshHelper do
     end
   end
 
+  describe '#ssh' do
+    it 'offers the given private key and no other identity' do
+      captured = nil
+      allow(Net::SSH).to receive(:start) { |_host, _user, options| captured = options }
+
+      bosh_helper.ssh('10.0.0.1', 'vcap', 'echo hello', private_key: 'private')
+
+      expect(captured[:key_data]).to eq(['private'])
+      expect(captured[:keys]).to eq([])
+      expect(captured[:keys_only]).to be(true)
+      expect(captured[:use_agent]).to be(false)
+    end
+  end
+
   describe 'persistent_disk' do
     let(:job_name) { 'some-job' }
     let(:job_index) { 'some-index' }
