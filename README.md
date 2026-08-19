@@ -244,6 +244,38 @@ properties:
     gateway: 10.0.Y.1
 ```
 
+### Proxmox VE
+
+#### manual networking
+
+```yaml
+---
+cpi: pve
+properties:
+  stemcell:
+    name: bosh-proxmox-kvm-ubuntu-noble-go_agent
+    version: latest
+  instances: 1
+  vm_cores: 2 # (optional) cores for the BATs vm_type, defaults to 2
+  vm_memory: 2048 # (optional) memory in MiB for the BATs vm_type, defaults to 2048
+  vm_disk: 8192 # (optional) root disk in MiB for the BATs vm_type, defaults to 8192
+  cpi_id: pve-az1 # (optional) cpi-config entry name, required when the director has a cpi-config applied
+  second_static_ip: 10.0.1.31 # Secondary (private) IP to use for reconfiguring networks, must be in the primary network & different from static_ip
+  ssh_key_pair:
+    public_key: "public_key_string" # used when deploying VMs to allow direct ssh access
+    private_key: "private_key_string" # used to ssh into bosh deployed VMs
+  networks:
+  - name: default
+    type: manual
+    static_ip: 10.0.1.30 # Primary (private) IP assigned to the bat-release job vm, must be in the static range
+    cidr: 10.0.1.0/24
+    reserved: ['10.0.1.2 - 10.0.1.9']
+    static: ['10.0.1.30 - 10.0.1.39']
+    gateway: 10.0.1.1
+    cloud_properties:
+      bridge: vmbr0 # PVE bridge or SDN vnet the deployed VMs attach to
+      vlan: 100 # (optional) VLAN tag, 1-4094
+```
 
 ## Setup IaaS
 
@@ -275,6 +307,31 @@ Create the following flavors:
     * ephemeral disk = 0
     * root disk big enough for stemcell root partition (currently 3GB), plus at least 1GB for ephemeral & swap partitions
 
+### Proxmox VE Setup
+
+#### Networking Config
+
+The machine running BATs needs to reach TCP ports `22` and `4567` on the deployed VMs. PVE has no security group concept, so no per-VM rule is needed unless the PVE firewall is enabled, in which case allow both ports on the bridge or SDN vnet named by `cloud_properties.bridge`.
+
+The `static` range in `bat.yml` must sit inside the subnet the bridge serves, and the addresses in it must not collide with the director or anything else on that subnet. List every conflicting address in `reserved`.
+
+#### Runtime configs
+
+BATs deploys a single job and the `os` tagged specs compare monit's process list against that job's own pid, so the deployment must be free of runtime-config addons. Scope every addon on the director away from the BATs deployment, for example:
+
+```yaml
+addons:
+- name: my-addon
+  exclude:
+    deployments: [bat]
+```
+
+Without this, the pid file spec fails with `actual batlight pid (...) different from pid monitored by monit (...)` listing the addon's processes alongside batlight's.
+
+#### Multiple CPIs
+
+A director with a cpi-config applied rejects any AZ that does not name a CPI. Set `cpi_id` in `bat.yml` to the cpi-config entry BATs should deploy through; the template omits the key entirely when it is unset.
+
 ## Running BATS
 
 Some tests in BATs may not be applicable to a given IaaS and can be skipped using tags.
@@ -296,6 +353,12 @@ Execute the following inside the bosh-acceptance-tests directory:
 
 ```
 bundle exec rspec spec --tag ~vip_networking --tag ~dynamic_networking --tag ~root_partition --tag ~raw_ephemeral_storage
+```
+
+Here is the same for Proxmox VE on a lab with one IPv4 network. PVE has no floating IP concept and no raw instance storage, and its vm_types size the root disk explicitly, so those tags are skipped along with the ones the single network cannot cover:
+
+```
+bundle exec rspec spec --tag ~vip_networking --tag ~root_partition --tag ~raw_ephemeral_storage --tag ~raw_instance_storage --tag ~ipv6 --tag ~ipv6_manual_networking --tag ~ipv6_prefix_allocation --tag ~dual_stack --tag ~nic_groups --tag ~multiple_manual_networks
 ```
 
 It is also possible to only execute specific tests like this:
