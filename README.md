@@ -253,7 +253,7 @@ properties:
 cpi: pve
 properties:
   stemcell:
-    name: bosh-openstack-kvm-ubuntu-noble-go_agent # PVE runs the OpenStack KVM stemcells; see Proxmox VE Setup below
+    name: bosh-openstack-kvm-ubuntu-noble # PVE runs the OpenStack KVM stemcells; see Proxmox VE Setup below
     version: latest
   instances: 1
   vm_cores: 2 # (optional) cores for the BATs vm_type, defaults to 2
@@ -313,15 +313,17 @@ Create the following flavors:
 
 There is no Proxmox VE stemcell on bosh.io. PVE guests are QEMU/KVM, so the OpenStack KVM stemcells run as they are:
 
-```
+```bash
 bosh upload-stemcell https://bosh.io/d/stemcells/bosh-openstack-kvm-ubuntu-noble
 ```
 
-The director records that stemcell as `bosh-openstack-kvm-ubuntu-noble-go_agent`, which is the name `bat.yml` refers to. A CPI that repacks the same image as a light stemcell publishes it under its own name instead, so take the name from `bosh stemcells` rather than from the example above.
+Whatever `bosh stemcells` then lists is the name `bat.yml` must refer to. Do not assume the example above: current stemcells carry no `-go_agent` suffix, and a CPI that repacks the same image as a light stemcell publishes it under a name of its own.
 
 #### Networking Config
 
-The machine running BATs needs to reach TCP ports `22` and `4567` on the deployed VMs. PVE has no security group concept, so no per-VM rule is needed unless the PVE firewall is enabled, in which case allow both ports on the bridge or SDN vnet named by `cloud_properties.bridge`.
+The machine running BATs needs to reach TCP ports `22` and `4567` on the deployed VMs. PVE has no security group concept, so with the firewall off there is nothing to configure.
+
+With the firewall on, a bridge is not a firewall scope, so rules go on the guests. PVE filters a VM only when the datacenter master switch, the VM's own firewall option, and the firewall flag on that VM's network device are all enabled, so which of those the CPI sets decides what is left to do: where it leaves the per-device flag off, the VM is unfiltered and both ports are already reachable; where it sets the flag, add inbound TCP `22` and `4567` rules to the VM firewall or the deployed VMs are unreachable and every ssh example fails.
 
 The `static` range in `bat.yml` must sit inside the subnet the bridge serves, and the addresses in it must not collide with the director or anything else on that subnet. List every conflicting address in `reserved`.
 
@@ -367,7 +369,7 @@ bundle exec rspec spec --tag ~vip_networking --tag ~dynamic_networking --tag ~ro
 
 Here is the same for Proxmox VE on a lab with one IPv4 network. PVE has no floating IP concept and no raw instance storage, and its vm_types size the root disk explicitly, so those tags are skipped along with the ones the single network cannot cover:
 
-```
+```bash
 bundle exec rspec spec --tag ~vip_networking --tag ~root_partition --tag ~raw_ephemeral_storage --tag ~raw_instance_storage --tag ~ipv6 --tag ~ipv6_manual_networking --tag ~ipv6_prefix_allocation --tag ~dual_stack --tag ~nic_groups --tag ~multiple_manual_networks
 ```
 
