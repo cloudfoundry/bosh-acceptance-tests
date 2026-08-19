@@ -329,7 +329,7 @@ The `static` range in `bat.yml` must sit inside the subnet the bridge serves, an
 
 #### Runtime configs
 
-BATs deploys a single job and the `os` tagged specs compare monit's process list against that job's own pid, so the deployment must be free of runtime-config addons. Scope every addon on the director away from the BATs deployment, for example:
+BATs deploy a single job and the `os` tagged specs compare monit's process list against that job's own pid, so the deployment must be free of runtime-config addons. Scope every addon on the director away from the BATs deployment, for example:
 
 ```yaml
 addons:
