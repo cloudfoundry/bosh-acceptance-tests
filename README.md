@@ -253,7 +253,7 @@ properties:
 cpi: pve
 properties:
   stemcell:
-    name: bosh-proxmox-kvm-ubuntu-noble-go_agent
+    name: bosh-openstack-kvm-ubuntu-noble-go_agent # PVE runs the OpenStack KVM stemcells; see Proxmox VE Setup below
     version: latest
   instances: 1
   vm_cores: 2 # (optional) cores for the BATs vm_type, defaults to 2
@@ -308,6 +308,16 @@ Create the following flavors:
     * root disk big enough for stemcell root partition (currently 3GB), plus at least 1GB for ephemeral & swap partitions
 
 ### Proxmox VE Setup
+
+#### Stemcells
+
+There is no Proxmox VE stemcell on bosh.io. PVE guests are QEMU/KVM, so the OpenStack KVM stemcells run as they are:
+
+```
+bosh upload-stemcell https://bosh.io/d/stemcells/bosh-openstack-kvm-ubuntu-noble
+```
+
+The director records that stemcell as `bosh-openstack-kvm-ubuntu-noble-go_agent`, which is the name `bat.yml` refers to. A CPI that repacks the same image as a light stemcell publishes it under its own name instead, so take the name from `bosh stemcells` rather than from the example above.
 
 #### Networking Config
 
