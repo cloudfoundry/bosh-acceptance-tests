@@ -1,0 +1,64 @@
+<%#
+  Properties consumed from the BAT deployment spec (bat.yml):
+    networks[]              name, type, cidr, reserved[], static[], gateway,
+                            cloud_properties.bridge (required),
+                            cloud_properties.vlan (optional 1-4094 tag)
+    vm_cores / vm_memory / vm_disk
+                            sizing for the single `default` vm_type
+                            (cores, MiB, MiB; defaults 2 / 2048 / 8192)
+    cpi_id                  optional cpi-config entry name; required when the
+                            director has a cpi-config applied (multi-CPI)
+    disk_types              injected by use_multiple_persistent_disks
+%>---
+azs:
+- name: z1
+<% if_p('cpi_id') do |cpi| %>
+  cpi: <%= cpi %>
+<% end %>
+
+networks:
+<% properties.networks.each do |network| %>
+- name: <%= network.name %>
+  type: <%= network.type %>
+  subnets:
+  - range: <%= network.cidr %>
+    azs: [z1]
+    <% if network.type == 'manual' %>
+    reserved:
+      <% network.reserved.each do |range| %>
+    - <%= range %>
+      <% end %>
+    static:
+      <% network.static.each do |range| %>
+    - <%= range %>
+      <% end %>
+    gateway: <%= network.gateway %>
+    <% end %>
+    cloud_properties:
+      bridge: <%= network.cloud_properties.bridge %>
+      <% if network.cloud_properties.vlan %>
+      vlan: <%= network.cloud_properties.vlan %>
+      <% end %>
+<% end %>
+
+compilation:
+  workers: 2
+  network: <%= properties.networks.first.name %>
+  reuse_compilation_vms: true
+  vm_type: default
+  az: z1
+
+vm_types:
+- name: default
+  cloud_properties:
+    cores: <%= properties.vm_cores || 2 %>
+    memory: <%= properties.vm_memory || 2048 %>
+    disk: <%= properties.vm_disk || 8192 %>
+
+<% if properties.disk_types %>
+disk_types:
+  <% properties.disk_types.each do |disk_type| %>
+- name: <%= disk_type.name %>
+  disk_size: <%= disk_type.disk_size %>
+  <% end %>
+<% end %>
