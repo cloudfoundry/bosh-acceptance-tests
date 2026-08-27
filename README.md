@@ -260,6 +260,7 @@ properties:
   vm_memory: 2048 # (optional) memory in MiB for the BATs vm_type, defaults to 2048
   vm_disk: 8192 # (optional) root disk in MiB for the BATs vm_type, defaults to 8192
   cpi_id: pve-az1 # (optional) cpi-config entry name, required when the director has a cpi-config applied
+  target_node: pve1 # (optional) pins the BATs az to one PVE node, required when stemcell storage is node-local on a multi-node cluster
   second_static_ip: 10.0.1.31 # Secondary (private) IP to use for reconfiguring networks, must be in the primary network & different from static_ip
   ssh_key_pair:
     public_key: "public_key_string" # used when deploying VMs to allow direct ssh access
