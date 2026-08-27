@@ -8,12 +8,21 @@
                             (cores, MiB, MiB; defaults 2 / 2048 / 8192)
     cpi_id                  optional cpi-config entry name; required when the
                             director has a cpi-config applied (multi-CPI)
+    target_node             optional PVE node pin for the BATS az; required
+                            when the stemcell storage is node-local on a
+                            multi-node cluster (the stemcell cache template
+                            exists on one node and local storage cannot be
+                            cross-node cloned)
     disk_types              injected by use_multiple_persistent_disks
 %>---
 azs:
 - name: z1
 <% if_p('cpi_id') do |cpi| %>
   cpi: <%= cpi %>
+<% end %>
+<% if_p('target_node') do |node| %>
+  cloud_properties:
+    target_node: <%= node %>
 <% end %>
 
 networks:
