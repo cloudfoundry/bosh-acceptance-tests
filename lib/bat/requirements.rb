@@ -2,15 +2,15 @@ module Bat
   class Requirements
     include RSpec::Matchers
 
-    def initialize(stemcell_path, bosh_runner, spec_state, logger)
-      @stemcell_path = stemcell_path
+    def initialize(env, bosh_runner, spec_state, logger)
+      @env = env
       @bosh_runner = bosh_runner
       @spec_state = spec_state
       @logger = logger
     end
 
     def stemcell
-      @stemcell ||= Bat::Stemcell.from_path(@stemcell_path)
+      @stemcell ||= Bat::Stemcell.from_path(@env.stemcell_path)
     end
 
     def release
@@ -82,7 +82,7 @@ module Bat
     end
 
     def update_cloud_config(deployment_spec)
-      cloud_config = Bat::CloudConfig.new(deployment_spec)
+      cloud_config = Bat::CloudConfig.new(@env, deployment_spec)
 
       update_cc_output = @bosh_runner.bosh_safe("update-cloud-config #{cloud_config.to_path}")
       puts update_cc_output

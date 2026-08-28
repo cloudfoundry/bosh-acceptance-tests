@@ -31,7 +31,7 @@ logger = Logger.new(STDOUT)
 env = Bat::Env.from_env
 spec_state = Bat::SpecState.new(env.debug_mode)
 bosh_runner = Bat::BoshRunner.new(ENV['BAT_BOSH_CLI'], logger)
-requirements = Bat::Requirements.new(env.stemcell_path, bosh_runner, spec_state, logger)
+requirements = Bat::Requirements.new(env, bosh_runner, spec_state, logger)
 
 RSpec.configure do |config|
   config.include(Bat::BoshHelper)

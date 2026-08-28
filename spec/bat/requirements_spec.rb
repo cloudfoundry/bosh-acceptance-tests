@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'bat/env'
 require 'bat/requirements'
 require 'bat/bosh_runner'
 require 'bat/spec_state'
@@ -7,10 +8,13 @@ require 'fileutils'
 require 'common/exec'
 
 describe Bat::Requirements do
-  subject(:requirements) { described_class.new("/some-stemcell/path", bosh_runner, spec_state, logger) }
+  subject(:requirements) { described_class.new(bat_env, bosh_runner, spec_state, logger) }
+
   let(:bosh_runner) { Bat::BoshRunner.new("bosh", logger) }
   let(:logger) { Logger.new('/dev/null') }
   let(:spec_state) { Bat::SpecState.new(false) }
+  let(:stemcell_path) { "/some-stemcell/path" }
+  let(:bat_env) { instance_double(Bat::Env, stemcell_path: stemcell_path) }
 
   describe "#tasks_processing?" do
     let(:tasks_result) { Bosh::Exec::Result.new('bosh tasks', tasks_json, 0) }
