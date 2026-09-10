@@ -13,9 +13,9 @@ networks:
 - name: <%= network.name %>
   type: <%= network.type %>
   subnets:
-  - range: <%= network.cidr %>
-    azs: [z1]
+  - azs: [z1]
     <% if network.type == 'manual' %>
+    range: <%= network.cidr %>
     reserved:
       <% network.reserved.each do |range| %>
     - <%= range %>
@@ -53,7 +53,6 @@ disk_types:
   <% properties.disk_types.each do |disk_type| %>
 - name: <%= disk_type.name %>
   disk_size: <%= disk_type.disk_size %>
-  cloud_properties:
-    type: <%= properties.volume_type || 'gp2' %>
+  cloud_properties: <%= properties.volume_type ? "{type: #{properties.volume_type}}" : '{}' %>
   <% end %>
 <% end %>
