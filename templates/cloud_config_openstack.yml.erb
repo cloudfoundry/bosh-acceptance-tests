@@ -53,6 +53,11 @@ disk_types:
   <% properties.disk_types.each do |disk_type| %>
 - name: <%= disk_type.name %>
   disk_size: <%= disk_type.disk_size %>
-  cloud_properties: <%= properties.volume_type ? "{type: #{properties.volume_type}}" : '{}' %>
+  <% if properties.volume_type %>
+  cloud_properties:
+    type: <%= properties.volume_type %>
+  <% else %>
+  cloud_properties: {}
+  <% end %>
   <% end %>
 <% end %>
