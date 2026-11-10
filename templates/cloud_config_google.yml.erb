@@ -15,6 +15,12 @@ networks:
   - range: <%= subnet.range %>
     azs: [z1]
     static: <%= subnet.static %>
+    <% if subnet.reserved %>
+    reserved:
+    <% subnet.reserved.split(',').each do |r| %>
+    - <%= r.strip %>
+    <% end %>
+    <% end %>
     gateway: <%= subnet.gateway %>
     cloud_properties:
       network_name: <%= subnet.cloud_properties.network_name %>
