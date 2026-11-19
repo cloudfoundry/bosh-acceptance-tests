@@ -10,6 +10,7 @@ module Bat
 
     OPTIONAL_VARS = {
       debug_mode:           'BAT_DEBUG_MODE',
+      cc_templates_dir:     'BAT_CC_TEMPLATES_DIR',
     }.freeze
 
     def self.from_env

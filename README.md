@@ -30,6 +30,9 @@ export BAT_INFRASTRUCTURE=
 
 # Run tests with --fail-fast and skip cleanup in case of failure (optional)
 export BAT_DEBUG_MODE=
+
+# Provide an alternate directory where Bat::CloudConfig#load_template(cpi) should find "cloud_config_${cpi}.yml.erb" files 
+export BAT_CC_TEMPLATES_DIR=
 ```
 
 #### Environment variables for the BOSH v2 cli
