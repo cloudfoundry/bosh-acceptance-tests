@@ -17,8 +17,8 @@ networks:
     static: <%= subnet.static %>
     <% if subnet.reserved %>
     reserved:
-    <% subnet.reserved.split(',').each do |r| %>
-    - <%= r.strip %>
+    <% subnet.reserved.each do |r| %>
+    - <%= r %>
     <% end %>
     <% end %>
     gateway: <%= subnet.gateway %>
